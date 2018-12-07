@@ -113,7 +113,7 @@ export module ad {
 
         if (nativeView instanceof android.view.View) {
             windowToken = nativeView.getWindowToken()
-        } else if (androidApp.foregroundActivity instanceof android.support.v7.app.AppCompatActivity) {
+        } else if (androidApp.foregroundActivity instanceof androidx.appcompat.app.AppCompatActivity) {
             const decorView = androidApp.foregroundActivity.getWindow().getDecorView();
             windowToken = decorView ? decorView.getWindowToken() : null;
         }
@@ -177,7 +177,7 @@ export module ad {
             var result = 0;
             try {
                 if (!attr) {
-                    attr = java.lang.Class.forName("android.support.v7.appcompat.R$attr")
+                    attr = java.lang.Class.forName("androidx.appcompat.R$attr")
                 }
 
                 let colorID = 0;

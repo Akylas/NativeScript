@@ -382,7 +382,7 @@
                 setTabTextFontSize(fontSize: number): void;
                 getTabTextFontSize(): number;
 
-                setItems(items: Array<TabItemSpec>, viewPager: android.support.v4.view.ViewPager): void;
+                setItems(items: Array<TabItemSpec>, viewPager: androidx.viewpager.widget.ViewPager): void;
                 updateItemAt(position: number, itemSpec: TabItemSpec): void;
 
                 getTextViewForItemAt(index: number): android.widget.TextView;
@@ -390,7 +390,7 @@
                 getItemCount(): number;
             }
 
-            export class TabViewPager extends android.support.v4.view.ViewPager {
+            export class TabViewPager extends androidx.viewpager.widget.ViewPager {
                 constructor(context: android.content.Context);
                 constructor(context: android.content.Context, attrs: android.util.AttributeSet);
 

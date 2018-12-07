@@ -1,7 +1,7 @@
 import { AndroidFragmentCallbacks, setFragmentCallbacks, setFragmentClass } from "./frame";
 
 @JavaProxy("com.tns.FragmentClass")
-class FragmentClass extends android.support.v4.app.Fragment {
+class FragmentClass extends androidx.fragment.app.Fragment {
     // This field is updated in the frame module upon `new` (although hacky this eases the Fragment->callbacks association a lot)
     private _callbacks: AndroidFragmentCallbacks;
 

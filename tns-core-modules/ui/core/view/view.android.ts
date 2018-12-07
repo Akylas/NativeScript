@@ -46,7 +46,7 @@ interface TouchListener {
 }
 
 interface DialogFragment {
-    new(): android.support.v4.app.DialogFragment;
+    new(): androidx.fragment.app.DialogFragment;
 }
 
 function initializeTouchListener(): void {
@@ -113,7 +113,7 @@ function initializeDialogFragment() {
         }
     }
 
-    class DialogFragmentImpl extends android.support.v4.app.DialogFragment {
+    class DialogFragmentImpl extends androidx.fragment.app.DialogFragment {
         public owner: View;
         private _fullscreen: boolean;
         private _stretched: boolean;
@@ -134,7 +134,7 @@ function initializeDialogFragment() {
             this._dismissCallback = options.dismissCallback;
             this._shownCallback = options.shownCallback;
             this.owner._dialogFragment = this;
-            this.setStyle(android.support.v4.app.DialogFragment.STYLE_NO_TITLE, 0);
+            this.setStyle(androidx.fragment.app.DialogFragment.STYLE_NO_TITLE, 0);
 
             const dialog = new DialogImpl(this, this.getActivity(), this.getTheme());
 
@@ -218,14 +218,14 @@ function getModalOptions(domId: number): DialogOptions {
 export class View extends ViewCommon {
     public static androidBackPressedEvent = androidBackPressedEvent;
 
-    public _dialogFragment: android.support.v4.app.DialogFragment;
+    public _dialogFragment: androidx.fragment.app.DialogFragment;
     private _isClickable: boolean;
     private touchListenerIsSet: boolean;
     private touchListener: android.view.View.OnTouchListener;
     private layoutChangeListenerIsSet: boolean;
     private layoutChangeListener: android.view.View.OnLayoutChangeListener;
-    private _manager: android.support.v4.app.FragmentManager;
-    private _rootManager: android.support.v4.app.FragmentManager;
+    private _manager: androidx.fragment.app.FragmentManager;
+    private _rootManager: androidx.fragment.app.FragmentManager;
 
     nativeViewProtected: android.view.View;
 
@@ -257,19 +257,19 @@ export class View extends ViewCommon {
         }
     }
 
-    public _getChildFragmentManager(): android.support.v4.app.FragmentManager {
+    public _getChildFragmentManager(): androidx.fragment.app.FragmentManager {
         return null;
     }
 
-    public _getRootFragmentManager(): android.support.v4.app.FragmentManager {
+    public _getRootFragmentManager(): androidx.fragment.app.FragmentManager {
         if (!this._rootManager && this._context) {
-            this._rootManager = (<android.support.v4.app.FragmentActivity>this._context).getSupportFragmentManager();
+            this._rootManager = (<androidx.fragment.app.FragmentActivity>this._context).getSupportFragmentManager();
         }
 
         return this._rootManager;
     }
 
-    public _getFragmentManager(): android.support.v4.app.FragmentManager {
+    public _getFragmentManager(): androidx.fragment.app.FragmentManager {
         let manager = this._manager;
         if (!manager) {
             let view: View = this;

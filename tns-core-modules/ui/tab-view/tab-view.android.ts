@@ -20,7 +20,7 @@ const PRIMARY_COLOR = "colorPrimary";
 const DEFAULT_ELEVATION = 4;
 
 interface PagerAdapter {
-    new(owner: TabView): android.support.v4.view.PagerAdapter;
+    new(owner: TabView): androidx.viewpager.widget.PagerAdapter;
 }
 
 const TABID = "_tabId";
@@ -45,7 +45,7 @@ function initializeNativeClasses() {
         return;
     }
 
-    class TabFragmentImplementation extends android.support.v4.app.Fragment {
+    class TabFragmentImplementation extends androidx.fragment.app.Fragment {
         private tab: TabView;
         private index: number;
 
@@ -88,10 +88,10 @@ function initializeNativeClasses() {
     const POSITION_UNCHANGED = -1;
     const POSITION_NONE = -2;
 
-    class FragmentPagerAdapter extends android.support.v4.view.PagerAdapter {
+    class FragmentPagerAdapter extends  androidx.viewpager.widget.PagerAdapter {
         public items: Array<TabViewItemDefinition>;
-        private mCurTransaction: android.support.v4.app.FragmentTransaction;
-        private mCurrentPrimaryItem: android.support.v4.app.Fragment;
+        private mCurTransaction: androidx.fragment.app.FragmentTransaction;
+        private mCurrentPrimaryItem: androidx.fragment.app.Fragment;
 
         constructor(public owner: TabView) {
             super();
@@ -127,7 +127,7 @@ function initializeNativeClasses() {
             const itemId = this.getItemId(position);
             const name = makeFragmentName(container.getId(), itemId);
 
-            let fragment: android.support.v4.app.Fragment = fragmentManager.findFragmentByTag(name);
+            let fragment: androidx.fragment.app.Fragment = fragmentManager.findFragmentByTag(name);
             if (fragment != null) {
                 this.mCurTransaction.attach(fragment);
             } else {
@@ -159,7 +159,7 @@ function initializeNativeClasses() {
                 this.mCurTransaction = fragmentManager.beginTransaction();
             }
 
-            const fragment: android.support.v4.app.Fragment = <android.support.v4.app.Fragment>object;
+            const fragment: androidx.fragment.app.Fragment = <androidx.fragment.app.Fragment>object;
             this.mCurTransaction.detach(fragment);
 
             if (this.mCurrentPrimaryItem === fragment) {
@@ -174,7 +174,7 @@ function initializeNativeClasses() {
         }
 
         setPrimaryItem(container: android.view.ViewGroup, position: number, object: java.lang.Object): void {
-            const fragment = <android.support.v4.app.Fragment>object;
+            const fragment = <androidx.fragment.app.Fragment>object;
             if (fragment !== this.mCurrentPrimaryItem) {
                 if (this.mCurrentPrimaryItem != null) {
                     this.mCurrentPrimaryItem.setMenuVisibility(false);
@@ -204,7 +204,7 @@ function initializeNativeClasses() {
         }
 
         isViewFromObject(view: android.view.View, object: java.lang.Object): boolean {
-            return (<android.support.v4.app.Fragment>object).getView() === view;
+            return (<androidx.fragment.app.Fragment>object).getView() === view;
         }
 
         saveState(): android.os.Parcelable {
@@ -313,7 +313,7 @@ export class TabViewItem extends TabViewItemBase {
         }
     }
 
-    public _getChildFragmentManager(): android.support.v4.app.FragmentManager {
+    public _getChildFragmentManager(): androidx.fragment.app.FragmentManager {
         const tabView = this.parent as TabView;
         let tabFragment = null;
         const fragmentManager = tabView._getFragmentManager();
@@ -371,7 +371,7 @@ export class TabViewItem extends TabViewItemBase {
 }
 
 function setElevation(grid: org.nativescript.widgets.GridLayout, tabLayout: org.nativescript.widgets.TabLayout) {
-    const compat = <any>android.support.v4.view.ViewCompat;
+    const compat = <any>androidx.core.view.ViewCompat;
     if (compat.setElevation) {
         const val = DEFAULT_ELEVATION * layout.getDisplayDensity();
         compat.setElevation(grid, val);
@@ -391,8 +391,8 @@ function iterateIndexRange(index: number, eps: number, lastIndex: number, callba
 
 export class TabView extends TabViewBase {
     private _tabLayout: org.nativescript.widgets.TabLayout;
-    private _viewPager: android.support.v4.view.ViewPager;
-    private _pagerAdapter: android.support.v4.view.PagerAdapter;
+    private _viewPager: androidx.viewpager.widget.ViewPager;
+    private _pagerAdapter: androidx.viewpager.widget.PagerAdapter;
     private _androidViewId: number = -1;
 
     constructor() {
