@@ -33,7 +33,7 @@ function initializeMenuItemClickListener(): void {
         return;
     }
 
-    AppCompatTextView = (<any>android).support.v7.widget.AppCompatTextView;
+    AppCompatTextView = androidx.appcompat.widget.AppCompatTextView;
 
     @Interfaces([androidx.appcompat.widget.Toolbar.OnMenuItemClickListener])
     class MenuItemClickListenerImpl extends java.lang.Object implements androidx.appcompat.widget.Toolbar.OnMenuItemClickListener {

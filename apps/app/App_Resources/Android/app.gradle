@@ -4,7 +4,10 @@
 //dependencies {
 //	compile 'com.android.support:recyclerview-v7:+'
 //}
-
+project.ext.useAndroidX = true
+project.ext.androidXLegacy = "1.0.0"
+project.ext.androidXAppCompat = "1.1.0-alpha01"
+project.ext.androidXMaterial = "1.1.0-alpha01"
 android {  
   defaultConfig {  
     generatedDensities = []
