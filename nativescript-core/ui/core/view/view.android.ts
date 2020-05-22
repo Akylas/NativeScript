@@ -28,7 +28,6 @@ import lazy from "../../../utils/lazy";
 
 export * from "./view-common";
 
-const DOMID = "_domId";
 const androidBackPressedEvent = "androidBackPressed";
 
 const shortAnimTime = 17694720; // android.R.integer.config_shortAnimTime
@@ -38,11 +37,6 @@ const styleAnimationDialog = 16973826; // android.R.style.Animation_Dialog
 
 const sdkVersion = lazy(() => parseInt(device.sdkVersion));
 
-const modalMap = new Map<number, DialogOptions>();
-
-let TouchListener: TouchListener;
-let DialogFragment: DialogFragment;
-
 interface DialogOptions {
     owner: View;
     fullscreen: boolean;
@@ -51,225 +45,6 @@ interface DialogOptions {
     cancelable: boolean;
     shownCallback: () => void;
     dismissCallback: () => void;
-}
-
-interface TouchListener {
-    new(owner: View): android.view.View.OnTouchListener;
-}
-
-interface DialogFragment {
-    new(): androidx.fragment.app.DialogFragment;
-}
-
-function initializeTouchListener(): void {
-    if (TouchListener) {
-        return;
-    }
-
-    @Interfaces([android.view.View.OnTouchListener])
-    class TouchListenerImpl extends java.lang.Object implements android.view.View.OnTouchListener {
-        private owner: WeakRef<View>;
-        constructor(owner: View) {
-            super();
-            this.owner = new WeakRef(owner);
-
-            return global.__native(this);
-        }
-
-        onTouch(view: android.view.View, event: android.view.MotionEvent): boolean {
-            const owner = this.owner.get();
-            if (!owner) {
-                return;
-            }
-            owner.handleGestureTouch(event);
-
-            let nativeView = owner.nativeViewProtected;
-            if (!nativeView || !nativeView.onTouchEvent) {
-                return false;
-            }
-
-            return nativeView.onTouchEvent(event);
-        }
-    }
-
-    TouchListener = TouchListenerImpl;
-}
-
-function initializeDialogFragment() {
-    if (DialogFragment) {
-        return;
-    }
-
-    class DialogImpl extends android.app.Dialog {
-        constructor(public fragment: DialogFragmentImpl,
-            context: android.content.Context,
-            themeResId: number) {
-            super(context, themeResId);
-
-            return global.__native(this);
-        }
-
-        public onDetachedFromWindow(): void {
-            super.onDetachedFromWindow();
-            this.fragment = null;
-        }
-
-        public onBackPressed(): void {
-            const view = this.fragment.owner;
-            const args = <AndroidActivityBackPressedEventData>{
-                eventName: "activityBackPressed",
-                object: view,
-                activity: view._context,
-                cancel: false,
-            };
-
-            // Fist fire application.android global event
-            androidApp.notify(args);
-            if (args.cancel) {
-                return;
-            }
-
-            view.notify(args);
-
-            if (!args.cancel && !view.onBackPressed()) {
-                super.onBackPressed();
-            }
-        }
-    }
-
-    class DialogFragmentImpl extends androidx.fragment.app.DialogFragment {
-        public owner: View;
-        private _fullscreen: boolean;
-        private _animated: boolean;
-        private _stretched: boolean;
-        private _cancelable: boolean;
-        private _shownCallback: () => void;
-        private _dismissCallback: () => void;
-
-        constructor() {
-            super();
-
-            return global.__native(this);
-        }
-
-        public onCreateDialog(savedInstanceState: android.os.Bundle): android.app.Dialog {
-            const ownerId = this.getArguments().getInt(DOMID);
-            const options = getModalOptions(ownerId);
-            this.owner = options.owner;
-            // Set owner._dialogFragment to this in case the DialogFragment was recreated after app suspend
-            this.owner._dialogFragment = this;
-            this._fullscreen = options.fullscreen;
-            this._animated = options.animated;
-            this._cancelable = options.cancelable;
-            this._stretched = options.stretched;
-            this._dismissCallback = options.dismissCallback;
-            this._shownCallback = options.shownCallback;
-            this.setStyle(androidx.fragment.app.DialogFragment.STYLE_NO_TITLE, 0);
-
-            let theme = this.getTheme();
-            if (this._fullscreen) {
-                // In fullscreen mode, get the application's theme.
-                theme = this.getActivity().getApplicationInfo().theme;
-            }
-
-            const dialog = new DialogImpl(this, this.getActivity(), theme);
-
-            // do not override alignment unless fullscreen modal will be shown;
-            // otherwise we might break component-level layout:
-            // https://github.com/NativeScript/NativeScript/issues/5392
-            if (!this._fullscreen && !this._stretched) {
-                this.owner.horizontalAlignment = "center";
-                this.owner.verticalAlignment = "middle";
-            } else {
-                this.owner.horizontalAlignment = "stretch";
-                this.owner.verticalAlignment = "stretch";
-            }
-
-            // set the modal window animation
-            // https://github.com/NativeScript/NativeScript/issues/5989
-            if (this._animated) {
-                dialog
-                    .getWindow()
-                    .setWindowAnimations(
-                        styleAnimationDialog
-                    );
-            }
-
-            dialog.setCanceledOnTouchOutside(this._cancelable);
-
-            return dialog;
-        }
-
-        public onCreateView(inflater: android.view.LayoutInflater, container: android.view.ViewGroup, savedInstanceState: android.os.Bundle): android.view.View {
-            const owner = this.owner;
-            owner._setupAsRootView(this.getActivity());
-            owner._isAddedToNativeVisualTree = true;
-
-            return owner.nativeViewProtected;
-        }
-
-        public onStart(): void {
-            super.onStart();
-            if (this._fullscreen) {
-                const window = this.getDialog().getWindow();
-                const length = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-                window.setLayout(length, length);
-                // This removes the default backgroundDrawable so there are no margins.
-                window.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.WHITE));
-            }
-
-            const owner = this.owner;
-            if (owner && !owner.isLoaded) {
-                owner.callLoaded();
-            }
-
-            this._shownCallback();
-        }
-
-        public onDismiss(dialog: android.content.DialogInterface): void {
-            super.onDismiss(dialog);
-            const manager = this.getFragmentManager();
-            if (manager) {
-                removeModal(this.owner._domId);
-                this._dismissCallback();
-            }
-
-            const owner = this.owner;
-            if (owner && owner.isLoaded) {
-                owner.callUnloaded();
-            }
-        }
-
-        public onDestroy(): void {
-            super.onDestroy();
-            const owner = this.owner;
-
-            if (owner) {
-                // Android calls onDestroy before onDismiss.
-                // Make sure we unload first and then call _tearDownUI.
-                if (owner.isLoaded) {
-                    owner.callUnloaded();
-                }
-
-                owner._isAddedToNativeVisualTree = false;
-                owner._tearDownUI(true);
-            }
-        }
-    }
-
-    DialogFragment = DialogFragmentImpl;
-}
-
-function saveModal(options: DialogOptions) {
-    modalMap.set(options.owner._domId, options);
-}
-
-function removeModal(domId: number) {
-    modalMap.delete(domId);
-}
-
-function getModalOptions(domId: number): DialogOptions {
-    return modalMap.get(domId);
 }
 
 export class View extends ViewCommon {
@@ -448,8 +223,24 @@ export class View extends ViewCommon {
 
         // do not set noop listener that handles the event (disabled listener) if IsUserInteractionEnabled is
         // false as we might need the ability for the event to pass through to a parent view
-        initializeTouchListener();
-        this.touchListener = this.touchListener || new TouchListener(this);
+        // initializeTouchListener();
+        const wOwner = new WeakRef(this);
+        this.touchListener = this.touchListener || new android.view.View.OnTouchListener({
+            onTouch(view: android.view.View, event: android.view.MotionEvent): boolean {
+                const owner = wOwner.get();
+                if (!owner) {
+                    return;
+                }
+                owner.handleGestureTouch(event);
+    
+                let nativeView = owner.nativeViewProtected;
+                if (!nativeView || !nativeView.onTouchEvent) {
+                    return false;
+                }
+    
+                return nativeView.onTouchEvent(event);
+            }
+        });
         this.nativeViewProtected.setOnTouchListener(this.touchListener);
 
         this.touchListenerIsSet = true;
@@ -638,12 +429,9 @@ export class View extends ViewCommon {
     }
     protected _showNativeModalView(parent: View, options: ShowModalOptions) {
         super._showNativeModalView(parent, options);
-        initializeDialogFragment();
 
-        const df = new DialogFragment();
-        const args = new android.os.Bundle();
-        args.putInt(DOMID, this._domId);
-        df.setArguments(args);
+        const owner = this;
+        const domId = this._domId;
 
         let cancelable = true;
 
@@ -651,9 +439,6 @@ export class View extends ViewCommon {
             cancelable = !!(<any>options).android.cancelable;
             console.log("ShowModalOptions.android.cancelable is deprecated. Use ShowModalOptions.cancelable instead.");
         }
-
-        cancelable = options.cancelable !== undefined ? !!options.cancelable : cancelable;
-
         const dialogOptions: DialogOptions = {
             owner: this,
             fullscreen: !!options.fullscreen,
@@ -663,13 +448,132 @@ export class View extends ViewCommon {
             shownCallback: () => this._raiseShownModallyEvent(),
             dismissCallback: () => this.closeModal()
         };
+        const dfListener = new org.nativescript.widgets.DialogFragment.DialogFragmentListener({
+            onCreateDialog(fragment: org.nativescript.widgets.DialogFragment, savedInstanceState: android.os.Bundle): android.app.Dialog {
+                let theme = fragment.getTheme();
+                fragment.setStyle(androidx.fragment.app.DialogFragment.STYLE_NO_TITLE, 0);
 
-        saveModal(dialogOptions);
+                if (this._fullscreen) {
+                    // In fullscreen mode, get the application's theme.
+                    theme = fragment.getActivity().getApplicationInfo().theme;
+                }
 
+
+                // do not override alignment unless fullscreen modal will be shown;
+                // otherwise we might break component-level layout:
+                // https://github.com/NativeScript/NativeScript/issues/5392
+                if (!dialogOptions.fullscreen && !dialogOptions.stretched) {
+                    owner.horizontalAlignment = "center";
+                    owner.verticalAlignment = "middle";
+                } else {
+                    owner.horizontalAlignment = "stretch";
+                    owner.verticalAlignment = "stretch";
+                }
+
+
+                const dialogListener = new org.nativescript.widgets.Dialog.DialogListener({
+                    onDetachedFromWindow(dialog: org.nativescript.widgets.Dialog) {
+                        (dialog as any).nListener = null;
+                    },
+
+                    onBackPressed(dialog: org.nativescript.widgets.Dialog) {
+                        if (!owner) {
+                            return false;
+                        }
+                        const args = <AndroidActivityBackPressedEventData>{
+                            eventName: 'activityBackPressed',
+                            object: owner,
+                            activity: owner._context,
+                            cancel: false,
+                        };
+
+                        // Fist fire application.android global event
+                        androidApp.notify(args);
+                        if (args.cancel) {
+                            return true;
+                        }
+
+                        owner.notify(args);
+                        return args.cancel || owner.onBackPressed();
+                    },
+                });
+                const dialog = new org.nativescript.widgets.Dialog(fragment.getActivity(), theme);
+                dialog.setListener(dialogListener);
+                (dialog as any).nListener = dialogListener;
+                
+                // set the modal window animation
+                // https://github.com/NativeScript/NativeScript/issues/5989
+                if (dialogOptions.animated) {
+                    dialog
+                        .getWindow()
+                        .setWindowAnimations(
+                            styleAnimationDialog
+                        );
+                }
+
+                dialog.setCanceledOnTouchOutside(dialogOptions.cancelable);
+                return dialog;
+            },
+
+            onCreateView(
+                fragment: org.nativescript.widgets.DialogFragment,
+                inflater: android.view.LayoutInflater,
+                container: android.view.ViewGroup,
+                savedInstanceState: android.os.Bundle
+            ): android.view.View {
+                owner._setupAsRootView(fragment.getActivity());
+                owner._isAddedToNativeVisualTree = true;
+                return owner.nativeViewProtected;
+            },
+
+            onStart(fragment: org.nativescript.widgets.DialogFragment): void {
+                if (this._fullscreen) {
+                    const window = this.getDialog().getWindow();
+                    const length = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+                    window.setLayout(length, length);
+                    // This removes the default backgroundDrawable so there are no margins.
+                    window.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.WHITE));
+                }
+
+                
+                if (owner && !owner.isLoaded) {
+                    owner.callLoaded();
+                }
+
+                dialogOptions.shownCallback();
+            },
+
+            onDismiss(fragment: org.nativescript.widgets.DialogFragment, dialog: android.content.DialogInterface): void {
+                const manager = fragment.getFragmentManager();
+                if (manager) {
+                    // removeModal(domId);
+                    dialogOptions.dismissCallback();
+                }
+
+                if (owner && owner.isLoaded) {
+                    owner.callUnloaded();
+                }
+            },
+
+            onDestroy(fragment: org.nativescript.widgets.DialogFragment): void {
+                (df as any).nListener = null;
+                if (owner) {
+                    // Android calls onDestroy before onDismiss.
+                    // Make sure we unload first and then call _tearDownUI.
+                    if (owner.isLoaded) {
+                        owner.callUnloaded();
+                    }
+                    owner._isAddedToNativeVisualTree = false;
+                    owner._tearDownUI(true);
+                }
+            },
+        });
+        const df = new org.nativescript.widgets.DialogFragment();
+        df.setListener(dfListener);
+        (df as any).nListener = dfListener;
         this._dialogFragment = df;
         this._raiseShowingModallyEvent();
-
-        this._dialogFragment.show(parent._getRootFragmentManager(), this._domId.toString());
+        df.show((<any>parent)._getRootFragmentManager(), domId.toString());
     }
 
     protected _hideNativeModalView(parent: View, whenClosedCallback: () => void) {

@@ -52,35 +52,6 @@ interface MenuItemClickListener {
 }
 
 let appResources: android.content.res.Resources;
-let MenuItemClickListener: MenuItemClickListener;
-
-function initializeMenuItemClickListener(): void {
-    if (MenuItemClickListener) {
-        return;
-    }
-
-    apiLevel = android.os.Build.VERSION.SDK_INT;
-
-    AppCompatTextView = androidx.appcompat.widget.AppCompatTextView;
-
-    @Interfaces([androidx.appcompat.widget.Toolbar.OnMenuItemClickListener])
-    class MenuItemClickListenerImpl extends java.lang.Object implements androidx.appcompat.widget.Toolbar.OnMenuItemClickListener {
-        constructor(public owner: ActionBar) {
-            super();
-
-            return global.__native(this);
-        }
-
-        onMenuItemClick(item: android.view.MenuItem): boolean {
-            let itemId = item.getItemId();
-
-            return this.owner._onAndroidItemSelected(itemId);
-        }
-    }
-
-    MenuItemClickListener = MenuItemClickListenerImpl;
-    appResources = application.android.context.getResources();
-}
 
 let apiLevel: number;
 
@@ -173,8 +144,19 @@ export class ActionBar extends ActionBarBase {
     public initNativeView(): void {
         super.initNativeView();
         const nativeView = this.nativeViewProtected;
-        initializeMenuItemClickListener();
-        const menuItemClickListener = new MenuItemClickListener(this);
+        if (!apiLevel) {
+            apiLevel = android.os.Build.VERSION.SDK_INT;
+        }
+        if (!appResources) {
+            appResources = application.android.context.getResources();
+        }
+        const owner = this;
+        const menuItemClickListener = new androidx.appcompat.widget.Toolbar.OnMenuItemClickListener({
+            onMenuItemClick(item: android.view.MenuItem): boolean {
+                let itemId = item.getItemId();
+                return owner._onAndroidItemSelected(itemId);
+            }
+        });
         nativeView.setOnMenuItemClickListener(menuItemClickListener);
         (<any>nativeView).menuItemClickListener = menuItemClickListener;
     }
@@ -455,6 +437,9 @@ export class ActionBar extends ActionBarBase {
 }
 
 function getAppCompatTextView(toolbar: androidx.appcompat.widget.Toolbar): typeof AppCompatTextView {
+    if (!AppCompatTextView) {
+        AppCompatTextView = androidx.appcompat.widget.AppCompatTextView
+    }
     for (let i = 0, count = toolbar.getChildCount(); i < count; i++) {
         const child = toolbar.getChildAt(i);
         if (child instanceof AppCompatTextView) {

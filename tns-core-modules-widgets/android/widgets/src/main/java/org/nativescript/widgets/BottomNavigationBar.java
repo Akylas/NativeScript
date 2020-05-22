@@ -47,6 +47,18 @@ public class BottomNavigationBar extends LinearLayout {
 
     }
 
+    public interface Listener {
+        public void onSelectedPositionChange(int position, int prevPosition);
+        public boolean onTap(int position);
+    }
+
+    Listener listener;
+
+
+    public void setListener(Listener listener) {
+        this.listener = listener;
+    }
+
     private static final int BOTTOM_NAV_HEIGHT = 56;
     private static final int ITEM_TEXT_SIZE_SP = 12;
     private static final int ITEM_TEXT_MAX_WIDTH = 144;
@@ -234,11 +246,17 @@ public class BottomNavigationBar extends LinearLayout {
 
     public boolean onTap(int position) {
         // to be overridden in JS
+        if (this.listener != null) {
+            this.listener.onTap(position);
+        }
         return true;
     }
 
     public void onSelectedPositionChange(int position, int prevPosition) {
         // to be overridden in JS
+        if (this.listener != null) {
+            this.listener.onSelectedPositionChange(position, prevPosition);
+        }
     }
 
     private void setImageHeights(){

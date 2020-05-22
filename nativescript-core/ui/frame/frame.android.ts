@@ -40,7 +40,6 @@ const FRAMEID = "_frameId";
 const CALLBACKS = "_callbacks";
 const HMR_REPLACE_TRANSITION = "fade";
 
-const ownerSymbol = Symbol("_owner");
 const activityRootViewsMap = new Map<number, WeakRef<View>>();
 
 let navDepth = -1;
@@ -52,39 +51,6 @@ if (global && global.__inspector) {
     const devtools = require("../../debugger/devtools-elements");
     devtools.attachDOMInspectorEventCallbacks(global.__inspector);
     devtools.attachDOMInspectorCommandCallbacks(global.__inspector);
-}
-
-export let attachStateChangeListener: android.view.View.OnAttachStateChangeListener;
-
-function getAttachListener(): android.view.View.OnAttachStateChangeListener {
-    if (!attachStateChangeListener) {
-        @Interfaces([android.view.View.OnAttachStateChangeListener])
-        class AttachListener extends java.lang.Object implements android.view.View.OnAttachStateChangeListener {
-            constructor() {
-                super();
-
-                return global.__native(this);
-            }
-
-            onViewAttachedToWindow(view: android.view.View): void {
-                const owner: View = view[ownerSymbol];
-                if (owner) {
-                    owner._onAttachedToWindow();
-                }
-            }
-
-            onViewDetachedFromWindow(view: android.view.View): void {
-                const owner: View = view[ownerSymbol];
-                if (owner) {
-                    owner._onDetachedFromWindow();
-                }
-            }
-        }
-
-        attachStateChangeListener = new AttachListener();
-    }
-
-    return attachStateChangeListener;
 }
 
 export class Frame extends FrameBase {
@@ -281,13 +247,66 @@ export class Frame extends FrameBase {
 
     private createFragment(backstackEntry: BackstackEntry, fragmentTag: string): androidx.fragment.app.Fragment {
         ensureFragmentClass();
-        const newFragment = new fragmentClass();
+        const callbacks = new FragmentCallbacksImplementation();
+        const newFragment = new org.nativescript.widgets.Fragment();
+        const inter = new org.nativescript.widgets.Fragment.Interface({
+            onHiddenChanged(hidden: boolean): void {
+                callbacks.onHiddenChanged(newFragment, hidden);
+            },
+        
+             onCreateAnimator(transit: number, enter: boolean, nextAnim: number): android.animation.Animator {
+                return callbacks.onCreateAnimator(newFragment, transit, enter, nextAnim);
+            },
+        
+             onStop(): void {
+                callbacks.onStop(newFragment);
+            },
+        
+             onPause(): void {
+                callbacks.onPause(newFragment);
+            },
+        
+             onCreate(savedInstanceState: android.os.Bundle) {
+                // if (!this._callbacks) {
+                //     setFragmentCallbacks(this);
+                // }
+        
+                this.setHasOptionsMenu(true);
+                callbacks.onCreate(this, savedInstanceState);
+            },
+        
+             onCreateView(inflater: android.view.LayoutInflater, container: android.view.ViewGroup, savedInstanceState: android.os.Bundle) {
+                let result = callbacks.onCreateView(this, inflater, container, savedInstanceState);
+        
+                return result;
+            },
+        
+             onSaveInstanceState(outState: android.os.Bundle) {
+                callbacks.onSaveInstanceState(newFragment, outState);
+            },
+        
+             onDestroyView() {
+                callbacks.onDestroyView(newFragment);
+            },
+        
+            onDestroy () {
+                callbacks.onDestroy(newFragment);
+            },
+        
+            toString(): string {
+                const callbacks = this._callbacks;
+                if (callbacks) {
+                    return callbacks.toStringOverride(this);
+                } else {
+                    return null;
+                }
+            }
+        });
+        newFragment.setInterface(inter);
         const args = new android.os.Bundle();
         args.putInt(FRAMEID, this._android.frameId);
         newFragment.setArguments(args);
-        setFragmentCallbacks(newFragment);
 
-        const callbacks = newFragment[CALLBACKS];
         callbacks.frame = this;
         callbacks.entry = backstackEntry;
 
@@ -494,9 +513,12 @@ export class Frame extends FrameBase {
 
     public initNativeView(): void {
         super.initNativeView();
-        const listener = getAttachListener();
-        this.nativeViewProtected.addOnAttachStateChangeListener(listener);
-        this.nativeViewProtected[ownerSymbol] = this;
+        const attachStateChangeListener = new android.view.View.OnAttachStateChangeListener({
+            onViewAttachedToWindow: this._onAttachedToWindow.bind(this),
+            onViewDetachedFromWindow: this._onDetachedFromWindow.bind(this)
+        })
+        this.nativeViewProtected.addOnAttachStateChangeListener(attachStateChangeListener);
+        this.nativeViewProtected.attachStateChangeListener = attachStateChangeListener;
         this._android.rootViewGroup = this.nativeViewProtected;
         if (this._containerViewId < 0) {
             this._containerViewId = android.view.View.generateViewId();
@@ -505,9 +527,9 @@ export class Frame extends FrameBase {
     }
 
     public disposeNativeView() {
-        const listener = getAttachListener();
-        this.nativeViewProtected.removeOnAttachStateChangeListener(listener);
-        this.nativeViewProtected[ownerSymbol] = null;
+        const attachStateChangeListener = this.nativeViewProtected.attachStateChangeListener;
+        this.nativeViewProtected.removeOnAttachStateChangeListener(attachStateChangeListener);
+        this.nativeViewProtected.attachStateChangeListener = null;
         this._tearDownPending = !!this._executingContext;
         const current = this._currentEntry;
         const executingEntry = this._executingContext ? this._executingContext.entry : null;
@@ -828,15 +850,14 @@ class FragmentCallbacksImplementation implements AndroidFragmentCallbacks {
     private backgroundBitmap: android.graphics.Bitmap = null;
 
     @profile
-    public onHiddenChanged(fragment: androidx.fragment.app.Fragment, hidden: boolean, superFunc: Function): void {
+    public onHiddenChanged(fragment: androidx.fragment.app.Fragment, hidden: boolean): void {
         if (traceEnabled()) {
             traceWrite(`${fragment}.onHiddenChanged(${hidden})`, traceCategories.NativeLifecycle);
         }
-        superFunc.call(fragment, hidden);
     }
 
     @profile
-    public onCreateAnimator(fragment: androidx.fragment.app.Fragment, transit: number, enter: boolean, nextAnim: number, superFunc: Function): android.animation.Animator {
+    public onCreateAnimator(fragment: androidx.fragment.app.Fragment, transit: number, enter: boolean, nextAnim: number): android.animation.Animator {
         let animator = null;
         const entry = <any>this.entry;
 
@@ -846,16 +867,15 @@ class FragmentCallbacksImplementation implements AndroidFragmentCallbacks {
             entry.isNestedDefaultTransition = false;
         }
 
-        return animator || superFunc.call(fragment, transit, enter, nextAnim);
+        return animator ;
     }
 
     @profile
-    public onCreate(fragment: androidx.fragment.app.Fragment, savedInstanceState: android.os.Bundle, superFunc: Function): void {
+    public onCreate(fragment: androidx.fragment.app.Fragment, savedInstanceState: android.os.Bundle): void {
         if (traceEnabled()) {
             traceWrite(`${fragment}.onCreate(${savedInstanceState})`, traceCategories.NativeLifecycle);
         }
 
-        superFunc.call(fragment, savedInstanceState);
         // There is no entry set to the fragment, so this must be destroyed fragment that was recreated by Android.
         // We should find its corresponding page in our backstack and set it manually.
         if (!this.entry) {
@@ -871,7 +891,7 @@ class FragmentCallbacksImplementation implements AndroidFragmentCallbacks {
     }
 
     @profile
-    public onCreateView(fragment: androidx.fragment.app.Fragment, inflater: android.view.LayoutInflater, container: android.view.ViewGroup, savedInstanceState: android.os.Bundle, superFunc: Function): android.view.View {
+    public onCreateView(fragment: androidx.fragment.app.Fragment, inflater: android.view.LayoutInflater, container: android.view.ViewGroup, savedInstanceState: android.os.Bundle): android.view.View {
         if (traceEnabled()) {
             traceWrite(`${fragment}.onCreateView(inflater, container, ${savedInstanceState})`, traceCategories.NativeLifecycle);
         }
@@ -945,15 +965,14 @@ class FragmentCallbacksImplementation implements AndroidFragmentCallbacks {
     }
 
     @profile
-    public onSaveInstanceState(fragment: androidx.fragment.app.Fragment, outState: android.os.Bundle, superFunc: Function): void {
+    public onSaveInstanceState(fragment: androidx.fragment.app.Fragment, outState: android.os.Bundle): void {
         if (traceEnabled()) {
             traceWrite(`${fragment}.onSaveInstanceState(${outState})`, traceCategories.NativeLifecycle);
         }
-        superFunc.call(fragment, outState);
     }
 
     @profile
-    public onDestroyView(fragment: org.nativescript.widgets.FragmentBase, superFunc: Function): void {
+    public onDestroyView(fragment: org.nativescript.widgets.FragmentBase): void {
         try {
             if (traceEnabled()) {
                 traceWrite(`${fragment}.onDestroyView()`, traceCategories.NativeLifecycle);
@@ -968,17 +987,14 @@ class FragmentCallbacksImplementation implements AndroidFragmentCallbacks {
                 this.backgroundBitmap = null;
             }
         } finally {
-            superFunc.call(fragment);
         }
     }
 
     @profile
-    public onDestroy(fragment: androidx.fragment.app.Fragment, superFunc: Function): void {
+    public onDestroy(fragment: androidx.fragment.app.Fragment): void {
         if (traceEnabled()) {
             traceWrite(`${fragment}.onDestroy()`, traceCategories.NativeLifecycle);
         }
-
-        superFunc.call(fragment);
 
         const entry = this.entry;
         if (!entry) {
@@ -1002,7 +1018,7 @@ class FragmentCallbacksImplementation implements AndroidFragmentCallbacks {
     }
 
     @profile
-    public onPause(fragment: org.nativescript.widgets.FragmentBase, superFunc: Function): void {
+    public onPause(fragment: org.nativescript.widgets.FragmentBase): void {
         try {
             // Get view as bitmap and set it as background. This is workaround for the disapearing nested fragments.
             // TODO: Consider removing it when update to androidx.fragment:1.2.0
@@ -1012,22 +1028,21 @@ class FragmentCallbacksImplementation implements AndroidFragmentCallbacks {
                 this.backgroundBitmap = this.loadBitmapFromView(this.frame.nativeViewProtected);
             }
         } finally {
-            superFunc.call(fragment);
+
         }
     }
 
     @profile
-    public onStop(fragment: androidx.fragment.app.Fragment, superFunc: Function): void {
-        superFunc.call(fragment);
+    public onStop(fragment: androidx.fragment.app.Fragment): void {
     }
 
     @profile
-    public toStringOverride(fragment: androidx.fragment.app.Fragment, superFunc: Function): string {
+    public toStringOverride(fragment: androidx.fragment.app.Fragment): string {
         const entry = this.entry;
         if (entry) {
             return `${entry.fragmentTag}<${entry.resolvedPage}>`;
         } else {
-            return "NO ENTRY, " + superFunc.call(fragment);
+            return null;
         }
     }
 

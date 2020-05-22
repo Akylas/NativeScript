@@ -32,6 +32,14 @@ def computeAndroidXVersion() {
         return "1.0.0"
     }
 }
+def computeAndroidXAppCompatVersion() {
+    if(project.hasProperty("androidXAppCompatVersion")) {
+        return androidXAppCompatVersion
+    }
+    else {
+        return "1.1.0"
+    }
+}
 
 def computeSupportVersion() {
     if(project.hasProperty("supportVersion")) {
@@ -75,8 +83,10 @@ dependencies {
     if(project.hasProperty("useAndroidX")) {
         println 'Using android X'
         def androidxVersion = computeAndroidXVersion()
+        def androidXAppCompatVersion = computeAndroidXAppCompatVersion()
         implementation 'androidx.viewpager:viewpager:' + androidxVersion
         implementation 'androidx.fragment:fragment:' + androidxVersion
+        implementation 'androidx.appcompat:appcompat:' + androidXAppCompatVersion
         implementation 'androidx.transition:transition:' + androidxVersion
     } else {
         println 'Using support library'

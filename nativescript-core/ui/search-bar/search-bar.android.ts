@@ -11,77 +11,6 @@ export * from "./search-bar-common";
 const SEARCHTEXT = Symbol("searchText");
 const QUERY = Symbol("query");
 
-interface QueryTextListener {
-    new(owner: SearchBar): androidx.appcompat.widget.SearchView.OnQueryTextListener;
-}
-
-interface CloseListener {
-    new(owner: SearchBar): androidx.appcompat.widget.SearchView.OnCloseListener;
-}
-
-let QueryTextListener: QueryTextListener;
-let CloseListener: CloseListener;
-
-function initializeNativeClasses(): void {
-    if (QueryTextListener) {
-        return;
-    }
-
-    @Interfaces([androidx.appcompat.widget.SearchView.OnQueryTextListener])
-    class CompatQueryTextListenerImpl extends java.lang.Object implements androidx.appcompat.widget.SearchView.OnQueryTextListener {
-        constructor(private owner: SearchBar) {
-            super();
-
-            return global.__native(this);
-        }
-
-        onQueryTextChange(newText: string): boolean {
-            const owner = this.owner;
-            textProperty.nativeValueChange(owner, newText);
-
-            // This code is needed since sometimes OnCloseListener is not called!
-            if (newText === "" && this[SEARCHTEXT] !== newText) {
-                owner._emit(SearchBarBase.clearEvent);
-            }
-
-            this[SEARCHTEXT] = newText;
-            this[QUERY] = undefined;
-
-            return true;
-        }
-
-        onQueryTextSubmit(query: string): boolean {
-            const owner = this.owner;
-            // This code is needed since onQueryTextSubmit is called twice with same query!
-            if (query !== "" && this[QUERY] !== query) {
-                owner._emit(SearchBarBase.submitEvent);
-            }
-
-            this[QUERY] = query;
-
-            return true;
-        }
-    }
-
-    @Interfaces([androidx.appcompat.widget.SearchView.OnCloseListener])
-    class CompatCloseListenerImpl extends java.lang.Object implements androidx.appcompat.widget.SearchView.OnCloseListener {
-        constructor(private owner: SearchBar) {
-            super();
-
-            return global.__native(this);
-        }
-
-        onClose(): boolean {
-            this.owner._emit(SearchBarBase.clearEvent);
-
-            return true;
-        }
-    }
-
-    QueryTextListener = CompatQueryTextListenerImpl;
-    CloseListener = CompatCloseListenerImpl;
-}
-
 function enableSearchView(nativeView: any, value: boolean) {
     nativeView.setEnabled(value);
 
@@ -137,12 +66,16 @@ export class SearchBar extends SearchBarBase {
     public initNativeView(): void {
         super.initNativeView();
         const nativeView = this.nativeViewProtected;
-        initializeNativeClasses();
-        const queryTextListener = new QueryTextListener(this);
+        const queryTextListener = new androidx.appcompat.widget.SearchView.OnQueryTextListener({
+            onQueryTextChange: this.onQueryTextChange.bind(this),
+            onQueryTextSubmit: this.onQueryTextSubmit.bind(this)
+        });
         nativeView.setOnQueryTextListener(queryTextListener);
         (<any>nativeView).queryTextListener = queryTextListener;
 
-        const closeListener = new CloseListener(this);
+        const closeListener = new androidx.appcompat.widget.SearchView.OnCloseListener({
+            onClose: this.onClose.bind(this)
+        });
         nativeView.setOnCloseListener(closeListener);
         (<any>nativeView).closeListener = closeListener;
     }
@@ -155,7 +88,35 @@ export class SearchBar extends SearchBarBase {
         this._searchTextView = null;
         super.disposeNativeView();
     }
+    protected onQueryTextChange(newText: string): boolean {
+        textProperty.nativeValueChange(this, newText);
 
+        // This code is needed since sometimes OnCloseListener is not called!
+        if (newText === "" && this[SEARCHTEXT] !== newText) {
+            this._emit(SearchBarBase.clearEvent);
+        }
+
+        this[SEARCHTEXT] = newText;
+        this[QUERY] = undefined;
+
+        return true;
+    }
+
+    protected onQueryTextSubmit(query: string): boolean {
+        // This code is needed since onQueryTextSubmit is called twice with same query!
+        if (query !== "" && this[QUERY] !== query) {
+            this._emit(SearchBarBase.submitEvent);
+        }
+
+        this[QUERY] = query;
+
+        return true;
+    }
+    protected onClose(): boolean {
+        this._emit(SearchBarBase.clearEvent);
+
+        return true;
+    }
     [isEnabledProperty.setNative](value: boolean) {
         enableSearchView(this.nativeViewProtected, value);
     }

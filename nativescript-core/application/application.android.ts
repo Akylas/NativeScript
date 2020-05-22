@@ -122,10 +122,11 @@ export class AndroidApplication extends Observable implements AndroidApplication
     }
 
     public registerBroadcastReceiver(intentFilter: string, onReceiveCallback: (context: android.content.Context, intent: android.content.Intent) => void) {
-        ensureBroadCastReceiverClass();
         const that = this;
         const registerFunc = function (context: android.content.Context) {
-            const receiver: android.content.BroadcastReceiver = new BroadcastReceiverClass(onReceiveCallback);
+            const receiver = new org.nativescript.widgets.BroadcastReceiver(new org.nativescript.widgets.BroadcastReceiver.BroadcastReceiverListener({
+                onReceive:onReceiveCallback
+            }));
             context.registerReceiver(receiver, new android.content.IntentFilter(intentFilter));
             that._registeredReceivers[intentFilter] = receiver;
         };
@@ -439,32 +440,6 @@ function initComponentCallbacks() {
     });
 
     return componentCallbacks;
-}
-
-let BroadcastReceiverClass;
-function ensureBroadCastReceiverClass() {
-    if (BroadcastReceiverClass) {
-        return;
-    }
-
-    class BroadcastReceiver extends android.content.BroadcastReceiver {
-        private _onReceiveCallback: (context: android.content.Context, intent: android.content.Intent) => void;
-
-        constructor(onReceiveCallback: (context: android.content.Context, intent: android.content.Intent) => void) {
-            super();
-            this._onReceiveCallback = onReceiveCallback;
-
-            return global.__native(this);
-        }
-
-        public onReceive(context: android.content.Context, intent: android.content.Intent) {
-            if (this._onReceiveCallback) {
-                this._onReceiveCallback(context, intent);
-            }
-        }
-    }
-
-    BroadcastReceiverClass = BroadcastReceiver;
 }
 
 declare namespace com {

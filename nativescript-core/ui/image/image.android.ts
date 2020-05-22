@@ -12,35 +12,6 @@ const ASYNC = "async";
 
 let AndroidImageView: typeof org.nativescript.widgets.ImageView;
 
-interface ImageLoadedListener {
-    new(owner: Image): org.nativescript.widgets.image.Worker.OnImageLoadedListener;
-}
-
-let ImageLoadedListener: ImageLoadedListener;
-function initializeImageLoadedListener() {
-    if (ImageLoadedListener) {
-        return;
-    }
-
-    @Interfaces([org.nativescript.widgets.image.Worker.OnImageLoadedListener])
-    class ImageLoadedListenerImpl extends java.lang.Object implements org.nativescript.widgets.image.Worker.OnImageLoadedListener {
-        constructor(public owner: Image) {
-            super();
-
-            return global.__native(this);
-        }
-
-        onImageLoaded(success: boolean): void {
-            const owner = this.owner;
-            if (owner) {
-                owner.isLoading = false;
-            }
-        }
-    }
-
-    ImageLoadedListener = ImageLoadedListenerImpl;
-}
-
 export class Image extends ImageBase {
     nativeViewProtected: org.nativescript.widgets.ImageView;
 
@@ -56,9 +27,10 @@ export class Image extends ImageBase {
 
     public initNativeView(): void {
         super.initNativeView();
-        initializeImageLoadedListener();
         const nativeView = this.nativeViewProtected;
-        const listener = new ImageLoadedListener(this);
+        const listener = new org.nativescript.widgets.image.Worker.OnImageLoadedListener({
+            onImageLoaded: this.onImageLoaded.bind(this)
+        });
         nativeView.setImageLoadedListener(listener);
         (<any>nativeView).listener = listener;
     }
@@ -71,6 +43,10 @@ export class Image extends ImageBase {
     public resetNativeView(): void {
         super.resetNativeView();
         this.nativeViewProtected.setImageMatrix(new android.graphics.Matrix());
+    }
+
+    protected onImageLoaded(success: boolean): void {
+        this.isLoading = false;
     }
 
     public _createImageSourceFromSrc(value: string | ImageSource | ImageAsset) {

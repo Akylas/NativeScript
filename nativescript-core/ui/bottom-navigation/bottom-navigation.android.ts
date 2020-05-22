@@ -27,13 +27,6 @@ export * from "../tab-navigation-base/tab-strip-item";
 const PRIMARY_COLOR = "colorPrimary";
 const DEFAULT_ELEVATION = 8;
 
-const TABID = "_tabId";
-const INDEX = "_index";
-const ownerSymbol = Symbol("_owner");
-
-let TabFragment: any;
-let BottomNavigationBar: any;
-let AttachStateChangeListener: any;
 let appResources: android.content.res.Resources;
 
 class IconInfo {
@@ -45,189 +38,6 @@ function makeFragmentName(viewId: number, id: number): string {
     return "android:bottomnavigation:" + viewId + ":" + id;
 }
 
-function getTabById(id: number): BottomNavigation {
-    const ref = tabs.find(ref => {
-        const tab = ref.get();
-
-        return tab && tab._domId === id;
-    });
-
-    return ref && ref.get();
-}
-
-function initializeNativeClasses() {
-    if (BottomNavigationBar) {
-        return;
-    }
-
-    class TabFragmentImplementation extends org.nativescript.widgets.FragmentBase {
-        private owner: BottomNavigation;
-        private index: number;
-        private backgroundBitmap: android.graphics.Bitmap = null;
-
-        constructor() {
-            super();
-
-            return global.__native(this);
-        }
-
-        static newInstance(tabId: number, index: number): TabFragmentImplementation {
-            const args = new android.os.Bundle();
-            args.putInt(TABID, tabId);
-            args.putInt(INDEX, index);
-            const fragment = new TabFragmentImplementation();
-            fragment.setArguments(args);
-
-            return fragment;
-        }
-
-        public onCreate(savedInstanceState: android.os.Bundle): void {
-            super.onCreate(savedInstanceState);
-            const args = this.getArguments();
-            this.owner = getTabById(args.getInt(TABID));
-            this.index = args.getInt(INDEX);
-            if (!this.owner) {
-                throw new Error(`Cannot find BottomNavigation`);
-            }
-        }
-
-        public onCreateView(inflater: android.view.LayoutInflater, container: android.view.ViewGroup, savedInstanceState: android.os.Bundle): android.view.View {
-            const tabItem = this.owner.items[this.index];
-
-            return tabItem.nativeViewProtected;
-        }
-
-        public onDestroyView() {
-            const hasRemovingParent = this.getRemovingParentFragment();
-
-            // Get view as bitmap and set it as background. This is workaround for the disapearing nested fragments.
-            // TODO: Consider removing it when update to androidx.fragment:1.2.0
-            if (hasRemovingParent && this.owner.selectedIndex === this.index) {
-                const bitmapDrawable = new android.graphics.drawable.BitmapDrawable(appResources, this.backgroundBitmap);
-                this.owner._originalBackground = this.owner.backgroundColor || new Color("White");
-                this.owner.nativeViewProtected.setBackgroundDrawable(bitmapDrawable);
-                this.backgroundBitmap = null;
-
-                let thisView = this.getView();
-                if (thisView) {
-                    let thisViewParent = thisView.getParent();
-                    if (thisViewParent && thisViewParent instanceof android.view.ViewGroup) {
-                        thisViewParent.removeView(thisView);
-                    }
-                }
-            }
-
-            super.onDestroyView();
-        }
-
-        public onPause(): void {
-            const hasRemovingParent = this.getRemovingParentFragment();
-
-            // Get view as bitmap and set it as background. This is workaround for the disapearing nested fragments.
-            // TODO: Consider removing it when update to androidx.fragment:1.2.0
-            if (hasRemovingParent && this.owner.selectedIndex === this.index) {
-                this.backgroundBitmap = this.loadBitmapFromView(this.owner.nativeViewProtected);
-            }
-
-            super.onPause();
-        }
-
-        private loadBitmapFromView(view: android.view.View): android.graphics.Bitmap {
-            // Another way to get view bitmap. Test performance vs setDrawingCacheEnabled
-            // const width = view.getWidth();
-            // const height = view.getHeight();
-            // const bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888);
-            // const canvas = new android.graphics.Canvas(bitmap);
-            // view.layout(0, 0, width, height);
-            // view.draw(canvas);
-
-            view.setDrawingCacheEnabled(true);
-            const bitmap = android.graphics.Bitmap.createBitmap(view.getDrawingCache());
-            view.setDrawingCacheEnabled(false);
-
-            return bitmap;
-        }
-    }
-
-    class BottomNavigationBarImplementation extends org.nativescript.widgets.BottomNavigationBar {
-
-        constructor(context: android.content.Context, public owner: BottomNavigation) {
-            super(context);
-
-            return global.__native(this);
-        }
-
-        public onSelectedPositionChange(position: number, prevPosition: number): void {
-            const owner = this.owner;
-            if (!owner) {
-                return;
-            }
-
-            owner.changeTab(position);
-
-            const tabStripItems = owner.tabStrip && owner.tabStrip.items;
-
-            if (position >= 0 && tabStripItems && tabStripItems[position]) {
-                tabStripItems[position]._emit(TabStripItem.selectEvent);
-            }
-
-            if (prevPosition >= 0 && tabStripItems && tabStripItems[prevPosition]) {
-                tabStripItems[prevPosition]._emit(TabStripItem.unselectEvent);
-            }
-
-            owner._setItemsColors(owner.tabStrip.items);
-        }
-
-        public onTap(position: number): boolean {
-            const owner = this.owner;
-            if (!owner) {
-                return false;
-            }
-
-            const tabStrip = owner.tabStrip;
-            const tabStripItems = tabStrip && tabStrip.items;
-
-            if (position >= 0 && tabStripItems[position]) {
-                tabStripItems[position]._emit(TabStripItem.tapEvent);
-                tabStrip.notify({ eventName: TabStrip.itemTapEvent, object: tabStrip, index: position });
-            }
-
-            if (!owner.items[position]) {
-                return false;
-            }
-
-            return true;
-        }
-    }
-
-    @Interfaces([android.view.View.OnAttachStateChangeListener])
-    class AttachListener extends java.lang.Object implements android.view.View.OnAttachStateChangeListener {
-        constructor() {
-            super();
-
-            return global.__native(this);
-        }
-
-        onViewAttachedToWindow(view: android.view.View): void {
-            const owner: View = view[ownerSymbol];
-            if (owner) {
-                owner._onAttachedToWindow();
-            }
-        }
-
-        onViewDetachedFromWindow(view: android.view.View): void {
-            const owner: View = view[ownerSymbol];
-            if (owner) {
-                owner._onDetachedFromWindow();
-            }
-        }
-    }
-
-    TabFragment = TabFragmentImplementation;
-    BottomNavigationBar = BottomNavigationBarImplementation;
-    AttachStateChangeListener = new AttachListener();
-    appResources = application.android.context.getResources();
-}
 
 function setElevation(bottomNavigationBar: org.nativescript.widgets.BottomNavigationBar) {
     const compat = <any>androidx.core.view.ViewCompat;
@@ -282,7 +92,6 @@ export class BottomNavigation extends TabNavigationBase {
     }
 
     public createNativeView() {
-        initializeNativeClasses();
         // if (traceEnabled()) {
         //     traceWrite("BottomNavigation._createUI(" + this + ");", traceCategory);
         // }
@@ -302,7 +111,9 @@ export class BottomNavigation extends TabNavigationBase {
         (<any>nativeView).contentView = contentView;
 
         // TABSTRIP
-        const bottomNavigationBar = new BottomNavigationBar(context, this);
+
+        const bottomNavigationBar = new org.nativescript.widgets.BottomNavigationBar(context);
+        
         const bottomNavigationBarLayoutParams = new org.nativescript.widgets.CommonLayoutParams();
         bottomNavigationBarLayoutParams.row = 1;
         bottomNavigationBar.setLayoutParams(bottomNavigationBarLayoutParams);
@@ -328,8 +139,20 @@ export class BottomNavigation extends TabNavigationBase {
 
         const nativeView: any = this.nativeViewProtected;
 
-        nativeView.addOnAttachStateChangeListener(AttachStateChangeListener);
-        nativeView[ownerSymbol] = this;
+        const listener = new org.nativescript.widgets.BottomNavigationBar.Listener({
+            onSelectedPositionChange:this.onSelectedPositionChange.bind(this),
+            onTap:this.onBottomNavigationBarTap.bind(this),
+        });
+        this._bottomNavigationBar.setListener(listener)
+        (this._bottomNavigationBar as any).listener = listener;
+
+        const attachStateChangeListener = new android.view.View.OnAttachStateChangeListener({
+            onViewAttachedToWindow: this._onAttachedToWindow.bind(this),
+            onViewDetachedFromWindow: this._onDetachedFromWindow.bind(this)
+        })
+
+        nativeView.addOnAttachStateChangeListener(attachStateChangeListener);
+        nativeView.attachStateChangeListener = attachStateChangeListener;
 
         this._contentView = (<any>nativeView).contentView;
         this._contentView.setId(this._contentViewId);
@@ -433,11 +256,12 @@ export class BottomNavigation extends TabNavigationBase {
     }
 
     public disposeNativeView() {
+        (this._bottomNavigationBar as any).listener = null;
         this._bottomNavigationBar.setItems(null);
         this._bottomNavigationBar = null;
-
-        this.nativeViewProtected.removeOnAttachStateChangeListener(AttachStateChangeListener);
-        this.nativeViewProtected[ownerSymbol] = null;
+        const nativeView = this.nativeViewProtected;
+        nativeView.removeOnAttachStateChangeListener(nativeView.attachStateChangeListener);
+        nativeView.attachStateChangeListener = null;
 
         super.disposeNativeView();
     }
@@ -460,6 +284,41 @@ export class BottomNavigation extends TabNavigationBase {
         }
 
         transaction.commitNowAllowingStateLoss();
+    }
+
+    public onSelectedPositionChange(position: number, prevPosition: number): void {
+
+        this.changeTab(position);
+
+        const tabStripItems = this.tabStrip && this.tabStrip.items;
+
+        if (position >= 0 && tabStripItems && tabStripItems[position]) {
+            tabStripItems[position]._emit(TabStripItem.selectEvent);
+        }
+
+        if (prevPosition >= 0 && tabStripItems && tabStripItems[prevPosition]) {
+            tabStripItems[prevPosition]._emit(TabStripItem.unselectEvent);
+        }
+
+        this._setItemsColors(this.tabStrip.items);
+    }
+
+    public onBottomNavigationBarTap(position: number): boolean {
+ 
+
+        const tabStrip = this.tabStrip;
+        const tabStripItems = tabStrip && tabStrip.items;
+
+        if (position >= 0 && tabStripItems[position]) {
+            tabStripItems[position]._emit(TabStripItem.tapEvent);
+            tabStrip.notify({ eventName: TabStrip.itemTapEvent, object: tabStrip, index: position });
+        }
+
+        if (!this.items[position]) {
+            return false;
+        }
+
+        return true;
     }
 
     private get currentTransaction(): androidx.fragment.app.FragmentTransaction {
@@ -506,7 +365,52 @@ export class BottomNavigation extends TabNavigationBase {
         if (fragment != null) {
             this.currentTransaction.attach(fragment);
         } else {
-            fragment = TabFragment.newInstance(this._domId, position);
+            const owner = this;
+            const index = position;
+            const fragmentInterface = new org.nativescript.widgets.TabFragment.Interface({
+                 onCreateView(fragment: org.nativescript.widgets.TabFragment, inflater: android.view.LayoutInflater, container: android.view.ViewGroup, savedInstanceState: android.os.Bundle): android.view.View {
+                    const tabItem = owner.items[index];
+        
+                    return tabItem.nativeViewProtected;
+                },
+        
+                 onDestroyView(fragment: org.nativescript.widgets.TabFragment) {
+                    const hasRemovingParent = fragment.getRemovingParentFragment();
+        
+                    // Get view as bitmap and set it as background. This is workaround for the disapearing nested fragments.
+                    // TODO: Consider removing it when update to androidx.fragment:1.2.0
+                    if (hasRemovingParent && owner.selectedIndex === index) {
+                        if (!appResources) {
+                            appResources = application.android.context.getResources();
+                        }
+                        const bitmapDrawable = new android.graphics.drawable.BitmapDrawable(appResources, this.backgroundBitmap);
+                        owner._originalBackground = owner.backgroundColor || new Color("White");
+                        owner.nativeViewProtected.setBackgroundDrawable(bitmapDrawable);
+                        this.backgroundBitmap = null;
+        
+                        let thisView = fragment.getView();
+                        if (thisView) {
+                            let thisViewParent = thisView.getParent();
+                            if (thisViewParent && thisViewParent instanceof android.view.ViewGroup) {
+                                thisViewParent.removeView(thisView);
+                            }
+                        }
+                    }
+        
+                },
+        
+                 onPause(fragment: org.nativescript.widgets.TabFragment): void {
+                    const hasRemovingParent = fragment.getRemovingParentFragment();
+                    // Get view as bitmap and set it as background. This is workaround for the disapearing nested fragments.
+                    // TODO: Consider removing it when update to androidx.fragment:1.2.0
+                    if (hasRemovingParent && owner.selectedIndex === index) {
+                        this.backgroundBitmap = owner.loadBitmapFromView(owner.nativeViewProtected);
+                    }
+                }
+        
+                
+            });
+            fragment = new org.nativescript.widgets.TabFragment(fragmentInterface);
             this.currentTransaction.add(container.getId(), fragment, name);
         }
 
@@ -516,6 +420,21 @@ export class BottomNavigation extends TabNavigationBase {
         }
 
         return fragment;
+    }
+    private loadBitmapFromView(view: android.view.View): android.graphics.Bitmap {
+        // Another way to get view bitmap. Test performance vs setDrawingCacheEnabled
+        // const width = view.getWidth();
+        // const height = view.getHeight();
+        // const bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888);
+        // const canvas = new android.graphics.Canvas(bitmap);
+        // view.layout(0, 0, width, height);
+        // view.draw(canvas);
+
+        view.setDrawingCacheEnabled(true);
+        const bitmap = android.graphics.Bitmap.createBitmap(view.getDrawingCache());
+        view.setDrawingCacheEnabled(false);
+
+        return bitmap;
     }
 
     private setPrimaryItem(position: number, fragment: androidx.fragment.app.Fragment): void {

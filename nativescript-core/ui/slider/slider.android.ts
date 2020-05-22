@@ -6,52 +6,11 @@ import {
 
 export * from "./slider-common";
 
-interface OwnerSeekBar extends android.widget.SeekBar {
-    owner: Slider;
-}
-
 let SeekBar: typeof android.widget.SeekBar;
-let SeekBarChangeListener: android.widget.SeekBar.OnSeekBarChangeListener;
-
-function initializeListenerClass(): void {
-
-    if (!SeekBarChangeListener) {
-        @Interfaces([android.widget.SeekBar.OnSeekBarChangeListener])
-        class SeekBarChangeListenerImpl extends java.lang.Object implements android.widget.SeekBar.OnSeekBarChangeListener {
-            constructor() {
-                super();
-
-                return global.__native(this);
-            }
-
-            onProgressChanged(seekBar: OwnerSeekBar, progress: number, fromUser: boolean): void {
-                const owner = seekBar.owner;
-                if (owner && !owner._supressNativeValue) {
-                    const newValue = progress + owner.minValue;
-                    valueProperty.nativeValueChange(owner, newValue);
-                }
-            }
-
-            onStartTrackingTouch(seekBar: OwnerSeekBar): void {
-                //
-            }
-
-            onStopTrackingTouch(seekBar: OwnerSeekBar): void {
-                //
-            }
-        }
-
-        SeekBarChangeListener = new SeekBarChangeListenerImpl();
-    }
-}
-
-function getListener(): android.widget.SeekBar.OnSeekBarChangeListener {
-    return SeekBarChangeListener;
-}
 
 export class Slider extends SliderBase {
     _supressNativeValue: boolean;
-    nativeViewProtected: OwnerSeekBar;
+    nativeViewProtected: android.widget.SeekBar;
 
     public createNativeView() {
         if (!SeekBar) {
@@ -64,14 +23,32 @@ export class Slider extends SliderBase {
     public initNativeView(): void {
         super.initNativeView();
         const nativeView = this.nativeViewProtected;
-        nativeView.owner = this;
-        initializeListenerClass();
-        const listener = getListener();
+        const listener = new android.widget.SeekBar.OnSeekBarChangeListener({
+            onStartTrackingTouch: this.onStartTrackingTouch.bind(this),
+            onStopTrackingTouch: this.onStopTrackingTouch.bind(this),
+            onProgressChanged: this.onProgressChanged.bind(this),
+        });
         nativeView.setOnSeekBarChangeListener(listener);
+        (nativeView as any).listener = listener;
+    }
+
+    protected onProgressChanged(seekBar: android.widget.SeekBar, progress: number, fromUser: boolean): void {
+        if (!this._supressNativeValue) {
+            const newValue = progress + this.minValue;
+            valueProperty.nativeValueChange(this, newValue);
+        }
+    }
+
+    protected onStartTrackingTouch(seekBar: android.widget.SeekBar): void {
+        //
+    }
+
+    protected onStopTrackingTouch(seekBar: android.widget.SeekBar): void {
+        //
     }
 
     public disposeNativeView() {
-        this.nativeViewProtected.owner = null;
+        (this.nativeViewProtected as any).listener = null;
         super.disposeNativeView();
     }
 

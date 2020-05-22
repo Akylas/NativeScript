@@ -1,31 +1,6 @@
 import * as common from "./image-cache-common";
 import * as trace from "../../trace";
 
-let LruBitmapCacheClass;
-function ensureLruBitmapCacheClass() {
-    if (LruBitmapCacheClass) {
-        return;
-    }
-
-    class LruBitmapCache extends android.util.LruCache<string, android.graphics.Bitmap> {
-        constructor(cacheSize: number) {
-            super(cacheSize);
-
-            return global.__native(this);
-        }
-
-        public sizeOf(key: string, bitmap: android.graphics.Bitmap): number {
-            // The cache size will be measured in kilobytes rather than
-            // number of items.
-            const result = Math.round(bitmap.getByteCount() / 1024);
-
-            return result;
-        }
-    }
-
-    LruBitmapCacheClass = LruBitmapCache;
-}
-
 export class Cache extends common.Cache {
     private _callback: any;
     private _cache: android.util.LruCache<string, android.graphics.Bitmap>;
@@ -33,10 +8,9 @@ export class Cache extends common.Cache {
     constructor() {
         super();
 
-        ensureLruBitmapCacheClass();
         const maxMemory = java.lang.Runtime.getRuntime().maxMemory() / 1024;
         const cacheSize = maxMemory / 8;
-        this._cache = new LruBitmapCacheClass(cacheSize);
+        this._cache = new org.nativescript.widgets.LruBitmapCache(cacheSize);
 
         const that = new WeakRef(this);
         this._callback = new org.nativescript.widgets.Async.CompleteCallback({

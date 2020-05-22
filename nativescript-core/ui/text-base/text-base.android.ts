@@ -14,79 +14,6 @@ import { isString } from "../../utils/types";
 
 export * from "./text-base-common";
 
-let TextTransformation: TextTransformation;
-
-function initializeTextTransformation(): void {
-    if (TextTransformation) {
-        return;
-    }
-
-    @Interfaces([android.text.method.TransformationMethod])
-    class TextTransformationImpl extends java.lang.Object implements android.text.method.TransformationMethod {
-        constructor(public textBase: TextBase) {
-            super();
-
-            return global.__native(this);
-        }
-
-        public getTransformation(charSeq: any, view: android.view.View): any {
-            // NOTE: Do we need to transform the new text here?
-            const formattedText = this.textBase.formattedText;
-            if (formattedText) {
-                return createSpannableStringBuilder(formattedText);
-            }
-            else {
-                const text = this.textBase.text;
-                const stringValue = (text === null || text === undefined) ? "" : text.toString();
-
-                return getTransformedText(stringValue, this.textBase.textTransform);
-            }
-        }
-
-        public onFocusChanged(view: android.view.View, sourceText: string, focused: boolean, direction: number, previouslyFocusedRect: android.graphics.Rect): void {
-            // Do nothing for now.
-        }
-    }
-
-    TextTransformation = TextTransformationImpl;
-}
-
-interface ClickableSpan {
-    new (owner: Span): android.text.style.ClickableSpan;
-}
-
-let ClickableSpan: ClickableSpan;
-
-function initializeClickableSpan(): void {
-    if (ClickableSpan) {
-        return;
-    }
-
-    class ClickableSpanImpl extends android.text.style.ClickableSpan {
-        owner: WeakRef<Span>;
-
-        constructor(owner: Span) {
-            super();
-            this.owner = new WeakRef(owner);
-
-            return global.__native(this);
-        }
-        onClick(view: android.view.View): void {
-            const owner = this.owner.get();
-            if (owner) {
-                owner._emit(Span.linkTapEvent);
-            }
-            view.clearFocus();
-            view.invalidate();
-        }
-        updateDrawState(tp: android.text.TextPaint): void {
-            // don't style as link
-        }
-    }
-
-    ClickableSpan = ClickableSpanImpl;
-}
-
 export class TextBase extends TextBaseCommon {
     nativeViewProtected: android.widget.TextView;
     nativeTextViewProtected: android.widget.TextView;
@@ -101,7 +28,6 @@ export class TextBase extends TextBaseCommon {
 
     public initNativeView(): void {
         super.initNativeView();
-        initializeTextTransformation();
         const nativeView = this.nativeTextViewProtected;
         this._defaultTransformationMethod = nativeView.getTransformationMethod();
         this._defaultMovementMethod = nativeView.getMovementMethod();
@@ -109,6 +35,11 @@ export class TextBase extends TextBaseCommon {
         this._maxHeight = nativeView.getMaxHeight();
         this._minLines = nativeView.getMinLines();
         this._maxLines = nativeView.getMaxLines();
+    }
+
+    public disposeNativeView() {
+        (this.nativeTextViewProtected as any).transformationMethod = null;
+        super.disposeNativeView();
     }
 
     public resetNativeView(): void {
@@ -160,7 +91,7 @@ export class TextBase extends TextBaseCommon {
         const nativeView = this.nativeTextViewProtected;
         if (!value) {
             if (nativeView instanceof android.widget.Button &&
-                nativeView.getTransformationMethod() instanceof TextTransformation) {
+                nativeView.getTransformationMethod() instanceof org.nativescript.widgets.TransformationMethod) {
                 nativeView.setTransformationMethod(this._defaultTransformationMethod);
             }
         }
@@ -177,15 +108,41 @@ export class TextBase extends TextBaseCommon {
         textProperty.nativeValueChange(this, (value === null || value === undefined) ? "" : value.toString());
 
         if (spannableStringBuilder && nativeView instanceof android.widget.Button &&
-            !(nativeView.getTransformationMethod() instanceof TextTransformation)) {
+            !(nativeView.getTransformationMethod() instanceof org.nativescript.widgets.TransformationMethod)) {
             // Replace Android Button's default transformation (in case the developer has not already specified a text-transform) method
             // with our transformation method which can handle formatted text.
             // Otherwise, the default tranformation method of the Android Button will overwrite and ignore our spannableStringBuilder.
-            nativeView.setTransformationMethod(new TextTransformation(this));
+            if (!(nativeView as any).transformationMethod) {
+                const transformationMethod = new org.nativescript.widgets.TransformationMethod({
+                    getTransformation: this.getTransformation.bind(this),
+                    onFocusChanged: this.onFocusChanged.bind(this)
+                });
+                nativeView.setTransformationMethod(transformationMethod);
+                (nativeView as any).transformationMethod = transformationMethod;
+            }
         }
     }
 
+    protected getTransformation(charSeq: any, view: android.view.View): any {
+        // NOTE: Do we need to transform the new text here?
+        const formattedText = this.formattedText;
+        if (formattedText) {
+            return createSpannableStringBuilder(formattedText);
+        }
+        else {
+            const text = this.text;
+            const stringValue = (text === null || text === undefined) ? "" : text.toString();
+
+            return getTransformedText(stringValue, this.textTransform);
+        }
+    }
+
+    protected onFocusChanged(view: android.view.View, sourceText: string, focused: boolean, direction: number, previouslyFocusedRect: android.graphics.Rect): void {
+        // Do nothing for now.
+    }
+
     [textTransformProperty.setNative](value: TextTransform) {
+        const nativeView = this.nativeTextViewProtected;
         if (value === "initial") {
             this.nativeTextViewProtected.setTransformationMethod(this._defaultTransformationMethod);
 
@@ -196,8 +153,15 @@ export class TextBase extends TextBaseCommon {
         if ((<any>this).secure) {
             return;
         }
-
-        this.nativeTextViewProtected.setTransformationMethod(new TextTransformation(this));
+        if (!(nativeView as any).transformationMethod) {
+            const transformationMethod = new org.nativescript.widgets.TransformationMethod({
+                getTransformation: this.getTransformation.bind(this),
+                onFocusChanged: this.onFocusChanged.bind(this)
+            });
+            nativeView.setTransformationMethod(transformationMethod);
+            (nativeView as any).transformationMethod = transformationMethod;
+        }
+        
     }
 
     [textAlignmentProperty.getDefault](): TextAlignment {
@@ -515,8 +479,22 @@ function setSpanModifiers(ssb: android.text.SpannableStringBuilder, span: Span, 
 
     const tappable = span.tappable;
     if (tappable) {
-        initializeClickableSpan();
-        ssb.setSpan(new ClickableSpan(span), start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        const wOwner = new WeakRef(span);
+        const listener = new org.nativescript.widgets.ClickableSpan.ClickableSpanListener({
+            onClick(view: android.view.View): void {
+                const owner = wOwner.get();
+                if (owner) {
+                    owner._emit(Span.linkTapEvent);
+                }
+                view.clearFocus();
+                view.invalidate();
+            },
+            updateDrawState(tp: android.text.TextPaint): void {
+                // don't style as link
+            }
+        });
+        (span as any).listener = listener;
+        ssb.setSpan(new org.nativescript.widgets.ClickableSpan(listener), start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     // TODO: Implement letterSpacing for Span here.

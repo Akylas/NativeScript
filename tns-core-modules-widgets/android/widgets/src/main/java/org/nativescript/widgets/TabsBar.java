@@ -17,7 +17,6 @@
 package org.nativescript.widgets;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import android.text.TextUtils;
@@ -61,6 +60,18 @@ public class TabsBar extends HorizontalScrollView {
          */
         int getIndicatorColor(int position);
 
+    }
+
+    public interface Listener {
+        public void onSelectedPositionChange(int position, int prevPosition);
+        public boolean onTap(int position);
+    }
+
+    Listener listener;
+
+
+    public void setListener(Listener listener) {
+        this.listener = listener;
     }
 
     private static final int TITLE_OFFSET_DIPS = 24;
@@ -314,11 +325,17 @@ public class TabsBar extends HorizontalScrollView {
 
     public boolean onTap(int position) {
         // to be overridden in JS
+        if (this.listener != null) {
+            return this.listener.onTap(position);
+        }
         return true;
     }
 
     public void onSelectedPositionChange(int position, int prevPosition) {
         // to be overridden in JS
+        if (this.listener != null) {
+            this.listener.onSelectedPositionChange(position, prevPosition);
+        }
     }
 
     private void populateTabStrip() {

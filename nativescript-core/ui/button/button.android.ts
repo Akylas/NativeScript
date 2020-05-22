@@ -13,37 +13,9 @@ export * from "./button-common";
 
 const sdkVersion = lazy(() => parseInt(device.sdkVersion));
 
-interface ClickListener {
-    new(owner: Button): android.view.View.OnClickListener;
-}
-
-let ClickListener: ClickListener;
 let APILEVEL: number;
 let AndroidButton: typeof android.widget.Button;
 
-function initializeClickListener(): void {
-    if (ClickListener) {
-        return;
-    }
-
-    @Interfaces([android.view.View.OnClickListener])
-    class ClickListenerImpl extends java.lang.Object implements android.view.View.OnClickListener {
-        constructor(public owner: Button) {
-            super();
-
-            return global.__native(this);
-        }
-
-        public onClick(v: android.view.View): void {
-            const owner = this.owner;
-            if (owner) {
-                owner._emit(ButtonBase.tapEvent);
-            }
-        }
-    }
-
-    ClickListener = ClickListenerImpl;
-}
 
 export class Button extends ButtonBase {
     nativeViewProtected: android.widget.Button;
@@ -70,8 +42,9 @@ export class Button extends ButtonBase {
     public initNativeView(): void {
         super.initNativeView();
         const nativeView = this.nativeViewProtected;
-        initializeClickListener();
-        const clickListener = new ClickListener(this);
+        const clickListener = new android.view.View.OnClickListener({
+            onClick: this.onClick.bind(this)
+        });
         nativeView.setOnClickListener(clickListener);
         (<any>nativeView).clickListener = clickListener;
     }
@@ -90,6 +63,9 @@ export class Button extends ButtonBase {
             (<any>this.nativeViewProtected).setStateListAnimator(this._stateListAnimator);
             this._stateListAnimator = undefined;
         }
+    }
+    protected onClick(v: android.view.View): void {
+        this._emit(ButtonBase.tapEvent);
     }
 
     @PseudoClassHandler("normal", "highlighted", "pressed", "active")

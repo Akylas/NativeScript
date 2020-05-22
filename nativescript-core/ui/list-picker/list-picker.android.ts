@@ -7,53 +7,6 @@ export * from "./list-picker-common";
 
 const sdkVersion = lazy(() => parseInt(device.sdkVersion));
 
-interface Formatter {
-    new(owner: ListPicker): android.widget.NumberPicker.Formatter;
-}
-
-interface ValueChangeListener {
-    new(owner: ListPicker): android.widget.NumberPicker.OnValueChangeListener;
-}
-
-let Formatter: Formatter;
-let ValueChangeListener: ValueChangeListener;
-
-function initializeNativeClasses(): void {
-    if (Formatter) {
-        return;
-    }
-
-    @Interfaces([android.widget.NumberPicker.Formatter])
-    class FormatterImpl extends java.lang.Object implements android.widget.NumberPicker.Formatter {
-        constructor(private owner: ListPicker) {
-            super();
-
-            return global.__native(this);
-        }
-
-        format(index: number): string {
-            return this.owner._getItemAsString(index);
-        }
-    }
-
-    @Interfaces([android.widget.NumberPicker.OnValueChangeListener])
-    class ValueChangeListenerImpl extends java.lang.Object implements android.widget.NumberPicker.OnValueChangeListener {
-        constructor(private owner: ListPicker) {
-            super();
-
-            return global.__native(this);
-        }
-
-        onValueChange(picker: android.widget.NumberPicker, oldValue: number, newValue: number): void {
-            selectedIndexProperty.nativeValueChange(this.owner, newValue);
-            this.owner.updateSelectedValue(newValue);
-        }
-    }
-
-    Formatter = FormatterImpl;
-    ValueChangeListener = ValueChangeListenerImpl;
-}
-
 function getEditText(picker: android.widget.NumberPicker): android.widget.EditText {
     for (let i = 0, count = picker.getChildCount(); i < count; i++) {
         let child = picker.getChildAt(i);
@@ -102,11 +55,15 @@ export class ListPicker extends ListPickerBase {
             this._selectorWheelPaint = getSelectorWheelPaint(nativeView);
         }
 
-        const formatter = new Formatter(this);
+        const formatter = new android.widget.NumberPicker.Formatter({
+            format: this.pickerFormat.bind(this)
+        });
         nativeView.setFormatter(formatter);
         (<any>nativeView).formatter = formatter;
 
-        const valueChangedListener = new ValueChangeListener(this);
+        const valueChangedListener = new android.widget.NumberPicker.OnValueChangeListener({
+            onValueChange: this.onValueChange.bind(this)
+        });
         nativeView.setOnValueChangedListener(valueChangedListener);
         (<any>nativeView).valueChangedListener = valueChangedListener;
 
@@ -129,6 +86,13 @@ export class ListPicker extends ListPickerBase {
         super.disposeNativeView();
     }
 
+    protected pickerFormat(index: number): string {
+        return this._getItemAsString(index);
+    }
+    protected onValueChange(picker: android.widget.NumberPicker, oldValue: number, newValue: number): void {
+        selectedIndexProperty.nativeValueChange(this, newValue);
+        this.updateSelectedValue(newValue);
+    }
     private _fixNumberPickerRendering() {
         const nativeView = this.nativeViewProtected;
         //HACK: Force the stubborn NumberPicker to render correctly when we have 0 or 1 items.

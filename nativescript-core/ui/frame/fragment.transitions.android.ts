@@ -23,7 +23,6 @@ const animFadeOut = 17432577; // android.R.anim.fade_out
 export const waitingQueue = new Map<number, Set<ExpandedEntry>>();
 export const completedEntries = new Map<number, ExpandedEntry>();
 
-let TransitionListener: TransitionListener;
 let AnimationListener: android.animation.Animator.AnimatorListener;
 
 interface ExpandedTransitionListener extends androidx.transition.Transition.TransitionListener {
@@ -38,10 +37,10 @@ interface ExpandedAnimator extends android.animation.Animator {
 
 interface ExpandedEntry extends BackstackEntry {
 
-    enterTransitionListener: ExpandedTransitionListener;
-    exitTransitionListener: ExpandedTransitionListener;
-    reenterTransitionListener: ExpandedTransitionListener;
-    returnTransitionListener: ExpandedTransitionListener;
+    enterTransitionListener: androidx.transition.Transition.TransitionListener;
+    exitTransitionListener: androidx.transition.Transition.TransitionListener;
+    reenterTransitionListener: androidx.transition.Transition.TransitionListener;
+    returnTransitionListener: androidx.transition.Transition.TransitionListener;
 
     enterAnimator: ExpandedAnimator;
     exitAnimator: ExpandedAnimator;
@@ -209,43 +208,35 @@ function setupExitAndPopEnterAnimation(entry: ExpandedEntry, transition: Transit
 
 function getAnimationListener(): android.animation.Animator.AnimatorListener {
     if (!AnimationListener) {
-        @Interfaces([android.animation.Animator.AnimatorListener])
-        class AnimationListenerImpl extends java.lang.Object implements android.animation.Animator.AnimatorListener {
-            constructor() {
-                super();
-
-                return global.__native(this);
-            }
-
+        
+        AnimationListener = new android.animation.Animator.AnimatorListener ({
             onAnimationStart(animator: ExpandedAnimator): void {
                 const entry = animator.entry;
                 addToWaitingQueue(entry);
                 if (traceEnabled()) {
                     traceWrite(`START ${animator.transitionType} for ${entry.fragmentTag}`, traceCategories.Transition);
                 }
-            }
+            },
 
             onAnimationRepeat(animator: ExpandedAnimator): void {
                 if (traceEnabled()) {
                     traceWrite(`REPEAT ${animator.transitionType} for ${animator.entry.fragmentTag}`, traceCategories.Transition);
                 }
-            }
+            },
 
             onAnimationEnd(animator: ExpandedAnimator): void {
                 if (traceEnabled()) {
                     traceWrite(`END ${animator.transitionType} for ${animator.entry.fragmentTag}`, traceCategories.Transition);
                 }
                 transitionOrAnimationCompleted(animator.entry);
-            }
+            },
 
             onAnimationCancel(animator: ExpandedAnimator): void {
                 if (traceEnabled()) {
                     traceWrite(`CANCEL ${animator.transitionType} for ${animator.entry.fragmentTag}`, traceCategories.Transition);
                 }
             }
-        }
-
-        AnimationListener = new AnimationListenerImpl();
+        });
     }
 
     return AnimationListener;
@@ -274,22 +265,22 @@ export function _updateTransitions(entry: ExpandedEntry): void {
     const fragment = entry.fragment;
     const enterTransitionListener = entry.enterTransitionListener;
     if (enterTransitionListener && fragment) {
-        fragment.setEnterTransition(enterTransitionListener.transition);
+        fragment.setEnterTransition(enterTransitionListener);
     }
 
     const exitTransitionListener = entry.exitTransitionListener;
     if (exitTransitionListener && fragment) {
-        fragment.setExitTransition(exitTransitionListener.transition);
+        fragment.setExitTransition(exitTransitionListener);
     }
 
     const reenterTransitionListener = entry.reenterTransitionListener;
     if (reenterTransitionListener && fragment) {
-        fragment.setReenterTransition(reenterTransitionListener.transition);
+        fragment.setReenterTransition(reenterTransitionListener);
     }
 
     const returnTransitionListener = entry.returnTransitionListener;
     if (returnTransitionListener && fragment) {
-        fragment.setReturnTransition(returnTransitionListener.transition);
+        fragment.setReturnTransition(returnTransitionListener);
     }
 }
 
@@ -301,7 +292,7 @@ export function _reverseTransitions(previousEntry: ExpandedEntry, currentEntry: 
     const returnTransitionListener = currentEntry.returnTransitionListener;
     if (returnTransitionListener) {
         transitionUsed = true;
-        currentFragment.setExitTransition(returnTransitionListener.transition);
+        currentFragment.setExitTransition(returnTransitionListener);
     } else {
         currentFragment.setExitTransition(null);
     }
@@ -309,7 +300,7 @@ export function _reverseTransitions(previousEntry: ExpandedEntry, currentEntry: 
     const reenterTransitionListener = previousEntry.reenterTransitionListener;
     if (reenterTransitionListener) {
         transitionUsed = true;
-        previousFragment.setEnterTransition(reenterTransitionListener.transition);
+        previousFragment.setEnterTransition(reenterTransitionListener);
     } else {
         previousFragment.setEnterTransition(null);
     }
@@ -319,57 +310,44 @@ export function _reverseTransitions(previousEntry: ExpandedEntry, currentEntry: 
 
 // Transition listener can't be static because
 // android is cloning transitions and we can't expand them :(
-function getTransitionListener(entry: ExpandedEntry, transition: androidx.transition.Transition): ExpandedTransitionListener {
-    if (!TransitionListener) {
-        @Interfaces([(<any>androidx).transition.Transition.TransitionListener])
-        class TransitionListenerImpl extends java.lang.Object implements androidx.transition.Transition.TransitionListener {
-            constructor(public entry: ExpandedEntry, public transition: androidx.transition.Transition) {
-                super();
+function getTransitionListener(entry: ExpandedEntry, transition: androidx.transition.Transition) {
+    return new androidx.transition.Transition.TransitionListener({
+        onTransitionStart(transition: androidx.transition.Transition): void {
+            const entry = this.entry;
+            addToWaitingQueue(entry);
+            if (traceEnabled()) {
+                traceWrite(`START ${toShortString(transition)} transition for ${entry.fragmentTag}`, traceCategories.Transition);
+            }
+        },
 
-                return global.__native(this);
+        onTransitionEnd(transition: androidx.transition.Transition): void {
+            const entry = this.entry;
+            if (traceEnabled()) {
+                traceWrite(`END ${toShortString(transition)} transition for ${entry.fragmentTag}`, traceCategories.Transition);
             }
 
-            public onTransitionStart(transition: androidx.transition.Transition): void {
-                const entry = this.entry;
-                addToWaitingQueue(entry);
-                if (traceEnabled()) {
-                    traceWrite(`START ${toShortString(transition)} transition for ${entry.fragmentTag}`, traceCategories.Transition);
-                }
+            transitionOrAnimationCompleted(entry);
+        },
+
+        onTransitionResume(transition: androidx.transition.Transition): void {
+            if (traceEnabled()) {
+                const fragment = this.entry.fragmentTag;
+                traceWrite(`RESUME ${toShortString(transition)} transition for ${fragment}`, traceCategories.Transition);
             }
+        },
 
-            onTransitionEnd(transition: androidx.transition.Transition): void {
-                const entry = this.entry;
-                if (traceEnabled()) {
-                    traceWrite(`END ${toShortString(transition)} transition for ${entry.fragmentTag}`, traceCategories.Transition);
-                }
-
-                transitionOrAnimationCompleted(entry);
+        onTransitionPause(transition: androidx.transition.Transition): void {
+            if (traceEnabled()) {
+                traceWrite(`PAUSE ${toShortString(transition)} transition for ${this.entry.fragmentTag}`, traceCategories.Transition);
             }
+        },
 
-            onTransitionResume(transition: androidx.transition.Transition): void {
-                if (traceEnabled()) {
-                    const fragment = this.entry.fragmentTag;
-                    traceWrite(`RESUME ${toShortString(transition)} transition for ${fragment}`, traceCategories.Transition);
-                }
-            }
-
-            onTransitionPause(transition: androidx.transition.Transition): void {
-                if (traceEnabled()) {
-                    traceWrite(`PAUSE ${toShortString(transition)} transition for ${this.entry.fragmentTag}`, traceCategories.Transition);
-                }
-            }
-
-            onTransitionCancel(transition: androidx.transition.Transition): void {
-                if (traceEnabled()) {
-                    traceWrite(`CANCEL ${toShortString(transition)} transition for ${this.entry.fragmentTag}`, traceCategories.Transition);
-                }
+        onTransitionCancel(transition: androidx.transition.Transition): void {
+            if (traceEnabled()) {
+                traceWrite(`CANCEL ${toShortString(transition)} transition for ${this.entry.fragmentTag}`, traceCategories.Transition);
             }
         }
-
-        TransitionListener = TransitionListenerImpl;
-    }
-
-    return new TransitionListener(entry, transition);
+    });
 }
 
 function addToWaitingQueue(entry: ExpandedEntry): void {
@@ -639,7 +617,7 @@ function setUpNativeTransition(navigationTransition: NavigationTransition, nativ
     nativeTransition.setInterpolator(interpolator);
 }
 
-export function addNativeTransitionListener(entry: ExpandedEntry, nativeTransition: androidx.transition.Transition): ExpandedTransitionListener {
+export function addNativeTransitionListener(entry: ExpandedEntry, nativeTransition: androidx.transition.Transition) {
     const listener = getTransitionListener(entry, nativeTransition);
     nativeTransition.addListener(listener);
 

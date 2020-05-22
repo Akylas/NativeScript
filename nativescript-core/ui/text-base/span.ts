@@ -9,6 +9,12 @@ export class Span extends ViewBase implements SpanDefinition {
     private _text: string;
     private _tappable: boolean = false;
 
+    disposeNativeView() {
+        // we might have a click listener on android
+        (this as any).listener = null;
+        super.disposeNativeView();
+    }
+
     get fontFamily(): string {
         return this.style.fontFamily;
     }

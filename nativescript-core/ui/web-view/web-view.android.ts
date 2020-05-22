@@ -2,91 +2,6 @@ import { WebViewBase, knownFolders, traceEnabled, traceWrite, traceCategories, W
 
 export * from "./web-view-common";
 
-let WebViewClient: WebViewClient;
-
-function initializeWebViewClient(): void {
-    if (WebViewClient) {
-        return;
-    }
-
-    class WebViewClientImpl extends android.webkit.WebViewClient {
-
-        constructor(public owner: WebViewBase) {
-            super();
-
-            return global.__native(this);
-        }
-
-        public shouldOverrideUrlLoading(view: android.webkit.WebView, url: string) {
-            if (traceEnabled()) {
-                traceWrite("WebViewClientClass.shouldOverrideUrlLoading(" + url + ")", traceCategories.Debug);
-            }
-
-            return false;
-        }
-
-        public onPageStarted(view: android.webkit.WebView, url: string, favicon: android.graphics.Bitmap) {
-            super.onPageStarted(view, url, favicon);
-            const owner = this.owner;
-            if (owner) {
-                if (traceEnabled()) {
-                    traceWrite("WebViewClientClass.onPageStarted(" + url + ", " + favicon + ")", traceCategories.Debug);
-                }
-                owner._onLoadStarted(url, undefined);
-            }
-        }
-
-        public onPageFinished(view: android.webkit.WebView, url: string) {
-            super.onPageFinished(view, url);
-            const owner = this.owner;
-            if (owner) {
-                if (traceEnabled()) {
-                    traceWrite("WebViewClientClass.onPageFinished(" + url + ")", traceCategories.Debug);
-                }
-                owner._onLoadFinished(url, undefined);
-            }
-        }
-
-        public onReceivedError() {
-            let view: android.webkit.WebView = arguments[0];
-
-            if (arguments.length === 4) {
-                let errorCode: number = arguments[1];
-                let description: string = arguments[2];
-                let failingUrl: string = arguments[3];
-
-                super.onReceivedError(view, errorCode, description, failingUrl);
-
-                const owner = this.owner;
-                if (owner) {
-                    if (traceEnabled()) {
-                        traceWrite("WebViewClientClass.onReceivedError(" + errorCode + ", " + description + ", " + failingUrl + ")", traceCategories.Debug);
-                    }
-                    owner._onLoadFinished(failingUrl, description + "(" + errorCode + ")");
-                }
-            } else {
-                let request: any = arguments[1];
-                let error: any = arguments[2];
-
-                // before API version 23 there's no onReceiveError with 3 parameters, so it shouldn't come here
-                // but we don't have the onReceivedError with 3 parameters there and that's why we are ignorint tye typescript error
-                // @ts-ignore TS2554
-                super.onReceivedError(view, request, error);
-
-                const owner = this.owner;
-                if (owner) {
-                    if (traceEnabled()) {
-                        traceWrite("WebViewClientClass.onReceivedError(" + error.getErrorCode() + ", " + error.getDescription() + ", " + (error.getUrl && error.getUrl()) + ")", traceCategories.Debug);
-                    }
-                    owner._onLoadFinished(error.getUrl && error.getUrl(), error.getDescription() + "(" + error.getErrorCode() + ")");
-                }
-            }
-        }
-    }
-
-    WebViewClient = WebViewClientImpl;
-}
-
 export class WebView extends WebViewBase {
     nativeViewProtected: android.webkit.WebView;
 
@@ -100,11 +15,17 @@ export class WebView extends WebViewBase {
 
     public initNativeView(): void {
         super.initNativeView();
-        initializeWebViewClient();
         const nativeView = this.nativeViewProtected;
-        const client = new WebViewClient(this);
+        const clientInterface = new org.nativescript.widgets.WebViewClient.WebViewClientInterface({
+            onPageStarted:this.onPageStarted.bind(this),
+            onPageFinished:this.onPageFinished.bind(this),
+            onReceivedError:this.onReceivedError.bind(this),
+            shouldOverrideUrlLoading:this.shouldOverrideUrlLoading.bind(this),
+        });
+        const client = new  org.nativescript.widgets.WebViewClient(clientInterface);
         nativeView.setWebViewClient(client);
         (<any>nativeView).client = client;
+        (<any>nativeView).clientInterface = clientInterface;
     }
 
     public disposeNativeView() {
@@ -113,8 +34,41 @@ export class WebView extends WebViewBase {
             nativeView.destroy();
         }
 
-        (<any>nativeView).client.owner = null;
+        (<any>nativeView).client = null;
+        (<any>nativeView).clientInterface = null;
         super.disposeNativeView();
+    }
+
+    protected shouldOverrideUrlLoading(view: android.webkit.WebView, url: string) {
+        if (traceEnabled()) {
+            traceWrite("WebViewClientClass.shouldOverrideUrlLoading(" + url + ")", traceCategories.Debug);
+        }
+
+        return false;
+    }
+
+    protected onPageStarted(view: android.webkit.WebView, url: string, favicon: android.graphics.Bitmap) {
+        if (traceEnabled()) {
+            traceWrite("WebViewClientClass.onPageStarted(" + url + ", " + favicon + ")", traceCategories.Debug);
+        }
+        this._onLoadStarted(url, undefined);
+    }
+
+    protected onPageFinished(view: android.webkit.WebView, url: string) {
+        if (traceEnabled()) {
+            traceWrite("WebViewClientClass.onPageFinished(" + url + ")", traceCategories.Debug);
+        }
+        this._onLoadFinished(url, undefined);
+    }
+
+    protected onReceivedError(view: android.webkit.WebView,
+        errorCode: number,
+        description: string,
+        failingUrl: string) {
+        if (traceEnabled()) {
+            traceWrite("WebViewClientClass.onReceivedError(" + errorCode + ", " + description + ", " + failingUrl + ")", traceCategories.Debug);
+        }
+        this._onLoadFinished(failingUrl, description + "(" + errorCode + ")");
     }
 
     public _loadUrl(src: string) {

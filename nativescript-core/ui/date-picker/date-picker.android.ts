@@ -5,52 +5,6 @@ import {
 
 export * from "./date-picker-common";
 
-interface DateChangedListener {
-    new(owner: DatePicker): android.widget.DatePicker.OnDateChangedListener;
-}
-
-let DateChangedListener: DateChangedListener;
-
-function initializeDateChangedListener(): void {
-    if (DateChangedListener) {
-        return;
-    }
-
-    @Interfaces([android.widget.DatePicker.OnDateChangedListener])
-    class DateChangedListenerImpl extends java.lang.Object implements android.widget.DatePicker.OnDateChangedListener {
-        constructor(public owner: DatePicker) {
-            super();
-
-            return global.__native(this);
-        }
-
-        onDateChanged(picker: android.widget.DatePicker, year: number, month: number, day: number) {
-            const owner = this.owner;
-            let dateChanged = false;
-            if (year !== owner.year) {
-                yearProperty.nativeValueChange(owner, year);
-                dateChanged = true;
-            }
-
-            if (month !== (owner.month - 1)) {
-                monthProperty.nativeValueChange(owner, month + 1);
-                dateChanged = true;
-            }
-
-            if (day !== owner.day) {
-                dayProperty.nativeValueChange(owner, day);
-                dateChanged = true;
-            }
-
-            if (dateChanged) {
-                dateProperty.nativeValueChange(owner, new Date(year, month, day));
-            }
-        }
-    }
-
-    DateChangedListener = DateChangedListenerImpl;
-}
-
 export class DatePicker extends DatePickerBase {
     nativeViewProtected: android.widget.DatePicker;
 
@@ -63,9 +17,10 @@ export class DatePicker extends DatePickerBase {
 
     public initNativeView(): void {
         super.initNativeView();
-        initializeDateChangedListener();
         const nativeView = this.nativeViewProtected;
-        const listener = new DateChangedListener(this);
+        const listener = new android.widget.DatePicker.OnDateChangedListener({
+            onDateChanged: this.onDateChanged.bind(this)
+        });
         nativeView.init(this.year, this.month - 1, this.day, listener);
         (<any>nativeView).listener = listener;
     }
@@ -73,6 +28,28 @@ export class DatePicker extends DatePickerBase {
     public disposeNativeView() {
         (<any>this.nativeViewProtected).listener.owner = null;
         super.disposeNativeView();
+    }
+
+    protected onDateChanged(picker: android.widget.DatePicker, year: number, month: number, day: number) {
+        let dateChanged = false;
+        if (year !== this.year) {
+            yearProperty.nativeValueChange(this, year);
+            dateChanged = true;
+        }
+
+        if (month !== (this.month - 1)) {
+            monthProperty.nativeValueChange(this, month + 1);
+            dateChanged = true;
+        }
+
+        if (day !== this.day) {
+            dayProperty.nativeValueChange(this, day);
+            dateChanged = true;
+        }
+
+        if (dateChanged) {
+            dateProperty.nativeValueChange(this, new Date(year, month, day));
+        }
     }
 
     private updateNativeDate(): void {

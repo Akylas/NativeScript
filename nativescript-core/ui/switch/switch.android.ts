@@ -4,34 +4,6 @@ import {
 
 export * from "./switch-common";
 
-interface CheckedChangeListener {
-    new(owner: Switch): android.widget.CompoundButton.OnCheckedChangeListener;
-}
-
-let CheckedChangeListener: CheckedChangeListener;
-
-function initializeCheckedChangeListener(): void {
-    if (CheckedChangeListener) {
-        return;
-    }
-
-    @Interfaces([android.widget.CompoundButton.OnCheckedChangeListener])
-    class CheckedChangeListenerImpl extends java.lang.Object implements android.widget.CompoundButton.OnCheckedChangeListener {
-        constructor(private owner: Switch) {
-            super();
-
-            return global.__native(this);
-        }
-
-        onCheckedChanged(buttonView: android.widget.CompoundButton, isChecked: boolean): void {
-            const owner = this.owner;
-            checkedProperty.nativeValueChange(owner, isChecked);
-        }
-    }
-
-    CheckedChangeListener = CheckedChangeListenerImpl;
-}
-
 export class Switch extends SwitchBase {
     nativeViewProtected: android.widget.Switch;
     public checked: boolean;
@@ -43,8 +15,9 @@ export class Switch extends SwitchBase {
     public initNativeView(): void {
         super.initNativeView();
         const nativeView = this.nativeViewProtected;
-        initializeCheckedChangeListener();
-        const listener = new CheckedChangeListener(this);
+        const listener = new android.widget.CompoundButton.OnCheckedChangeListener({
+            onCheckedChanged: this.onCheckedChanged.bind(this)
+        });
         nativeView.setOnCheckedChangeListener(listener);
         (<any>nativeView).listener = listener;
     }
@@ -53,6 +26,10 @@ export class Switch extends SwitchBase {
         const nativeView: any = this.nativeViewProtected;
         nativeView.listener.owner = null;
         super.disposeNativeView();
+    }
+
+    protected onCheckedChanged(buttonView: android.widget.CompoundButton, isChecked: boolean): void {
+        checkedProperty.nativeValueChange(this, isChecked);
     }
 
     private setNativeBackgroundColor(value: string | number | Color) {

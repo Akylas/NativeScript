@@ -14,35 +14,6 @@ const ITEMLOADING = ListViewBase.itemLoadingEvent;
 const LOADMOREITEMS = ListViewBase.loadMoreItemsEvent;
 const ITEMTAP = ListViewBase.itemTapEvent;
 
-interface ItemClickListener {
-    new(owner: ListView): android.widget.AdapterView.OnItemClickListener;
-}
-
-let ItemClickListener: ItemClickListener;
-
-function initializeItemClickListener(): void {
-    if (ItemClickListener) {
-        return;
-    }
-
-    @Interfaces([android.widget.AdapterView.OnItemClickListener])
-    class ItemClickListenerImpl extends java.lang.Object implements android.widget.AdapterView.OnItemClickListener {
-        constructor(public owner: ListView) {
-            super();
-
-            return global.__native(this);
-        }
-
-        onItemClick<T extends android.widget.Adapter>(parent: android.widget.AdapterView<T>, convertView: android.view.View, index: number, id: number) {
-            const owner = this.owner;
-            const view = owner._realizedTemplates.get(owner._getItemTemplate(index).key).get(convertView);
-            owner.notify({ eventName: ITEMTAP, object: owner, index: index, view: view });
-        }
-    }
-
-    ItemClickListener = ItemClickListenerImpl;
-}
-
 export class ListView extends ListViewBase {
     nativeViewProtected: android.widget.ListView;
     private _androidViewId: number = -1;
@@ -66,13 +37,24 @@ export class ListView extends ListViewBase {
         this.updateEffectiveRowHeight();
 
         const nativeView = this.nativeViewProtected;
-        initializeItemClickListener();
-        ensureListViewAdapterClass();
-        const adapter = new ListViewAdapterClass(this);
+
+        const adapterInterface = new org.nativescript.widgets.ListViewAdapter.ListViewAdapterInterface({
+            getCount: this.getCount.bind(this) ,
+            getItem: this.getItem.bind(this) ,
+            getItemId: this.getItemId.bind(this) ,
+            hasStableIds: this.hasStableIds.bind(this) ,
+            getViewTypeCount: this.getViewTypeCount.bind(this) ,
+            getItemViewType: this.getItemViewType.bind(this) ,
+        
+             getView: this.getView.bind(this) ,
+        });
+        const adapter = new org.nativescript.widgets.ListViewAdapter(adapterInterface);
         nativeView.setAdapter(adapter);
         (<any>nativeView).adapter = adapter;
 
-        const itemClickListener = new ItemClickListener(this);
+        const itemClickListener = new android.widget.AdapterView.OnItemClickListener({
+            onItemClick: this.onItemClick.bind(this)
+        });
         nativeView.setOnItemClickListener(itemClickListener);
         (<any>nativeView).itemClickListener = itemClickListener;
 
@@ -95,6 +77,121 @@ export class ListView extends ListViewBase {
         super.onLoaded();
         // Without this call itemClick won't be fired... :(
         this.requestLayout();
+    }
+
+    protected getCount() {
+        return this && this.items && this.items.length ? this.items.length : 0;
+    }
+
+    protected getItem(i: number) {
+        if (this && this.items && i < this.items.length) {
+            let getItem = (<ItemsSource>this.items).getItem;
+
+            return getItem ? getItem.call(this.items, i) : this.items[i];
+        }
+
+        return null;
+    }
+
+    protected getItemId(i: number) {
+        let item = this.getItem(i);
+        let id = i;
+        if (this && item && this.items) {
+            id = this.itemIdGenerator(item, i, this.items);
+        }
+
+        return long(id);
+    }
+
+    protected hasStableIds(): boolean {
+        return true;
+    }
+
+    protected getViewTypeCount() {
+        return this._itemTemplatesInternal.length;
+    }
+
+    protected getItemViewType(index: number) {
+        let template = this._getItemTemplate(index);
+        let itemViewType = this._itemTemplatesInternal.indexOf(template);
+
+        return itemViewType;
+    }
+
+    @profile
+    protected getView(index: number, convertView: android.view.View, parent: android.view.ViewGroup): android.view.View {
+
+        let totalItemCount = this.items ? this.items.length : 0;
+        if (index === (totalItemCount - 1)) {
+            this.notify({ eventName: LOADMOREITEMS, object: this });
+        }
+
+        // Recycle an existing view or create a new one if needed.
+        let template = this._getItemTemplate(index);
+        let view: View;
+        if (convertView) {
+            view = this._realizedTemplates.get(template.key).get(convertView);
+            if (!view) {
+                throw new Error(`There is no entry with key '${convertView}' in the realized views cache for template with key'${template.key}'.`);
+            }
+        }
+        else {
+            view = template.createView();
+        }
+
+        let args: ItemEventData = {
+            eventName: ITEMLOADING, object: this, index: index, view: view,
+            android: parent,
+            ios: undefined
+        };
+
+        this.notify(args);
+
+        if (!args.view) {
+            args.view = this._getDefaultItemContent(index);
+        }
+
+        if (args.view) {
+            if (this._effectiveRowHeight > -1) {
+                args.view.height = this.rowHeight;
+            }
+            else {
+                args.view.height = <Length>unsetValue;
+            }
+
+            this._prepareItem(args.view, index);
+            if (!args.view.parent) {
+                // Proxy containers should not get treated as layouts.
+                // Wrap them in a real layout as well.
+                if (args.view instanceof LayoutBase &&
+                    !(args.view instanceof ProxyViewContainer)) {
+                    this._addView(args.view);
+                    convertView = args.view.nativeViewProtected;
+                } else {
+                    let sp = new StackLayout();
+                    sp.addChild(args.view);
+                    this._addView(sp);
+
+                    convertView = sp.nativeViewProtected;
+                }
+            }
+
+            // Cache the view for recycling
+            let realizedItemsForTemplateKey = this._realizedTemplates.get(template.key);
+            if (!realizedItemsForTemplateKey) {
+                realizedItemsForTemplateKey = new Map<android.view.View, View>();
+                this._realizedTemplates.set(template.key, realizedItemsForTemplateKey);
+            }
+            realizedItemsForTemplateKey.set(convertView, args.view);
+            this._realizedItems.set(convertView, args.view);
+        }
+
+        return convertView;
+    }
+
+    protected onItemClick<T extends android.widget.Adapter>(parent: android.widget.AdapterView<T>, convertView: android.view.View, index: number, id: number) {
+        const view = this._realizedTemplates.get(this._getItemTemplate(index).key).get(convertView);
+        this.notify({ eventName: ITEMTAP, object: this, index: index, view: view });
     }
 
     public refresh() {
@@ -208,139 +305,8 @@ export class ListView extends ListViewBase {
             this._itemTemplatesInternal = this._itemTemplatesInternal.concat(value);
         }
 
-        this.nativeViewProtected.setAdapter(new ListViewAdapterClass(this));
+        this.nativeViewProtected.setAdapter((this.nativeViewProtected as any).adapter);
         this.refresh();
     }
 }
 
-let ListViewAdapterClass;
-function ensureListViewAdapterClass() {
-    if (ListViewAdapterClass) {
-        return;
-    }
-
-    class ListViewAdapter extends android.widget.BaseAdapter {
-        constructor(public owner: ListView) {
-            super();
-
-            return global.__native(this);
-        }
-
-        public getCount() {
-            return this.owner && this.owner.items && this.owner.items.length ? this.owner.items.length : 0;
-        }
-
-        public getItem(i: number) {
-            if (this.owner && this.owner.items && i < this.owner.items.length) {
-                let getItem = (<ItemsSource>this.owner.items).getItem;
-
-                return getItem ? getItem.call(this.owner.items, i) : this.owner.items[i];
-            }
-
-            return null;
-        }
-
-        public getItemId(i: number) {
-            let item = this.getItem(i);
-            let id = i;
-            if (this.owner && item && this.owner.items) {
-                id = this.owner.itemIdGenerator(item, i, this.owner.items);
-            }
-
-            return long(id);
-        }
-
-        public hasStableIds(): boolean {
-            return true;
-        }
-
-        public getViewTypeCount() {
-            return this.owner._itemTemplatesInternal.length;
-        }
-
-        public getItemViewType(index: number) {
-            let template = this.owner._getItemTemplate(index);
-            let itemViewType = this.owner._itemTemplatesInternal.indexOf(template);
-
-            return itemViewType;
-        }
-
-        @profile
-        public getView(index: number, convertView: android.view.View, parent: android.view.ViewGroup): android.view.View {
-            //this.owner._dumpRealizedTemplates();
-
-            if (!this.owner) {
-                return null;
-            }
-
-            let totalItemCount = this.owner.items ? this.owner.items.length : 0;
-            if (index === (totalItemCount - 1)) {
-                this.owner.notify({ eventName: LOADMOREITEMS, object: this.owner });
-            }
-
-            // Recycle an existing view or create a new one if needed.
-            let template = this.owner._getItemTemplate(index);
-            let view: View;
-            if (convertView) {
-                view = this.owner._realizedTemplates.get(template.key).get(convertView);
-                if (!view) {
-                    throw new Error(`There is no entry with key '${convertView}' in the realized views cache for template with key'${template.key}'.`);
-                }
-            }
-            else {
-                view = template.createView();
-            }
-
-            let args: ItemEventData = {
-                eventName: ITEMLOADING, object: this.owner, index: index, view: view,
-                android: parent,
-                ios: undefined
-            };
-
-            this.owner.notify(args);
-
-            if (!args.view) {
-                args.view = this.owner._getDefaultItemContent(index);
-            }
-
-            if (args.view) {
-                if (this.owner._effectiveRowHeight > -1) {
-                    args.view.height = this.owner.rowHeight;
-                }
-                else {
-                    args.view.height = <Length>unsetValue;
-                }
-
-                this.owner._prepareItem(args.view, index);
-                if (!args.view.parent) {
-                    // Proxy containers should not get treated as layouts.
-                    // Wrap them in a real layout as well.
-                    if (args.view instanceof LayoutBase &&
-                        !(args.view instanceof ProxyViewContainer)) {
-                        this.owner._addView(args.view);
-                        convertView = args.view.nativeViewProtected;
-                    } else {
-                        let sp = new StackLayout();
-                        sp.addChild(args.view);
-                        this.owner._addView(sp);
-
-                        convertView = sp.nativeViewProtected;
-                    }
-                }
-
-                // Cache the view for recycling
-                let realizedItemsForTemplateKey = this.owner._realizedTemplates.get(template.key);
-                if (!realizedItemsForTemplateKey) {
-                    realizedItemsForTemplateKey = new Map<android.view.View, View>();
-                    this.owner._realizedTemplates.set(template.key, realizedItemsForTemplateKey);
-                }
-                realizedItemsForTemplateKey.set(convertView, args.view);
-                this.owner._realizedItems.set(convertView, args.view);
-            }
-
-            return convertView;
-        }
-    }
-
-    ListViewAdapterClass = ListViewAdapter;
-}

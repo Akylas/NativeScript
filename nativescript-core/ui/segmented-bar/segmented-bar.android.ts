@@ -26,73 +26,6 @@ interface TabHost {
 let apiLevel: number;
 let selectedIndicatorThickness: number;
 
-let TabHost: TabHost;
-let TabChangeListener: TabChangeListener;
-let TabContentFactory: TabContentFactory;
-
-function initializeNativeClasses(): void {
-    if (TabChangeListener) {
-        return;
-    }
-
-    apiLevel = android.os.Build.VERSION.SDK_INT;
-    // Indicator thickness for material - 2dip. For pre-material - 5dip.
-    selectedIndicatorThickness = layout.toDevicePixels(apiLevel >= 21 ? 2 : 5);
-
-    @Interfaces([android.widget.TabHost.OnTabChangeListener])
-    class TabChangeListenerImpl extends java.lang.Object implements android.widget.TabHost.OnTabChangeListener {
-        constructor(public owner: SegmentedBar) {
-            super();
-
-            return global.__native(this);
-        }
-
-        onTabChanged(id: string): void {
-            const owner = this.owner;
-            if (owner.shouldChangeSelectedIndex()) {
-                owner.selectedIndex = parseInt(id);
-            }
-        }
-    }
-
-    @Interfaces([android.widget.TabHost.TabContentFactory])
-    class TabContentFactoryImpl extends java.lang.Object implements android.widget.TabHost.TabContentFactory {
-        constructor(public owner: SegmentedBar) {
-            super();
-
-            return global.__native(this);
-        }
-
-        createTabContent(tag: string): android.view.View {
-            const tv = new android.widget.TextView(this.owner._context);
-            // This is collapsed by default and made visible
-            // by android when TabItem becomes visible/selected.
-            // TODO: Try commenting visibility change.
-            tv.setVisibility(android.view.View.GONE);
-            tv.setMaxLines(1);
-            tv.setEllipsize(android.text.TextUtils.TruncateAt.END);
-
-            return tv;
-        }
-    }
-
-    class TabHostImpl extends android.widget.TabHost {
-        constructor(context: android.content.Context, attrs: android.util.AttributeSet) {
-            super(context, attrs);
-
-            return global.__native(this);
-        }
-
-        public onAttachedToWindow(): void {
-            // overriden to remove the code that will steal the focus from edit fields.
-        }
-    }
-
-    TabHost = TabHostImpl;
-    TabChangeListener = TabChangeListenerImpl;
-    TabContentFactory = TabContentFactoryImpl;
-}
-
 export class SegmentedBarItem extends SegmentedBarItemBase {
     nativeViewProtected: android.widget.TextView;
 
@@ -165,6 +98,11 @@ export class SegmentedBarItem extends SegmentedBarItemBase {
                 viewGroup.setBackground(newDrawable);
             } else {
                 const stateDrawable = new android.graphics.drawable.StateListDrawable();
+                if (!apiLevel) {
+                    apiLevel = android.os.Build.VERSION.SDK_INT;
+                    // Indicator thickness for material - 2dip. For pre-material - 5dip.
+                    selectedIndicatorThickness = layout.toDevicePixels(apiLevel >= 21 ? 2 : 5);
+                }
                 const colorDrawable: android.graphics.drawable.ColorDrawable = new org.nativescript.widgets.SegmentedBarColorDrawable(color, selectedIndicatorThickness);
                 const arr = Array.create("int", 1);
                 arr[0] = R_ATTR_STATE_SELECTED;
@@ -200,10 +138,8 @@ export class SegmentedBar extends SegmentedBarBase {
     }
 
     public createNativeView() {
-        initializeNativeClasses();
-
         const context: android.content.Context = this._context;
-        const nativeView = new TabHost(context, null);
+        const nativeView = new org.nativescript.widgets.TabHost(context, null);
 
         const tabHostLayout = new android.widget.LinearLayout(context);
         tabHostLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
@@ -225,17 +161,39 @@ export class SegmentedBar extends SegmentedBarBase {
     public initNativeView(): void {
         super.initNativeView();
         const nativeView = this.nativeViewProtected;
-        const listener = new TabChangeListener(this);
+        const listener = new android.widget.TabHost.OnTabChangeListener({
+            onTabChanged:this.onTabChanged.bind(this)
+        });
         nativeView.setOnTabChangedListener(listener);
         (<any>nativeView).listener = listener;
         nativeView.setup();
-        this._tabContentFactory = this._tabContentFactory || new TabContentFactory(this);
+        this._tabContentFactory = this._tabContentFactory || new android.widget.TabHost.TabContentFactory({
+            createTabContent: this.createTabContent.bind(this)
+        });
+    }
+
+    protected createTabContent(tag: string): android.view.View {
+        const tv = new android.widget.TextView(this._context);
+        // This is collapsed by default and made visible
+        // by android when TabItem becomes visible/selected.
+        // TODO: Try commenting visibility change.
+        tv.setVisibility(android.view.View.GONE);
+        tv.setMaxLines(1);
+        tv.setEllipsize(android.text.TextUtils.TruncateAt.END);
+
+        return tv;
     }
 
     public disposeNativeView() {
         const nativeView: any = this.nativeViewProtected;
         nativeView.listener.owner = null;
         super.disposeNativeView();
+    }
+
+    protected onTabChanged(id: string): void {
+        if (this.shouldChangeSelectedIndex()) {
+            this.selectedIndex = parseInt(id);
+        }
     }
 
     private insertTab(tabItem: SegmentedBarItem, index: number): void {

@@ -1,9 +1,15 @@
 ﻿declare module org {
     module nativescript {
         module widgets {
-            export class CustomTransition extends androidx.transition.Visibility {
-                constructor(animatorSet: android.animation.AnimatorSet, transitionName: string);
-                public setResetOnTransitionEnd(resetOnTransitionEnd: boolean): void;
+            export class CustomTransition extends androidx.transition
+                .Visibility {
+                constructor(
+                    animatorSet: android.animation.AnimatorSet,
+                    transitionName: string
+                );
+                public setResetOnTransitionEnd(
+                    resetOnTransitionEnd: boolean
+                ): void;
                 public getTransitionName(): string;
             }
             export module Async {
@@ -19,14 +25,38 @@
                 }
 
                 export module Image {
-                    export function download(url: string, callback: CompleteCallback, context: any);
+                    export function download(
+                        url: string,
+                        callback: CompleteCallback,
+                        context: any
+                    );
                 }
 
                 export module File {
-                    export function readText(path: string, encoding: string, callback: CompleteCallback, context: any);
-                    export function read(path: string, callback: CompleteCallback, context: any);
-                    export function writeText(path: string, content: string, encoding: string, callback: CompleteCallback, context: any);
-                    export function write(path: string, content: native.Array<number>, callback: CompleteCallback, context: any);
+                    export function readText(
+                        path: string,
+                        encoding: string,
+                        callback: CompleteCallback,
+                        context: any
+                    );
+                    export function read(
+                        path: string,
+                        callback: CompleteCallback,
+                        context: any
+                    );
+                    export function writeText(
+                        path: string,
+                        content: string,
+                        encoding: string,
+                        callback: CompleteCallback,
+                        context: any
+                    );
+                    export function write(
+                        path: string,
+                        content: native.Array<number>,
+                        callback: CompleteCallback,
+                        context: any
+                    );
                 }
 
                 export module Http {
@@ -58,7 +88,11 @@
                         public error: java.lang.Exception;
                     }
 
-                    export function MakeRequest(options: RequestOptions, callback: CompleteCallback, context: any);
+                    export function MakeRequest(
+                        options: RequestOptions,
+                        callback: CompleteCallback,
+                        context: any
+                    );
                 }
             }
 
@@ -67,8 +101,60 @@
 
                 public getRemovingParentFragment(): androidx.fragment.app.Fragment;
             }
+            export namespace Fragment {
+                class Interface {
+                    constructor(implementation: {
+                        onHiddenChanged(hidden: boolean): void;
+                        onCreateAnimator(
+                            transit: number,
+                            enter: boolean,
+                            nextAnim: number
+                        ): android.animation.Animator;
+                        onStop(): void;
+                        onPause(): void;
+                        onCreate(savedInstanceState: android.os.Bundle);
+                        onCreateView(
+                            inflater: android.view.LayoutInflater,
+                            container: android.view.ViewGroup,
+                            savedInstanceState: android.os.Bundle
+                        );
+                        onSaveInstanceState(outState: android.os.Bundle);
+                        onDestroyView();
 
-            export class BorderDrawable extends android.graphics.drawable.ColorDrawable {
+                        onDestroy();
+
+                        toString(): string;
+                    });
+                    onHiddenChanged(hidden: boolean): void;
+                    onCreateAnimator(
+                        transit: number,
+                        enter: boolean,
+                        nextAnim: number
+                    ): android.animation.Animator;
+                    public onStop(): void;
+                    public onPause(): void;
+                    public onCreate(savedInstanceState: android.os.Bundle);
+                    public onCreateView(
+                        inflater: android.view.LayoutInflater,
+                        container: android.view.ViewGroup,
+                        savedInstanceState: android.os.Bundle
+                    );
+                    public onSaveInstanceState(outState: android.os.Bundle);
+                    public onDestroyView();
+
+                    public onDestroy();
+
+                    public toString(): string;
+                }
+            }
+            export class Fragment extends FragmentBase {
+                constructor(inter?: Fragment.Interface);
+                inter: Fragment.Interface
+                setInterface(inter: Fragment.Interface);
+            }
+
+            export class BorderDrawable extends android.graphics.drawable
+                .ColorDrawable {
                 constructor(density: number);
                 constructor(density: number, id: string);
 
@@ -139,8 +225,14 @@
             }
 
             export class LinearGradientDefinition {
-                constructor(startX: number, endX: number, startY: number,
-                    endY: number, colors: number[], stops?: number[]);
+                constructor(
+                    startX: number,
+                    endX: number,
+                    startY: number,
+                    endY: number,
+                    colors: number[],
+                    stops?: number[]
+                );
 
                 public getStartX(): number;
                 public getStartY(): number;
@@ -151,14 +243,20 @@
             }
 
             export class CSSValue {
-                constructor(type: string, str: string, unit: string, value: number);
+                constructor(
+                    type: string,
+                    str: string,
+                    unit: string,
+                    value: number
+                );
                 public getType(): string;
                 public getString(): string;
                 public getUnit(): string;
                 public getValue(): number;
             }
 
-            export class CommonLayoutParams extends android.widget.FrameLayout.LayoutParams {
+            export class CommonLayoutParams extends android.widget.FrameLayout
+                .LayoutParams {
                 constructor();
 
                 public widthPercent: number;
@@ -188,39 +286,39 @@
                 none,
                 aspectFill,
                 aspectFit,
-                fill
+                fill,
             }
 
             export enum HorizontalAlignment {
                 left,
                 center,
                 right,
-                stretch
+                stretch,
             }
 
             export enum VerticalAlignment {
                 top,
                 center,
                 bottom,
-                stretch
+                stretch,
             }
 
             export enum Dock {
                 left,
                 top,
                 right,
-                bottom
+                bottom,
             }
 
             export enum GridUnitType {
                 auto,
                 pixel,
-                star
+                star,
             }
 
             export enum Orientation {
                 horizontal,
-                vertical
+                vertical,
             }
 
             export class OriginPoint {
@@ -337,7 +435,8 @@
                 public static ALIGN_CONTENT_STRETCH: number;
             }
             export namespace FlexboxLayout {
-                export class LayoutParams extends org.nativescript.widgets.CommonLayoutParams {
+                export class LayoutParams extends org.nativescript.widgets
+                    .CommonLayoutParams {
                     public static ALIGN_SELF_AUTO: number;
                     public static ALIGN_SELF_FLEX_START: number;
                     public static ALIGN_SELF_FLEX_END: number;
@@ -366,7 +465,8 @@
                 public setScrollEnabled(value: boolean): void;
             }
 
-            export class HorizontalScrollView extends android.widget.HorizontalScrollView {
+            export class HorizontalScrollView extends android.widget
+                .HorizontalScrollView {
                 constructor(context: android.content.Context);
                 public getScrollableLength(): number;
                 public getScrollEnabled(): boolean;
@@ -384,14 +484,30 @@
                 getRotationAngle(): number;
                 setRotationAngle(angle: number): void;
 
-                setUri(uri: string, decodeWidth: number, decodeHeight: number, keepAspectRatio: boolean, useCache: boolean, async: boolean): void;
-                setImageLoadedListener(listener: image.Worker.OnImageLoadedListener): void;
+                setUri(
+                    uri: string,
+                    decodeWidth: number,
+                    decodeHeight: number,
+                    keepAspectRatio: boolean,
+                    useCache: boolean,
+                    async: boolean
+                ): void;
+                setImageLoadedListener(
+                    listener: image.Worker.OnImageLoadedListener
+                ): void;
             }
 
             export class TabLayout extends android.widget.HorizontalScrollView {
                 constructor(context: android.content.Context);
-                constructor(context: android.content.Context, attrs: android.util.AttributeSet);
-                constructor(context: android.content.Context, attrs: android.util.AttributeSet, defStyle: number);
+                constructor(
+                    context: android.content.Context,
+                    attrs: android.util.AttributeSet
+                );
+                constructor(
+                    context: android.content.Context,
+                    attrs: android.util.AttributeSet,
+                    defStyle: number
+                );
 
                 setSelectedIndicatorColors(color: Array<number>): void;
                 getSelectedIndicatorColors(): Array<number>;
@@ -402,7 +518,10 @@
                 setTabTextFontSize(fontSize: number): void;
                 getTabTextFontSize(): number;
 
-                setItems(items: Array<TabItemSpec>, viewPager: androidx.viewpager.widget.ViewPager): void;
+                setItems(
+                    items: Array<TabItemSpec>,
+                    viewPager: androidx.viewpager.widget.ViewPager
+                ): void;
                 updateItemAt(position: number, itemSpec: TabItemSpec): void;
 
                 getTextViewForItemAt(index: number): android.widget.TextView;
@@ -412,8 +531,15 @@
 
             export class TabsBar extends android.widget.HorizontalScrollView {
                 constructor(context: android.content.Context);
-                constructor(context: android.content.Context, attrs: android.util.AttributeSet);
-                constructor(context: android.content.Context, attrs: android.util.AttributeSet, defStyle: number);
+                constructor(
+                    context: android.content.Context,
+                    attrs: android.util.AttributeSet
+                );
+                constructor(
+                    context: android.content.Context,
+                    attrs: android.util.AttributeSet,
+                    defStyle: number
+                );
 
                 setSelectedIndicatorColors(color: Array<number>): void;
                 getSelectedIndicatorColors(): Array<number>;
@@ -424,18 +550,46 @@
                 setTabTextFontSize(fontSize: number): void;
                 getTabTextFontSize(): number;
 
-                setItems(items: Array<TabItemSpec>, viewPager: androidx.viewpager.widget.ViewPager): void;
+                setItems(
+                    items: Array<TabItemSpec>,
+                    viewPager: androidx.viewpager.widget.ViewPager
+                ): void;
                 updateItemAt(position: number, itemSpec: TabItemSpec): void;
 
                 getTextViewForItemAt(index: number): android.widget.TextView;
                 getViewForItemAt(index: number): android.widget.LinearLayout;
                 getItemCount(): number;
+                setListener(listener: TabsBar.Listener);
+            }
+            namespace TabsBar {
+                class Listener {
+                    constructor(implementation: {
+                        onSelectedPositionChange(
+                            position: number,
+                            prevPosition: number
+                        ): void;
+                        onTap(position: number): boolean;
+                    });
+                    onSelectedPositionChange(
+                        position: number,
+                        prevPosition: number
+                    ): void;
+                    onTap(position: number): boolean;
+                }
             }
 
-            export class BottomNavigationBar extends android.widget.LinearLayout {
+            export class BottomNavigationBar extends android.widget
+                .LinearLayout {
                 constructor(context: android.content.Context);
-                constructor(context: android.content.Context, attrs: android.util.AttributeSet);
-                constructor(context: android.content.Context, attrs: android.util.AttributeSet, defStyle: number);
+                constructor(
+                    context: android.content.Context,
+                    attrs: android.util.AttributeSet
+                );
+                constructor(
+                    context: android.content.Context,
+                    attrs: android.util.AttributeSet,
+                    defStyle: number
+                );
 
                 setTabTextColor(color: number): void;
                 getTabTextColor(): number;
@@ -445,7 +599,10 @@
                 getTabTextFontSize(): number;
 
                 onTap(position: number): boolean;
-                onSelectedPositionChange(position: number, prevPosition: number): void;
+                onSelectedPositionChange(
+                    position: number,
+                    prevPosition: number
+                ): void;
                 setSelectedPosition(position: number): void;
                 setItems(items: Array<TabItemSpec>): void;
                 updateItemAt(position: number, itemSpec: TabItemSpec): void;
@@ -453,11 +610,32 @@
                 getTextViewForItemAt(index: number): android.widget.TextView;
                 getViewForItemAt(index: number): android.widget.LinearLayout;
                 getItemCount(): number;
+                setListener(listener: BottomNavigationBar.Listener);
+            }
+            namespace BottomNavigationBar {
+                class Listener {
+                    constructor(implementation: {
+                        onSelectedPositionChange(
+                            position: number,
+                            prevPosition: number
+                        ): void;
+                        onTap(position: number): boolean;
+                    });
+                    onSelectedPositionChange(
+                        position: number,
+                        prevPosition: number
+                    ): void;
+                    onTap(position: number): boolean;
+                }
             }
 
-            export class TabViewPager extends androidx.viewpager.widget.ViewPager {
+            export class TabViewPager extends androidx.viewpager.widget
+                .ViewPager {
                 constructor(context: android.content.Context);
-                constructor(context: android.content.Context, attrs: android.util.AttributeSet);
+                constructor(
+                    context: android.content.Context,
+                    attrs: android.util.AttributeSet
+                );
 
                 setSwipePageEnabled(enabled: boolean): void;
             }
@@ -474,22 +652,22 @@
             }
 
             export namespace image {
-
                 export class Cache {
                     private constructor();
-                    public static getInstance(cacheParams: Cache.CacheParams): Cache;
+                    public static getInstance(
+                        cacheParams: Cache.CacheParams
+                    ): Cache;
                 }
 
-                export class Worker {
-
-                }
+                export class Worker {}
 
                 export namespace Worker {
                     interface IOnImageLoadedListener {
                         onImageLoaded(success: boolean): void;
                     }
 
-                    export class OnImageLoadedListener implements IOnImageLoadedListener {
+                    export class OnImageLoadedListener
+                        implements IOnImageLoadedListener {
                         constructor(implementation: IOnImageLoadedListener);
                         public onImageLoaded(success: boolean): void;
                     }
@@ -497,16 +675,28 @@
 
                 export class Fetcher extends Worker {
                     private constructor();
-                    public static getInstance(context: android.content.Context): Fetcher;
-                    public static calculateInSampleSize(imageWidth: number, imageHeight: number,
-                        reqWidth: number, reqHeight: number): number;
+                    public static getInstance(
+                        context: android.content.Context
+                    ): Fetcher;
+                    public static calculateInSampleSize(
+                        imageWidth: number,
+                        imageHeight: number,
+                        reqWidth: number,
+                        reqHeight: number
+                    ): number;
                     public addImageCache(cache: Cache): void;
                     public initCache(): void;
                     public clearCache(): void;
                     public closeCache(): void;
-                    public loadImage(data: Object, imageView: ImageView,
-                        decodeWidth: number, decodeHeight: number, useCache: boolean, async: boolean,
-                        listener: Worker.IOnImageLoadedListener): void;
+                    public loadImage(
+                        data: Object,
+                        imageView: ImageView,
+                        decodeWidth: number,
+                        decodeHeight: number,
+                        useCache: boolean,
+                        async: boolean,
+                        listener: Worker.IOnImageLoadedListener
+                    ): void;
                 }
 
                 export namespace Cache {
@@ -521,101 +711,547 @@
 
             export class ViewHelper {
                 public static getMinWidth(view: android.view.View): number;
-                public static setMinWidth(view: android.view.View, value: number): void;
+                public static setMinWidth(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getMinHeight(view: android.view.View): number;
-                public static setMinHeight(view: android.view.View, value: number): void;
+                public static setMinHeight(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getWidth(view: android.view.View): number;
-                public static setWidth(view: android.view.View, value: number): void;
-                public static setWidthPercent(view: android.view.View, value: number): void;
+                public static setWidth(
+                    view: android.view.View,
+                    value: number
+                ): void;
+                public static setWidthPercent(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getHeight(view: android.view.View): number;
-                public static setHeight(view: android.view.View, value: number): void;
-                public static setHeightPercent(view: android.view.View, value: number): void;
+                public static setHeight(
+                    view: android.view.View,
+                    value: number
+                ): void;
+                public static setHeightPercent(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
-                public static getMargin(view: android.view.View): { left: number, top: number, right: number, bottom: number };
-                public static setMargin(view: android.view.View, left: number, top: number, right: number, bottom: number): void;
+                public static getMargin(
+                    view: android.view.View
+                ): { left: number; top: number; right: number; bottom: number };
+                public static setMargin(
+                    view: android.view.View,
+                    left: number,
+                    top: number,
+                    right: number,
+                    bottom: number
+                ): void;
 
                 public static getMarginLeft(view: android.view.View): number;
-                public static setMarginLeft(view: android.view.View, value: number): void;
-                public static setMarginLeftPercent(view: android.view.View, value: number): void;
+                public static setMarginLeft(
+                    view: android.view.View,
+                    value: number
+                ): void;
+                public static setMarginLeftPercent(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getMarginTop(view: android.view.View): number;
-                public static setMarginTop(view: android.view.View, value: number): void;
-                public static setMarginTopPercent(view: android.view.View, value: number): void;
+                public static setMarginTop(
+                    view: android.view.View,
+                    value: number
+                ): void;
+                public static setMarginTopPercent(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getMarginRight(view: android.view.View): number;
-                public static setMarginRight(view: android.view.View, value: number): void;
-                public static setMarginRightPercent(view: android.view.View, value: number): void;
+                public static setMarginRight(
+                    view: android.view.View,
+                    value: number
+                ): void;
+                public static setMarginRightPercent(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getMarginBottom(view: android.view.View): number;
-                public static setMarginBottom(view: android.view.View, value: number): void;
-                public static setMarginBottomPercent(view: android.view.View, value: number): void;
+                public static setMarginBottom(
+                    view: android.view.View,
+                    value: number
+                ): void;
+                public static setMarginBottomPercent(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
-                public static getHorizontalAlignment(view: android.view.View): string;
-                public static setHorizontalAlignment(view: android.view.View, value: string): void;
+                public static getHorizontalAlignment(
+                    view: android.view.View
+                ): string;
+                public static setHorizontalAlignment(
+                    view: android.view.View,
+                    value: string
+                ): void;
 
-                public static getVerticalAlignment(view: android.view.View): string;
-                public static setVerticalAlignment(view: android.view.View, value: string): void;
+                public static getVerticalAlignment(
+                    view: android.view.View
+                ): string;
+                public static setVerticalAlignment(
+                    view: android.view.View,
+                    value: string
+                ): void;
 
-                public static getPadding(view: android.view.View): android.graphics.Rect;
-                public static setPadding(view: android.view.View, left: number, top: number, right: number, bottom: number): void;
+                public static getPadding(
+                    view: android.view.View
+                ): android.graphics.Rect;
+                public static setPadding(
+                    view: android.view.View,
+                    left: number,
+                    top: number,
+                    right: number,
+                    bottom: number
+                ): void;
 
                 public static getPaddingLeft(view: android.view.View): number;
-                public static setPaddingLeft(view: android.view.View, value: number): void;
+                public static setPaddingLeft(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getPaddingTop(view: android.view.View): number;
-                public static setPaddingTop(view: android.view.View, value: number): void;
+                public static setPaddingTop(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getPaddingRight(view: android.view.View): number;
-                public static setPaddingRight(view: android.view.View, value: number): void;
+                public static setPaddingRight(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getPaddingBottom(view: android.view.View): number;
-                public static setPaddingBottom(view: android.view.View, value: number): void;
+                public static setPaddingBottom(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getRotate(view: android.view.View): number;
-                public static setRotate(view: android.view.View, value: number): void;
+                public static setRotate(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getRotateX(view: android.view.View): number;
-                public static setRotateX(view: android.view.View, value: number): void;
+                public static setRotateX(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getRotateY(view: android.view.View): number;
-                public static setRotateY(view: android.view.View, value: number): void;
+                public static setRotateY(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
-                public static setPerspective(view: android.view.View, value: number): void;
+                public static setPerspective(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getScaleX(view: android.view.View): number;
-                public static setScaleX(view: android.view.View, value: number): void;
+                public static setScaleX(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getScaleY(view: android.view.View): number;
-                public static setScaleY(view: android.view.View, value: number): void;
+                public static setScaleY(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getTranslateX(view: android.view.View): number;
-                public static setTranslateX(view: android.view.View, value: number): void;
+                public static setTranslateX(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getTranslateY(view: android.view.View): number;
-                public static setTranslateY(view: android.view.View, value: number): void;
+                public static setTranslateY(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getZIndex(view: android.view.View): number;
-                public static setZIndex(view: android.view.View, value: number): void;
+                public static setZIndex(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
                 public static getLetterspacing(view: android.view.View): number;
-                public static setLetterspacing(view: android.view.View, value: number): void;
+                public static setLetterspacing(
+                    view: android.view.View,
+                    value: number
+                ): void;
 
-                public static setBackground(view: android.view.View, background: android.graphics.drawable.Drawable): void;
+                public static setBackground(
+                    view: android.view.View,
+                    background: android.graphics.drawable.Drawable
+                ): void;
             }
 
-            export class DisableUserInteractionListener extends java.lang.Object implements android.view.View.OnTouchListener {
-                public onTouch(view: android.view.View, motionEvent: android.view.MotionEvent): boolean;
+            export class DisableUserInteractionListener extends java.lang.Object
+                implements android.view.View.OnTouchListener {
+                public onTouch(
+                    view: android.view.View,
+                    motionEvent: android.view.MotionEvent
+                ): boolean;
             }
 
-            export class SegmentedBarColorDrawable extends android.graphics.drawable.ColorDrawable {
+            export class SegmentedBarColorDrawable extends android.graphics
+                .drawable.ColorDrawable {
                 constructor(color: number, thickness: number);
             }
 
-            export class CustomTypefaceSpan extends android.text.style.TypefaceSpan {
-                constructor(family: string, typeface: android.graphics.Typeface);
+            export class CustomTypefaceSpan extends android.text.style
+                .TypefaceSpan {
+                constructor(
+                    family: string,
+                    typeface: android.graphics.Typeface
+                );
+            }
+
+            class DialogFragment extends androidx.fragment.app.DialogFragment {
+                public setListener(listener: DialogFragment.Listener);
+            }
+            namespace DialogFragment {
+                class Listener {
+                    constructor(implementation: {
+                        onDismiss(
+                            param0: DialogFragment,
+                            param1: android.content.DialogInterface
+                        ): void;
+                        onCreateDialog(
+                            param0: DialogFragment,
+                            param1: android.os.Bundle
+                        ): android.app.Dialog;
+                        onStart(param0: DialogFragment): void;
+                        onDestroy(param0: DialogFragment): void;
+                        onCreateView(
+                            param0: DialogFragment,
+                            param1: android.view.LayoutInflater,
+                            param2: android.view.ViewGroup,
+                            param3: android.os.Bundle
+                        ): android.view.View;
+                    });
+                    public onDismiss(
+                        param0: DialogFragment,
+                        param1: android.content.DialogInterface
+                    ): void;
+                    public onCreateDialog(
+                        param0: DialogFragment,
+                        param1: android.os.Bundle
+                    ): android.app.Dialog;
+                    public onStart(param0: DialogFragment): void;
+                    public onDestroy(param0: DialogFragment): void;
+                    public onCreateView(
+                        param0: DialogFragment,
+                        param1: android.view.LayoutInflater,
+                        param2: android.view.ViewGroup,
+                        param3: android.os.Bundle
+                    ): android.view.View;
+                }
+            }
+
+            class Dialog extends android.app.Dialog {
+                public setListener(listener: Dialog.Listener);
+            }
+            namespace Dialog {
+                class Listener {
+                    constructor(implementation: {
+                        onBackPressed(dialog: Dialog): void;
+                        onDetachedFromWindow(dialog: Dialog): void;
+                    });
+                    public onBackPressed(dialog: Dialog): void;
+                    public onDetachedFromWindow(dialog: Dialog): void;
+                }
+            }
+            class BroadcastReceiver extends android.content.BroadcastReceiver {
+                constructor(listener: BroadcastReceiver.Listener);
+                public setListener(listener: BroadcastReceiver.Listener);
+            }
+            namespace BroadcastReceiver {
+                class Listener {
+                    constructor(implementation: {
+                        onReceive(
+                            param0: android.content.Context,
+                            param1: android.content.Intent
+                        ): void;
+                    });
+                    public onReceive(
+                        param0: android.content.Context,
+                        param1: android.content.Intent
+                    ): void;
+                }
+            }
+            class ClickableSpan extends android.text.style.ClickableSpan {
+                constructor(listener: ClickableSpan.Listener);
+                public setListener(listener: ClickableSpan.Listener);
+            }
+            namespace ClickableSpan {
+                class Listener {
+                    constructor(implementation: {
+                        onClick(view: android.view.View): void;
+                        updateDrawState(tp: android.text.TextPaint): void;
+                    });
+                    public onClick(view: android.view.View): void;
+                    public updateDrawState(tp: android.text.TextPaint): void;
+                }
+            }
+            class TabFragment extends FragmentBase {
+                constructor(listener: TabFragment.Interface);
+                public setInterface(listener: TabFragment.Interface);
+            }
+            namespace TabFragment {
+                class Interface {
+                    constructor(implementation: {
+                        onPause(fragment: TabFragment): void;
+                        onDestroyView(fragment: TabFragment): void;
+                        onCreateView(
+                            fragment: TabFragment,
+                            param0: globalAndroid.view.LayoutInflater,
+                            param1: globalAndroid.view.ViewGroup,
+                            param2: globalAndroid.os.Bundle
+                        ): globalAndroid.view.View;
+                    });
+                    public onPause(fragment: TabFragment): void;
+                    public onDestroyView(fragment: TabFragment): void;
+                    public onCreateView(
+                        fragment: TabFragment,
+                        param0: globalAndroid.view.LayoutInflater,
+                        param1: globalAndroid.view.ViewGroup,
+                        param2: globalAndroid.os.Bundle
+                    ): globalAndroid.view.View;
+                }
+            }
+            class PagerAdapter extends androidx.viewpager.widget.PagerAdapter {
+                constructor(listener: PagerAdapter.Interface);
+                public setInterface(listener: PagerAdapter.Interface);
+            }
+            namespace PagerAdapter {
+                class Interface {
+                    constructor(implementation: {
+                        getCount(): number;
+                        getPageTitle(index: number);
+                        startUpdate(container: android.view.ViewGroup): void;
+                        instantiateItem(
+                            container: android.view.ViewGroup,
+                            position: number
+                        ): java.lang.Object;
+                        getItemPosition(object: java.lang.Object): number;
+                        destroyItem(
+                            container: android.view.ViewGroup,
+                            position: number,
+                            object: java.lang.Object
+                        ): void;
+                        setPrimaryItem(
+                            container: android.view.ViewGroup,
+                            position: number,
+                            object: java.lang.Object
+                        ): void;
+                        finishUpdate(container: android.view.ViewGroup): void;
+                        isViewFromObject(
+                            view: android.view.View,
+                            object: java.lang.Object
+                        ): boolean;
+                        saveState(): android.os.Parcelable;
+                        restoreState(
+                            state: android.os.Parcelable,
+                            loader: java.lang.ClassLoader
+                        ): void;
+                    });
+                    public getCount(): number;
+                    public getPageTitle(index: number);
+                    public startUpdate(container: android.view.ViewGroup): void;
+                    public instantiateItem(
+                        container: android.view.ViewGroup,
+                        position: number
+                    ): java.lang.Object;
+                    public getItemPosition(object: java.lang.Object): number;
+                    public destroyItem(
+                        container: android.view.ViewGroup,
+                        position: number,
+                        object: java.lang.Object
+                    ): void;
+                    public setPrimaryItem(
+                        container: android.view.ViewGroup,
+                        position: number,
+                        object: java.lang.Object
+                    ): void;
+                    public finishUpdate(
+                        container: android.view.ViewGroup
+                    ): void;
+                    public isViewFromObject(
+                        view: android.view.View,
+                        object: java.lang.Object
+                    ): boolean;
+                    public saveState(): android.os.Parcelable;
+                    public restoreState(
+                        state: android.os.Parcelable,
+                        loader: java.lang.ClassLoader
+                    ): void;
+                }
+            }
+            class SimpleOnGestureListener extends android.view.GestureDetector
+                .SimpleOnGestureListener {
+                constructor(
+                    listener: SimpleOnGestureListener.SimpleOnGestureListenerListener
+                );
+                public setListener(
+                    listener: SimpleOnGestureListener.SimpleOnGestureListenerListener
+                );
+            }
+            namespace SimpleOnGestureListener {
+                class SimpleOnGestureListenerListener {
+                    constructor(implementation: {
+                        onDown(motionEvent: android.view.MotionEvent): boolean;
+                        onFling(
+                            initialEvent: android.view.MotionEvent,
+                            currentEvent: android.view.MotionEvent,
+                            velocityX: number,
+                            velocityY: number
+                        ): boolean;
+                        onSingleTapUp(
+                            motionEvent: android.view.MotionEvent
+                        ): boolean;
+                        onLongPress(
+                            motionEvent: android.view.MotionEvent
+                        ): void;
+                    });
+                    public onDown(
+                        motionEvent: android.view.MotionEvent
+                    ): boolean;
+                    public onFling(
+                        initialEvent: android.view.MotionEvent,
+                        currentEvent: android.view.MotionEvent,
+                        velocityX: number,
+                        velocityY: number
+                    ): boolean;
+                    public onSingleTapUp(
+                        motionEvent: android.view.MotionEvent
+                    ): boolean;
+                    public onLongPress(
+                        motionEvent: android.view.MotionEvent
+                    ): void;
+                }
+            }
+
+            class TransformationMethod extends android.text.method
+                .TransformationMethod {}
+            class TabHost extends android.widget.TabHost {}
+
+            class ListViewAdapter extends android.widget.BaseAdapter {
+                constructor(inter: ListViewAdapter.Interface);
+                public setInterface(inter: ListViewAdapter.Interface);
+            }
+            namespace ListViewAdapter {
+                class Interface {
+                    constructor(implementation: {
+                        getCount(): number;
+                        getItem(i: number): any;
+                        getItemId(i: number): number;
+                        hasStableIds(): boolean;
+                        getViewTypeCount(): number;
+                        getItemViewType(index: number): number;
+
+                        getView(
+                            index: number,
+                            convertView: android.view.View,
+                            parent: android.view.ViewGroup
+                        ): android.view.View;
+                    });
+                    public getCount(): number;
+                    public getItem(i: number): any;
+                    public getItemId(i: number): number;
+                    public hasStableIds(): boolean;
+                    public getViewTypeCount(): number;
+                    public getItemViewType(index: number): number;
+
+                    public getView(
+                        index: number,
+                        convertView: android.view.View,
+                        parent: android.view.ViewGroup
+                    ): android.view.View;
+                }
+            }
+
+            class LruBitmapCache extends android.util.LruCache<
+                string,
+                android.graphics.Bitmap
+            > {}
+
+            class WebViewClient extends android.webkit.WebViewClient {
+                constructor(inter: WebViewClient.Interface);
+                public setInterface(inter: WebViewClient.Interface);
+            }
+            namespace WebViewClient {
+                class Interface {
+                    constructor(implementation: {
+                        shouldOverrideUrlLoading(
+                            view: android.webkit.WebView,
+                            url: string
+                        ): boolean;
+
+                        onPageStarted(
+                            Wview: android.webkit.WebView,
+                            url: string,
+                            favicon: android.graphics.Bitmap
+                        );
+
+                        onPageFinished(
+                            view: android.webkit.WebView,
+                            url: string
+                        );
+
+                        onReceivedError(
+                            view: android.webkit.WebView,
+                            errorCode: number,
+                            description: string,
+                            failingUrl: string
+                        );
+                    });
+                    public shouldOverrideUrlLoading(
+                        view: android.webkit.WebView,
+                        url: string
+                    ): boolean;
+
+                    public onPageStarted(
+                        Wview: android.webkit.WebView,
+                        url: string,
+                        favicon: android.graphics.Bitmap
+                    );
+
+                    public onPageFinished(
+                        view: android.webkit.WebView,
+                        url: string
+                    );
+
+                    public onReceivedError(
+                        view: android.webkit.WebView,
+                        errorCode: number,
+                        description: string,
+                        failingUrl: string
+                    );
+                }
             }
         }
     }

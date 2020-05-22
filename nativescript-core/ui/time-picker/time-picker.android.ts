@@ -2,41 +2,6 @@ import { TimePickerBase, getValidTime, timeProperty, hourProperty, minutePropert
 
 export * from "./time-picker-common";
 
-interface TimeChangedListener {
-    new(owner: TimePicker): android.widget.TimePicker.OnTimeChangedListener;
-}
-
-let TimeChangedListener: TimeChangedListener;
-
-function initializeTimeChangedListener(): void {
-    if (TimeChangedListener) {
-        return;
-    }
-
-    apiLevel = android.os.Build.VERSION.SDK_INT;
-
-    @Interfaces([android.widget.TimePicker.OnTimeChangedListener])
-    class TimeChangedListenerImpl extends java.lang.Object implements android.widget.TimePicker.OnTimeChangedListener {
-        constructor(public owner: TimePicker) {
-            super();
-
-            return global.__native(this);
-        }
-
-        onTimeChanged(picker: android.widget.TimePicker, hour: number, minute: number): void {
-            const timePicker = this.owner;
-            if (timePicker.updatingNativeValue) {
-                return;
-            }
-
-            const validTime = getValidTime(timePicker, hour, minute);
-            timeProperty.nativeValueChange(timePicker, new Date(0, 0, 0, validTime.hour, validTime.minute));
-        }
-    }
-
-    TimeChangedListener = TimeChangedListenerImpl;
-}
-
 let apiLevel: number;
 
 export class TimePicker extends TimePickerBase {
@@ -50,8 +15,9 @@ export class TimePicker extends TimePickerBase {
     public initNativeView(): void {
         super.initNativeView();
         const nativeView = this.nativeViewProtected;
-        initializeTimeChangedListener();
-        const listener = new TimeChangedListener(this);
+        const listener = new android.widget.TimePicker.OnTimeChangedListener({
+            onTimeChanged: this.onTimeChanged.bind(this)
+        });
         nativeView.setOnTimeChangedListener(listener);
         (<any>nativeView).listener = listener;
         const calendar = (<any>nativeView).calendar = java.util.Calendar.getInstance();
@@ -63,6 +29,14 @@ export class TimePicker extends TimePickerBase {
         if (!timeProperty.isSet(this)) {
             this.time = new Date(0, 0, 0, validTime.hour, validTime.minute);
         }
+    }
+    protected onTimeChanged(picker: android.widget.TimePicker, hour: number, minute: number): void {
+        if (this.updatingNativeValue) {
+            return;
+        }
+
+        const validTime = getValidTime(this, hour, minute);
+        timeProperty.nativeValueChange(this, new Date(0, 0, 0, validTime.hour, validTime.minute));
     }
 
     [minuteProperty.setNative](value: number) {

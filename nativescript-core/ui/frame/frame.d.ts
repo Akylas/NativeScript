@@ -449,16 +449,16 @@ export interface AndroidActivityCallbacks {
 }
 
 export interface AndroidFragmentCallbacks {
-    onHiddenChanged(fragment: any, hidden: boolean, superFunc: Function): void;
-    onCreateAnimator(fragment: any, transit: number, enter: boolean, nextAnim: number, superFunc: Function): any;
+    onHiddenChanged(fragment: any, hidden: boolean): void;
+    onCreateAnimator(fragment: any, transit: number, enter: boolean, nextAnim: number): any;
     onCreate(fragment: any, savedInstanceState: any, superFunc: Function): void;
-    onCreateView(fragment: any, inflater: any, container: any, savedInstanceState: any, superFunc: Function): any;
-    onSaveInstanceState(fragment: any, outState: any, superFunc: Function): void;
-    onDestroyView(fragment: any, superFunc: Function): void;
-    onDestroy(fragment: any, superFunc: Function): void;
-    onPause(fragment: any, superFunc: Function): void;
-    onStop(fragment: any, superFunc: Function): void;
-    toStringOverride(fragment: any, superFunc: Function): string;
+    onCreateView(fragment: any, inflater: any, container: any, savedInstanceState: any): any;
+    onSaveInstanceState(fragment: any, outState: any): void;
+    onDestroyView(fragment: any): void;
+    onDestroy(fragment: any): void;
+    onPause(fragment: any): void;
+    onStop(fragment: any): void;
+    toStringOverride(fragment: any): string;
 }
 
 /* tslint:disable */
