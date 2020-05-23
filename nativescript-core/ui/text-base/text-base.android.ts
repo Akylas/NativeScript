@@ -480,7 +480,7 @@ function setSpanModifiers(ssb: android.text.SpannableStringBuilder, span: Span, 
     const tappable = span.tappable;
     if (tappable) {
         const wOwner = new WeakRef(span);
-        const listener = new org.nativescript.widgets.ClickableSpan.ClickableSpanListener({
+        const listener = new org.nativescript.widgets.ClickableSpan.Listener({
             onClick(view: android.view.View): void {
                 const owner = wOwner.get();
                 if (owner) {

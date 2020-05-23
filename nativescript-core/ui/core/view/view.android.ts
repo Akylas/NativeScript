@@ -448,7 +448,7 @@ export class View extends ViewCommon {
             shownCallback: () => this._raiseShownModallyEvent(),
             dismissCallback: () => this.closeModal()
         };
-        const dfListener = new org.nativescript.widgets.DialogFragment.DialogFragmentListener({
+        const dfListener = new org.nativescript.widgets.DialogFragment.Listener({
             onCreateDialog(fragment: org.nativescript.widgets.DialogFragment, savedInstanceState: android.os.Bundle): android.app.Dialog {
                 let theme = fragment.getTheme();
                 fragment.setStyle(androidx.fragment.app.DialogFragment.STYLE_NO_TITLE, 0);
@@ -471,7 +471,7 @@ export class View extends ViewCommon {
                 }
 
 
-                const dialogListener = new org.nativescript.widgets.Dialog.DialogListener({
+                const dialogListener = new org.nativescript.widgets.Dialog.Listener({
                     onDetachedFromWindow(dialog: org.nativescript.widgets.Dialog) {
                         (dialog as any).nListener = null;
                     },

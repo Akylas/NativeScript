@@ -246,7 +246,6 @@ export class Frame extends FrameBase {
     }
 
     private createFragment(backstackEntry: BackstackEntry, fragmentTag: string): androidx.fragment.app.Fragment {
-        ensureFragmentClass();
         const callbacks = new FragmentCallbacksImplementation();
         const newFragment = new org.nativescript.widgets.Fragment();
         const inter = new org.nativescript.widgets.Fragment.Interface({
@@ -267,9 +266,6 @@ export class Frame extends FrameBase {
             },
         
              onCreate(savedInstanceState: android.os.Bundle) {
-                // if (!this._callbacks) {
-                //     setFragmentCallbacks(this);
-                // }
         
                 this.setHasOptionsMenu(true);
                 callbacks.onCreate(this, savedInstanceState);
@@ -822,27 +818,6 @@ function getFrameByNumberId(frameId: number): Frame {
     return null;
 }
 
-function ensureFragmentClass() {
-    if (fragmentClass) {
-        return;
-    }
-
-    // this require will apply the FragmentClass implementation
-    require("./fragment");
-
-    if (!fragmentClass) {
-        throw new Error("Failed to initialize the extended androidx.fragment.app.Fragment class");
-    }
-}
-
-let fragmentClass: any;
-export function setFragmentClass(clazz: any) {
-    if (fragmentClass) {
-        throw new Error("Fragment class already initialized");
-    }
-
-    fragmentClass = clazz;
-}
 
 class FragmentCallbacksImplementation implements AndroidFragmentCallbacks {
     public frame: Frame;
@@ -1392,6 +1367,3 @@ export function setActivityCallbacks(activity: androidx.appcompat.app.AppCompatA
     activity[CALLBACKS] = new ActivityCallbacksImplementation();
 }
 
-export function setFragmentCallbacks(fragment: androidx.fragment.app.Fragment): void {
-    fragment[CALLBACKS] = new FragmentCallbacksImplementation();
-}

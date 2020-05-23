@@ -124,7 +124,7 @@ export class AndroidApplication extends Observable implements AndroidApplication
     public registerBroadcastReceiver(intentFilter: string, onReceiveCallback: (context: android.content.Context, intent: android.content.Intent) => void) {
         const that = this;
         const registerFunc = function (context: android.content.Context) {
-            const receiver = new org.nativescript.widgets.BroadcastReceiver(new org.nativescript.widgets.BroadcastReceiver.BroadcastReceiverListener({
+            const receiver = new org.nativescript.widgets.BroadcastReceiver(new org.nativescript.widgets.BroadcastReceiver.Listener({
                 onReceive:onReceiveCallback
             }));
             context.registerReceiver(receiver, new android.content.IntentFilter(intentFilter));

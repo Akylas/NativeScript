@@ -16,7 +16,7 @@ export class WebView extends WebViewBase {
     public initNativeView(): void {
         super.initNativeView();
         const nativeView = this.nativeViewProtected;
-        const clientInterface = new org.nativescript.widgets.WebViewClient.WebViewClientInterface({
+        const clientInterface = new org.nativescript.widgets.WebViewClient.Interface({
             onPageStarted:this.onPageStarted.bind(this),
             onPageFinished:this.onPageFinished.bind(this),
             onReceivedError:this.onReceivedError.bind(this),

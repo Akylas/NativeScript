@@ -38,7 +38,7 @@ export class ListView extends ListViewBase {
 
         const nativeView = this.nativeViewProtected;
 
-        const adapterInterface = new org.nativescript.widgets.ListViewAdapter.ListViewAdapterInterface({
+        const adapterInterface = new org.nativescript.widgets.ListViewAdapter.Interface({
             getCount: this.getCount.bind(this) ,
             getItem: this.getItem.bind(this) ,
             getItemId: this.getItemId.bind(this) ,
