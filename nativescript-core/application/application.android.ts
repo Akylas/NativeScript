@@ -237,7 +237,11 @@ export function getNativeApplication(): android.app.Application {
     if (!nativeApp) {
         // check whether the com.tns.NativeScriptApplication type exists
         if (!nativeApp && com.tns.NativeScriptApplication) {
+            
             nativeApp = com.tns.NativeScriptApplication.getInstance();
+            console.log('getNativeApplication', nativeApp);
+
+            require('../ui/frame/frame').setActivityCallbacks();
         }
 
         // the getInstance might return null if com.tns.NativeScriptApplication exists but is  not the starting app type

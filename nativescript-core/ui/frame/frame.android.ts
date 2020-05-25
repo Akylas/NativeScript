@@ -249,56 +249,22 @@ export class Frame extends FrameBase {
         const callbacks = new FragmentCallbacksImplementation();
         const newFragment = new org.nativescript.widgets.Fragment();
         const inter = new org.nativescript.widgets.Fragment.Interface({
-            onHiddenChanged(hidden: boolean): void {
-                callbacks.onHiddenChanged(newFragment, hidden);
-            },
-        
-             onCreateAnimator(transit: number, enter: boolean, nextAnim: number): android.animation.Animator {
-                return callbacks.onCreateAnimator(newFragment, transit, enter, nextAnim);
-            },
-        
-             onStop(): void {
-                callbacks.onStop(newFragment);
-            },
-        
-             onPause(): void {
-                callbacks.onPause(newFragment);
-            },
-        
-             onCreate(savedInstanceState: android.os.Bundle) {
+            onHiddenChanged:(hidden: boolean) => callbacks.onHiddenChanged(newFragment, hidden),
+            onCreateAnimator:(transit: number, enter: boolean, nextAnim: number) => callbacks.onCreateAnimator(newFragment, transit, enter, nextAnim),
+            onStop:() => callbacks.onStop(newFragment),
+            onPause:() => callbacks.onPause(newFragment),
+            onCreate(savedInstanceState: android.os.Bundle) {
                 newFragment.setHasOptionsMenu(true);
                 callbacks.onCreate(newFragment, savedInstanceState);
             },
-        
-             onCreateView(inflater: android.view.LayoutInflater, container: android.view.ViewGroup, savedInstanceState: android.os.Bundle) {
-                let result = callbacks.onCreateView(newFragment, inflater, container, savedInstanceState);
-        
-                return result;
-            },
-        
-             onSaveInstanceState(outState: android.os.Bundle) {
-                callbacks.onSaveInstanceState(newFragment, outState);
-            },
-        
-             onDestroyView() {
-                callbacks.onDestroyView(newFragment);
-            },
-        
-            onDestroy () {
-                callbacks.onDestroy(newFragment);
-            },
-        
-            toString(): string {
-                if (callbacks) {
-                    return callbacks.toStringOverride(newFragment);
-                } else {
-                    return null;
-                }
-            }
+            onCreateView:(inflater: android.view.LayoutInflater, container: android.view.ViewGroup, savedInstanceState: android.os.Bundle) => callbacks.onCreateView(newFragment, inflater, container, savedInstanceState),
+            onSaveInstanceState:(outState: android.os.Bundle) => callbacks.onSaveInstanceState(newFragment, outState),
+            onDestroyView:() => callbacks.onDestroyView(newFragment),
+            onDestroy:() => callbacks.onDestroy(newFragment),
+            toString:() => callbacks.toStringOverride(newFragment)
         });
         newFragment.setInterface(inter);
         const args = new android.os.Bundle();
-        console.log('createFragment',this._android.frameId );
         args.putInt(FRAMEID, this._android.frameId);
         newFragment.setArguments(args);
 
@@ -784,9 +750,6 @@ function findPageForFragment(fragment: androidx.fragment.app.Fragment, frame: Fr
     }
 
     if (page) {
-        const callbacks: FragmentCallbacksImplementation = fragment[CALLBACKS];
-        callbacks.frame = frame;
-        callbacks.entry = entry;
         entry.fragment = fragment;
         _updateTransitions(entry);
     }
@@ -1043,8 +1006,9 @@ class FragmentCallbacksImplementation implements AndroidFragmentCallbacks {
         return bitmap;
     }
 }
-
-class ActivityCallbacksImplementation implements AndroidActivityCallbacks {
+let activityInterface:com.tns.NativescriptActivity.Interface;
+let activityCallbacks:ActivityCallbacksImplementation;
+class ActivityCallbacksImplementation {
     private _rootView: View;
 
     public getRootView(): View {
@@ -1052,17 +1016,9 @@ class ActivityCallbacksImplementation implements AndroidActivityCallbacks {
     }
 
     @profile
-    public onCreate(activity: androidx.appcompat.app.AppCompatActivity, savedInstanceState: android.os.Bundle, intentOrSuperFunc: android.content.Intent | Function, superFunc?: Function): void {
+    public beforeOnCreate(activity: androidx.appcompat.app.AppCompatActivity, savedInstanceState: android.os.Bundle): boolean {
         if (traceEnabled()) {
             traceWrite(`Activity.onCreate(${savedInstanceState})`, traceCategories.NativeLifecycle);
-        }
-
-        const intent: android.content.Intent = superFunc ? <android.content.Intent>intentOrSuperFunc : undefined;
-
-        if (!superFunc) {
-            console.log("AndroidActivityCallbacks.onCreate(activity: any, savedInstanceState: any, superFunc: Function) " +
-                "is deprecated. Use AndroidActivityCallbacks.onCreate(activity: any, savedInstanceState: any, intent: any, superFunc: Function) instead.");
-            superFunc = <Function>intentOrSuperFunc;
         }
 
         // If there is savedInstanceState this call will recreate all fragments that were previously in the navigation.
@@ -1071,15 +1027,17 @@ class ActivityCallbacksImplementation implements AndroidActivityCallbacks {
         // For now we treat it like first run (e.g. we are not passing savedInstanceState so no fragments are being restored).
         // When we add support for application save/load state - revise this logic.
         let isRestart = !!savedInstanceState && moduleLoaded;
-        superFunc.call(activity, isRestart ? savedInstanceState : null);
-
+        return isRestart;
+    }
+    public afterOnCreate(activity: androidx.appcompat.app.AppCompatActivity, savedInstanceState: android.os.Bundle): void {
+        const intent = activity.getIntent();
         // Try to get the rootViewId form the saved state in case the activity
         // was destroyed and we are now recreating it.
         if (savedInstanceState) {
             const rootViewId = savedInstanceState.getInt(ROOT_VIEW_ID_EXTRA, -1);
             if (rootViewId !== -1 && activityRootViewsMap.has(rootViewId)) {
                 this._rootView = activityRootViewsMap.get(rootViewId).get();
-            }
+            } 
         }
 
         if (intent && intent.getAction()) {
@@ -1096,8 +1054,7 @@ class ActivityCallbacksImplementation implements AndroidActivityCallbacks {
     }
 
     @profile
-    public onSaveInstanceState(activity: androidx.appcompat.app.AppCompatActivity, outState: android.os.Bundle, superFunc: Function): void {
-        superFunc.call(activity, outState);
+    public onSaveInstanceState(activity: androidx.appcompat.app.AppCompatActivity, outState: android.os.Bundle): void {
         const rootView = this._rootView;
         if (rootView instanceof Frame) {
             outState.putInt(INTENT_EXTRA, rootView.android.frameId);
@@ -1108,9 +1065,8 @@ class ActivityCallbacksImplementation implements AndroidActivityCallbacks {
     }
 
     @profile
-    public onNewIntent(activity: androidx.appcompat.app.AppCompatActivity, intent: android.content.Intent, superSetIntentFunc: Function, superFunc: Function): void {
-        superFunc.call(activity, intent);
-        superSetIntentFunc.call(activity, intent);
+    public onNewIntent(activity: androidx.appcompat.app.AppCompatActivity, intent: android.content.Intent): void {
+        activity.setIntent(intent);
 
         application.android.notify(<application.AndroidActivityNewIntentEventData>{
             eventName: application.AndroidApplication.activityNewIntentEvent,
@@ -1121,9 +1077,7 @@ class ActivityCallbacksImplementation implements AndroidActivityCallbacks {
     }
 
     @profile
-    public onStart(activity: any, superFunc: Function): void {
-        superFunc.call(activity);
-
+    public onStart(activity: any): void {
         if (traceEnabled()) {
             traceWrite("NativeScriptActivity.onStart();", traceCategories.NativeLifecycle);
         }
@@ -1135,9 +1089,7 @@ class ActivityCallbacksImplementation implements AndroidActivityCallbacks {
     }
 
     @profile
-    public onStop(activity: any, superFunc: Function): void {
-        superFunc.call(activity);
-
+    public onStop(activity: any): void {
         if (traceEnabled()) {
             traceWrite("NativeScriptActivity.onStop();", traceCategories.NativeLifecycle);
         }
@@ -1149,8 +1101,7 @@ class ActivityCallbacksImplementation implements AndroidActivityCallbacks {
     }
 
     @profile
-    public onPostResume(activity: any, superFunc: Function): void {
-        superFunc.call(activity);
+    public onPostResume(activity: any): void {
 
         if (traceEnabled()) {
             traceWrite("NativeScriptActivity.onPostResume();", traceCategories.NativeLifecycle);
@@ -1173,7 +1124,7 @@ class ActivityCallbacksImplementation implements AndroidActivityCallbacks {
     }
 
     @profile
-    public onDestroy(activity: any, superFunc: Function): void {
+    public onDestroy(activity: any): void {
         try {
             if (traceEnabled()) {
                 traceWrite("NativeScriptActivity.onDestroy();", traceCategories.NativeLifecycle);
@@ -1187,12 +1138,11 @@ class ActivityCallbacksImplementation implements AndroidActivityCallbacks {
             const exitArgs = { eventName: application.exitEvent, object: application.android, android: activity };
             application.notify(exitArgs);
         } finally {
-            superFunc.call(activity);
         }
     }
 
     @profile
-    public onBackPressed(activity: any, superFunc: Function): void {
+    public onBackPressed(activity: any): boolean {
         if (traceEnabled()) {
             traceWrite("NativeScriptActivity.onBackPressed;", traceCategories.NativeLifecycle);
         }
@@ -1225,10 +1175,7 @@ class ActivityCallbacksImplementation implements AndroidActivityCallbacks {
                 callSuper = true;
             }
         }
-
-        if (callSuper) {
-            superFunc.call(activity);
-        }
+        return callSuper;
     }
 
     @profile
@@ -1237,7 +1184,6 @@ class ActivityCallbacksImplementation implements AndroidActivityCallbacks {
         requestCode: number,
         permissions: Array<String>,
         grantResults: Array<number>,
-        superFunc: Function
     ): void {
         if (traceEnabled()) {
             traceWrite("NativeScriptActivity.onRequestPermissionsResult;", traceCategories.NativeLifecycle);
@@ -1258,10 +1204,8 @@ class ActivityCallbacksImplementation implements AndroidActivityCallbacks {
         activity: any,
         requestCode: number,
         resultCode: number,
-        data: android.content.Intent,
-        superFunc: Function
+        data: android.content.Intent
     ): void {
-        superFunc.call(activity, requestCode, resultCode, data);
         if (traceEnabled()) {
             traceWrite(`NativeScriptActivity.onActivityResult(${requestCode}, ${resultCode}, ${data})`, traceCategories.NativeLifecycle);
         }
@@ -1362,7 +1306,104 @@ const notifyLaunch = profile("notifyLaunch", function notifyLaunch(intent: andro
     return launchArgs.root;
 });
 
-export function setActivityCallbacks(activity: androidx.appcompat.app.AppCompatActivity): void {
-    activity[CALLBACKS] = new ActivityCallbacksImplementation();
+// const activitiesCallbacksMap = new Map<string, ActivityCallbacksImplementation>();
+
+// let activityId = -1;
+// TODO this could be cleaner. We might even be able to get rid of ActivityCallbacksImplementation
+// the only issue is with the stored _rootView
+export function setActivityCallbacks(): void {
+    if (!activityInterface) {
+        // activityCallbacks = new ActivityCallbacksImplementation();
+        activityInterface = new com.tns.NativescriptActivity.Interface({
+            beforeOnCreate(activity: androidx.appcompat.app.AppCompatActivity, savedInstanceState: android.os.Bundle): boolean {
+                application.android.init(activity.getApplication());
+                // Set isNativeScriptActivity in onCreate.
+                // The JS constructor might not be called because the activity is created from Android.
+                const callbacks = (activity as any)._callbacks as ActivityCallbacksImplementation;
+                if (!callbacks) {
+                    // activityId++;
+                    // const tag = `activity${activityId}`;
+                    // activity.setTag
+                    const callbacks = (activity as any)._callbacks = new ActivityCallbacksImplementation();
+                    // activitiesCallbacksMap[tag] = callbacks;
+                }
+                let isRestart = !!savedInstanceState && moduleLoaded;
+                return isRestart;
+            },
+            afterOnCreate(activity: androidx.appcompat.app.AppCompatActivity, savedInstanceState: android.os.Bundle): void {
+                const callbacks = (activity as any)._callbacks as ActivityCallbacksImplementation;
+                if (callbacks) {
+                    callbacks.afterOnCreate(activity, savedInstanceState);
+                }
+                
+            },
+            onSaveInstanceState(activity: androidx.appcompat.app.AppCompatActivity, outState: android.os.Bundle): void {
+                const callbacks = (activity as any)._callbacks as ActivityCallbacksImplementation;
+                if (callbacks) {
+                    callbacks.onSaveInstanceState(activity, outState);
+                }
+            },
+            onNewIntent(activity: androidx.appcompat.app.AppCompatActivity, intent: android.content.Intent): void {
+                const callbacks = (activity as any)._callbacks as ActivityCallbacksImplementation;
+                if (callbacks) {
+                    callbacks.onNewIntent(activity, intent);
+                }
+            },
+            onStart(activity: any): void {
+                const callbacks = (activity as any)._callbacks as ActivityCallbacksImplementation;
+                if (callbacks) {
+                    callbacks.onStart(activity);
+                }
+            },
+            onStop(activity: any): void {
+                const callbacks = (activity as any)._callbacks as ActivityCallbacksImplementation;
+                if (callbacks) {
+                    callbacks.onStop(activity);
+                }
+            },
+            onPostResume(activity: any): void {
+                const callbacks = (activity as any)._callbacks as ActivityCallbacksImplementation;
+                if (callbacks) {
+                    callbacks.onPostResume(activity);
+                }
+            },
+            onDestroy(activity: any): void {
+                const callbacks = (activity as any)._callbacks as ActivityCallbacksImplementation;
+                if (callbacks) {
+                    callbacks.onDestroy(activity);
+                }
+            },
+            onBackPressed(activity: any): boolean {
+                const callbacks = (activity as any)._callbacks as ActivityCallbacksImplementation;
+                if (callbacks) {
+                    return callbacks.onBackPressed(activity);
+                }
+                return true;
+            },
+            onRequestPermissionsResult(
+                activity: any,
+                requestCode: number,
+                permissions: Array<String>,
+                grantResults: Array<number>,
+            ): void {
+                const callbacks = (activity as any)._callbacks as ActivityCallbacksImplementation;
+                if (callbacks) {
+                    callbacks.onRequestPermissionsResult(activity, requestCode, permissions, grantResults);
+                }
+            },
+            onActivityResult(
+                activity: any,
+                requestCode: number,
+                resultCode: number,
+                data: android.content.Intent
+            ): void {
+                const callbacks = (activity as any)._callbacks as ActivityCallbacksImplementation;
+                if (callbacks) {
+                    callbacks.onActivityResult(activity, requestCode, resultCode, data);
+                }
+            }
+        });
+    }
+    com.tns.NativescriptActivity.setInterface(activityInterface);
 }
 

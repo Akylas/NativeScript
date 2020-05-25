@@ -149,7 +149,7 @@
             }
             export class Fragment extends FragmentBase {
                 constructor(inter?: Fragment.Interface);
-                inter: Fragment.Interface
+                inter: Fragment.Interface;
                 setInterface(inter: Fragment.Interface);
             }
 
@@ -1252,6 +1252,103 @@
                         failingUrl: string
                     );
                 }
+            }
+        }
+    }
+}
+declare module com {
+    module tns {
+        class NativescriptActivity extends androidx.appcompat.app.AppCompatActivity {
+            static setInterface(inter: NativescriptActivity.Interface);
+        }
+        namespace NativescriptActivity {
+            class Interface {
+                constructor(implementation: {
+                    beforeOnCreate(
+                        activity: NativescriptActivity,
+                        savedInstanceState: globalAndroid.os.Bundle
+                    ): boolean;
+                    afterOnCreate(
+                        activity: NativescriptActivity,
+                        savedInstanceState: globalAndroid.os.Bundle
+                    );
+
+                    onNewIntent(
+                        activity: NativescriptActivity,
+                        intent: globalAndroid.content.Intent
+                    );
+
+                    onSaveInstanceState(
+                        activity: NativescriptActivity,
+                        outState: globalAndroid.os.Bundle
+                    );
+
+                    onStart(activity: NativescriptActivity);
+
+                    onStop(activity: NativescriptActivity);
+
+                    onDestroy(activity: NativescriptActivity);
+
+                    onPostResume(activity: NativescriptActivity);
+
+                    onBackPressed(activity: NativescriptActivity): boolean;
+
+                    onRequestPermissionsResult(
+                        activity: NativescriptActivity,
+                        requestCode: number,
+                        permissions: string[],
+                        grantResults: number[]
+                    );
+
+                    onActivityResult(
+                        activity: NativescriptActivity,
+                        requestCode: number,
+                        resultCode: number,
+                        data: globalAndroid.content.Intent
+                    );
+                });
+                beforeOnCreate(
+                    activity: NativescriptActivity,
+                    savedInstanceState: globalAndroid.os.Bundle
+                ): boolean;
+                afterOnCreate(
+                    activity: NativescriptActivity,
+                    savedInstanceState: globalAndroid.os.Bundle
+                );
+
+                onNewIntent(
+                    activity: NativescriptActivity,
+                    intent: globalAndroid.content.Intent
+                );
+
+                onSaveInstanceState(
+                    activity: NativescriptActivity,
+                    outState: globalAndroid.os.Bundle
+                );
+
+                onStart(activity: NativescriptActivity);
+
+                onStop(activity: NativescriptActivity);
+
+                onDestroy(activity: NativescriptActivity);
+
+                onPostResume(activity: NativescriptActivity);
+
+                onBackPressed(activity: NativescriptActivity): boolean;
+
+                onRequestPermissionsResult(
+                    activity: NativescriptActivity,
+                    requestCode: number,
+                    permissions: string[],
+                    grantResults: number[]
+                );
+
+                onActivityResult(
+                    activity: NativescriptActivity,
+                    requestCode: number,
+                    resultCode: number,
+                    data: globalAndroid.content.Intent
+                );
             }
         }
     }
