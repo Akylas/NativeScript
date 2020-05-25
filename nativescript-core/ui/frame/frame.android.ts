@@ -266,13 +266,12 @@ export class Frame extends FrameBase {
             },
         
              onCreate(savedInstanceState: android.os.Bundle) {
-        
-                this.setHasOptionsMenu(true);
-                callbacks.onCreate(this, savedInstanceState);
+                newFragment.setHasOptionsMenu(true);
+                callbacks.onCreate(newFragment, savedInstanceState);
             },
         
              onCreateView(inflater: android.view.LayoutInflater, container: android.view.ViewGroup, savedInstanceState: android.os.Bundle) {
-                let result = callbacks.onCreateView(this, inflater, container, savedInstanceState);
+                let result = callbacks.onCreateView(newFragment, inflater, container, savedInstanceState);
         
                 return result;
             },
@@ -290,9 +289,8 @@ export class Frame extends FrameBase {
             },
         
             toString(): string {
-                const callbacks = this._callbacks;
                 if (callbacks) {
-                    return callbacks.toStringOverride(this);
+                    return callbacks.toStringOverride(newFragment);
                 } else {
                     return null;
                 }
@@ -300,6 +298,7 @@ export class Frame extends FrameBase {
         });
         newFragment.setInterface(inter);
         const args = new android.os.Bundle();
+        console.log('createFragment',this._android.frameId );
         args.putInt(FRAMEID, this._android.frameId);
         newFragment.setArguments(args);
 

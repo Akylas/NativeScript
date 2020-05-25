@@ -11,10 +11,6 @@ import { _resolveAnimationCurve } from "../animation";
 import lazy from "../../utils/lazy";
 import { isEnabled as traceEnabled, write as traceWrite, categories as traceCategories } from "../../trace";
 
-interface TransitionListener {
-    new(entry: ExpandedEntry, transition: androidx.transition.Transition): ExpandedTransitionListener;
-}
-
 const defaultInterpolator = lazy(() => new android.view.animation.AccelerateDecelerateInterpolator());
 
 const animFadeIn = 17432576; // android.R.anim.fade_in
@@ -25,22 +21,20 @@ export const completedEntries = new Map<number, ExpandedEntry>();
 
 let AnimationListener: android.animation.Animator.AnimatorListener;
 
-interface ExpandedTransitionListener extends androidx.transition.Transition.TransitionListener {
-    entry: ExpandedEntry;
-    transition: androidx.transition.Transition;
-}
-
 interface ExpandedAnimator extends android.animation.Animator {
     entry: ExpandedEntry;
     transitionType?: string;
 }
+interface ExpandedTransitionListener extends androidx.transition.Transition.TransitionListener {
+    transition: androidx.transition.Transition;
+}
 
 interface ExpandedEntry extends BackstackEntry {
 
-    enterTransitionListener: androidx.transition.Transition.TransitionListener;
-    exitTransitionListener: androidx.transition.Transition.TransitionListener;
-    reenterTransitionListener: androidx.transition.Transition.TransitionListener;
-    returnTransitionListener: androidx.transition.Transition.TransitionListener;
+    enterTransitionListener: ExpandedTransitionListener;
+    exitTransitionListener: ExpandedTransitionListener;
+    reenterTransitionListener: ExpandedTransitionListener;
+    returnTransitionListener: ExpandedTransitionListener;
 
     enterAnimator: ExpandedAnimator;
     exitAnimator: ExpandedAnimator;
@@ -265,22 +259,22 @@ export function _updateTransitions(entry: ExpandedEntry): void {
     const fragment = entry.fragment;
     const enterTransitionListener = entry.enterTransitionListener;
     if (enterTransitionListener && fragment) {
-        fragment.setEnterTransition(enterTransitionListener);
+        fragment.setEnterTransition(enterTransitionListener.transition);
     }
 
     const exitTransitionListener = entry.exitTransitionListener;
     if (exitTransitionListener && fragment) {
-        fragment.setExitTransition(exitTransitionListener);
+        fragment.setExitTransition(exitTransitionListener.transition);
     }
 
     const reenterTransitionListener = entry.reenterTransitionListener;
     if (reenterTransitionListener && fragment) {
-        fragment.setReenterTransition(reenterTransitionListener);
+        fragment.setReenterTransition(reenterTransitionListener.transition);
     }
 
     const returnTransitionListener = entry.returnTransitionListener;
     if (returnTransitionListener && fragment) {
-        fragment.setReturnTransition(returnTransitionListener);
+        fragment.setReturnTransition(returnTransitionListener.transition);
     }
 }
 
@@ -292,7 +286,7 @@ export function _reverseTransitions(previousEntry: ExpandedEntry, currentEntry: 
     const returnTransitionListener = currentEntry.returnTransitionListener;
     if (returnTransitionListener) {
         transitionUsed = true;
-        currentFragment.setExitTransition(returnTransitionListener);
+        currentFragment.setExitTransition(returnTransitionListener.transition);
     } else {
         currentFragment.setExitTransition(null);
     }
@@ -300,7 +294,7 @@ export function _reverseTransitions(previousEntry: ExpandedEntry, currentEntry: 
     const reenterTransitionListener = previousEntry.reenterTransitionListener;
     if (reenterTransitionListener) {
         transitionUsed = true;
-        previousFragment.setEnterTransition(reenterTransitionListener);
+        previousFragment.setEnterTransition(reenterTransitionListener.transition);
     } else {
         previousFragment.setEnterTransition(null);
     }
@@ -311,9 +305,9 @@ export function _reverseTransitions(previousEntry: ExpandedEntry, currentEntry: 
 // Transition listener can't be static because
 // android is cloning transitions and we can't expand them :(
 function getTransitionListener(entry: ExpandedEntry, transition: androidx.transition.Transition) {
-    return new androidx.transition.Transition.TransitionListener({
+    const result = new androidx.transition.Transition.TransitionListener({
         onTransitionStart(transition: androidx.transition.Transition): void {
-            const entry = this.entry;
+            // const entry = this.entry;
             addToWaitingQueue(entry);
             if (traceEnabled()) {
                 traceWrite(`START ${toShortString(transition)} transition for ${entry.fragmentTag}`, traceCategories.Transition);
@@ -321,7 +315,7 @@ function getTransitionListener(entry: ExpandedEntry, transition: androidx.transi
         },
 
         onTransitionEnd(transition: androidx.transition.Transition): void {
-            const entry = this.entry;
+            // const entry = this.entry;
             if (traceEnabled()) {
                 traceWrite(`END ${toShortString(transition)} transition for ${entry.fragmentTag}`, traceCategories.Transition);
             }
@@ -330,24 +324,26 @@ function getTransitionListener(entry: ExpandedEntry, transition: androidx.transi
         },
 
         onTransitionResume(transition: androidx.transition.Transition): void {
+            const fragment = entry.fragmentTag;
             if (traceEnabled()) {
-                const fragment = this.entry.fragmentTag;
                 traceWrite(`RESUME ${toShortString(transition)} transition for ${fragment}`, traceCategories.Transition);
             }
         },
 
         onTransitionPause(transition: androidx.transition.Transition): void {
             if (traceEnabled()) {
-                traceWrite(`PAUSE ${toShortString(transition)} transition for ${this.entry.fragmentTag}`, traceCategories.Transition);
+                traceWrite(`PAUSE ${toShortString(transition)} transition for ${entry.fragmentTag}`, traceCategories.Transition);
             }
         },
 
         onTransitionCancel(transition: androidx.transition.Transition): void {
             if (traceEnabled()) {
-                traceWrite(`CANCEL ${toShortString(transition)} transition for ${this.entry.fragmentTag}`, traceCategories.Transition);
+                traceWrite(`CANCEL ${toShortString(transition)} transition for ${entry.fragmentTag}`, traceCategories.Transition);
             }
         }
-    });
+    }) as ExpandedTransitionListener;
+    result.transition = transition;
+    return result;
 }
 
 function addToWaitingQueue(entry: ExpandedEntry): void {
@@ -365,7 +361,8 @@ function clearExitAndReenterTransitions(entry: ExpandedEntry, removeListener: bo
     const fragment: androidx.fragment.app.Fragment = entry.fragment;
     const exitListener = entry.exitTransitionListener;
     if (exitListener) {
-        const exitTransition = fragment.getExitTransition();
+        const exitTransition = fragment.getExitTransition() as androidx.transition.Transition;
+        console.log('clearExitAndReenterTransitions',fragment, exitTransition );
         if (exitTransition) {
             if (removeListener) {
                 exitTransition.removeListener(exitListener);
@@ -473,10 +470,11 @@ function setEnterTransition(navigationTransition: NavigationTransition, entry: E
 function setExitTransition(navigationTransition: NavigationTransition, entry: ExpandedEntry, transition: androidx.transition.Transition): void {
     setUpNativeTransition(navigationTransition, transition);
     const listener = addNativeTransitionListener(entry, transition);
-
+    
     // attach listener to JS object so that it will be alive as long as entry.
     entry.exitTransitionListener = listener;
     const fragment: androidx.fragment.app.Fragment = entry.fragment;
+    console.log('setExitTransition', fragment, transition, listener);
     fragment.setExitTransition(transition);
 }
 
