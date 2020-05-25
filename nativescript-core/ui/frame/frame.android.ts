@@ -1006,7 +1006,7 @@ class FragmentCallbacksImplementation implements AndroidFragmentCallbacks {
         return bitmap;
     }
 }
-let activityInterface:com.tns.NativescriptActivity.Interface;
+let activityInterface:com.tns.NativeScriptActivity.Interface;
 let activityCallbacks:ActivityCallbacksImplementation;
 class ActivityCallbacksImplementation {
     private _rootView: View;
@@ -1314,7 +1314,7 @@ const notifyLaunch = profile("notifyLaunch", function notifyLaunch(intent: andro
 export function setActivityCallbacks(): void {
     if (!activityInterface) {
         // activityCallbacks = new ActivityCallbacksImplementation();
-        activityInterface = new com.tns.NativescriptActivity.Interface({
+        activityInterface = new com.tns.NativeScriptActivity.Interface({
             beforeOnCreate(activity: androidx.appcompat.app.AppCompatActivity, savedInstanceState: android.os.Bundle): boolean {
                 application.android.init(activity.getApplication());
                 // Set isNativeScriptActivity in onCreate.
@@ -1404,6 +1404,6 @@ export function setActivityCallbacks(): void {
             }
         });
     }
-    com.tns.NativescriptActivity.setInterface(activityInterface);
+    com.tns.NativeScriptActivity.setInterface(activityInterface);
 }
 

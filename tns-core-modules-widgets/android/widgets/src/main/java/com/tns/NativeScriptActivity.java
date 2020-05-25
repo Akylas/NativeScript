@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class NativescriptActivity extends AppCompatActivity {
+public class NativeScriptActivity extends AppCompatActivity {
     public final boolean isNativeScriptActivity = true;
     public interface Interface {
 
@@ -35,17 +35,17 @@ public class NativescriptActivity extends AppCompatActivity {
 
     public static Interface inter;
 
-    public NativescriptActivity() {
+    public NativeScriptActivity() {
         super();
     }
 
-    public NativescriptActivity(NativescriptActivity.Interface inter) {
+    public NativeScriptActivity(NativeScriptActivity.Interface inter) {
         super();
         this.setInterface(inter);
     }
 
-    public static void setInterface(NativescriptActivity.Interface inter) {
-        NativescriptActivity.inter = inter;
+    public static void setInterface(NativeScriptActivity.Interface inter) {
+        NativeScriptActivity.inter = inter;
     }
 
     @Override

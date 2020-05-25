@@ -14,6 +14,11 @@ import {
 } from "./application-interfaces";
 import { View } from "../ui/core/view";
 import { NavigationEntry, AndroidActivityCallbacks } from "../ui/frame/frame-interfaces";
+import * as globals from "../globals";
+
+if (global.__snapshot) {
+    globals.install();
+}
 
 // Requires
 import {

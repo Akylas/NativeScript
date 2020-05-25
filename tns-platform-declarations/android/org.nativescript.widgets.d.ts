@@ -1258,93 +1258,93 @@
 }
 declare module com {
     module tns {
-        class NativescriptActivity extends androidx.appcompat.app.AppCompatActivity {
-            static setInterface(inter: NativescriptActivity.Interface);
+        class NativeScriptActivity extends androidx.appcompat.app.AppCompatActivity {
+            static setInterface(inter: NativeScriptActivity.Interface);
         }
-        namespace NativescriptActivity {
+        namespace NativeScriptActivity {
             class Interface {
                 constructor(implementation: {
                     beforeOnCreate(
-                        activity: NativescriptActivity,
+                        activity: NativeScriptActivity,
                         savedInstanceState: globalAndroid.os.Bundle
                     ): boolean;
                     afterOnCreate(
-                        activity: NativescriptActivity,
+                        activity: NativeScriptActivity,
                         savedInstanceState: globalAndroid.os.Bundle
                     );
 
                     onNewIntent(
-                        activity: NativescriptActivity,
+                        activity: NativeScriptActivity,
                         intent: globalAndroid.content.Intent
                     );
 
                     onSaveInstanceState(
-                        activity: NativescriptActivity,
+                        activity: NativeScriptActivity,
                         outState: globalAndroid.os.Bundle
                     );
 
-                    onStart(activity: NativescriptActivity);
+                    onStart(activity: NativeScriptActivity);
 
-                    onStop(activity: NativescriptActivity);
+                    onStop(activity: NativeScriptActivity);
 
-                    onDestroy(activity: NativescriptActivity);
+                    onDestroy(activity: NativeScriptActivity);
 
-                    onPostResume(activity: NativescriptActivity);
+                    onPostResume(activity: NativeScriptActivity);
 
-                    onBackPressed(activity: NativescriptActivity): boolean;
+                    onBackPressed(activity: NativeScriptActivity): boolean;
 
                     onRequestPermissionsResult(
-                        activity: NativescriptActivity,
+                        activity: NativeScriptActivity,
                         requestCode: number,
                         permissions: string[],
                         grantResults: number[]
                     );
 
                     onActivityResult(
-                        activity: NativescriptActivity,
+                        activity: NativeScriptActivity,
                         requestCode: number,
                         resultCode: number,
                         data: globalAndroid.content.Intent
                     );
                 });
                 beforeOnCreate(
-                    activity: NativescriptActivity,
+                    activity: NativeScriptActivity,
                     savedInstanceState: globalAndroid.os.Bundle
                 ): boolean;
                 afterOnCreate(
-                    activity: NativescriptActivity,
+                    activity: NativeScriptActivity,
                     savedInstanceState: globalAndroid.os.Bundle
                 );
 
                 onNewIntent(
-                    activity: NativescriptActivity,
+                    activity: NativeScriptActivity,
                     intent: globalAndroid.content.Intent
                 );
 
                 onSaveInstanceState(
-                    activity: NativescriptActivity,
+                    activity: NativeScriptActivity,
                     outState: globalAndroid.os.Bundle
                 );
 
-                onStart(activity: NativescriptActivity);
+                onStart(activity: NativeScriptActivity);
 
-                onStop(activity: NativescriptActivity);
+                onStop(activity: NativeScriptActivity);
 
-                onDestroy(activity: NativescriptActivity);
+                onDestroy(activity: NativeScriptActivity);
 
-                onPostResume(activity: NativescriptActivity);
+                onPostResume(activity: NativeScriptActivity);
 
-                onBackPressed(activity: NativescriptActivity): boolean;
+                onBackPressed(activity: NativeScriptActivity): boolean;
 
                 onRequestPermissionsResult(
-                    activity: NativescriptActivity,
+                    activity: NativeScriptActivity,
                     requestCode: number,
                     permissions: string[],
                     grantResults: number[]
                 );
 
                 onActivityResult(
-                    activity: NativescriptActivity,
+                    activity: NativeScriptActivity,
                     requestCode: number,
                     resultCode: number,
                     data: globalAndroid.content.Intent
