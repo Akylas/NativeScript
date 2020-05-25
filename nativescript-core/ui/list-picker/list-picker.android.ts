@@ -45,7 +45,6 @@ export class ListPicker extends ListPickerBase {
 
     public initNativeView(): void {
         super.initNativeView();
-        initializeNativeClasses();
         const nativeView = this.nativeViewProtected;
 
         // api28 and lower uses reflection to retrieve and manipulate
