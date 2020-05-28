@@ -474,7 +474,6 @@ function setExitTransition(navigationTransition: NavigationTransition, entry: Ex
     // attach listener to JS object so that it will be alive as long as entry.
     entry.exitTransitionListener = listener;
     const fragment: androidx.fragment.app.Fragment = entry.fragment;
-    console.log('setExitTransition', fragment, transition, listener);
     fragment.setExitTransition(transition);
 }
 

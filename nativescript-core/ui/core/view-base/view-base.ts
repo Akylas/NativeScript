@@ -278,7 +278,7 @@ export abstract class ViewBase extends Observable implements ViewBaseDefinition 
 
     // TODO: Use Type.prototype.typeName instead.
     get typeName(): string {
-        return types.getClass(this);
+        return this.constructor.name;
     }
 
     get style(): Style {

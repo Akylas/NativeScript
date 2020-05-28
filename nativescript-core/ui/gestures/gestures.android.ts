@@ -15,6 +15,9 @@ import * as timer from "../../timer";
 export * from "./gestures-common";
 
 
+var noop = function(){};
+var noopFalse = function(){return false;};
+
 let DoubleTapTimeout;
 
 const SWIPE_THRESHOLD = 100;
@@ -31,7 +34,7 @@ export function observe(target: View, type: GestureTypes, callback: (args: Gestu
 
 export class GesturesObserver extends GesturesObserverBase {
     private _notifyTouch: boolean;
-    private _simpleGestureDetector: android.view.GestureDetector;
+    private _simpleGestureDetector: androidx.core.view.GestureDetectorCompat;
     private _scaleGestureDetector: android.view.ScaleGestureDetector;
     private _swipeGestureDetector: android.view.GestureDetector;
     private _panGestureDetector: CustomPanGestureDetector;
@@ -101,7 +104,11 @@ export class GesturesObserver extends GesturesObserverBase {
             if (!DoubleTapTimeout) {
                 DoubleTapTimeout = android.view.ViewConfiguration.getDoubleTapTimeout();
             }
+            this._tapType = type;
             const tapGestureListener = new android.view.GestureDetector.OnGestureListener({
+                onScroll:noopFalse,
+                onShowPress:noop,
+                onFling:noopFalse,
                 onDown:this.onTapDown.bind(this),
                 onSingleTapUp:this.onSingleTapUp.bind(this),
                 onLongPress:this.onLongPress.bind(this)
@@ -122,6 +129,10 @@ export class GesturesObserver extends GesturesObserverBase {
 
         if (type & GestureTypes.swipe) {
             const swipeGestureListener = new android.view.GestureDetector.OnGestureListener({
+                onScroll:noopFalse,
+                onShowPress:noop,
+                onSingleTapUp:noopFalse,
+                onLongPress:noopFalse,
                 onDown:this.onSwipeDown.bind(this),
                 onFling:this.onSwipeFling.bind(this),
             } as any);
@@ -296,7 +307,7 @@ export class GesturesObserver extends GesturesObserverBase {
             this._eventData.prepare(this.target, motionEvent);
             _executeCallback(this, this._eventData);
         }
-
+        
         if (this._simpleGestureDetector) {
             this._simpleGestureDetector.onTouchEvent(motionEvent);
         }
