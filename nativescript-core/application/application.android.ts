@@ -14,11 +14,12 @@ import {
 } from "./application-interfaces";
 import { View } from "../ui/core/view";
 import { NavigationEntry, AndroidActivityCallbacks } from "../ui/frame/frame-interfaces";
-import * as globals from "../globals";
 
-if (global.__snapshot) {
-    globals.install();
-}
+// TODO: why is install gone but this call still here? How could it work before?
+// import * as globals from "../globals";
+// if (global.__snapshot) {
+//     globals.install();
+// }
 
 // Requires
 import {
@@ -244,8 +245,6 @@ export function getNativeApplication(): android.app.Application {
         if (!nativeApp && com.tns.NativeScriptApplication) {
             
             nativeApp = com.tns.NativeScriptApplication.getInstance();
-            console.log('getNativeApplication', nativeApp);
-
             require('../ui/frame/frame').setActivityCallbacks();
         }
 
