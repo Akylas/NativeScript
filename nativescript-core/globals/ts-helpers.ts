@@ -11,7 +11,8 @@ if (!global.__extends) {
   };
 }
 
-import * as tslib from "tslib";
+import * as tslibType from "tslib";
+const tslib: typeof tslibType = require("tslib");
 
 // Bind the tslib helpers to global scope.
 // This is needed when we don't use importHelpers, which
