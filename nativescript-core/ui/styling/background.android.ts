@@ -2,11 +2,13 @@ import { View } from "../core/view";
 import { LinearGradient } from "./linear-gradient";
 
 import { isDataURI, isFileOrResourcePath, layout, RESOURCE_PREFIX, FILE_PREFIX } from "../../utils/utils";
-import { parse } from "../../css-value";
+import { parse as parseType } from "../../css-value";
 import { path, knownFolders } from "../../file-system";
 import * as application from "../../application";
 import { profile } from "../../profiling";
 export * from "./background-common";
+
+const parse:typeof parseType = require("../../css-value");
 
 interface AndroidView {
     _cachedDrawable: android.graphics.drawable.Drawable.ConstantState | android.graphics.drawable.Drawable;

@@ -19,7 +19,9 @@ import {
 } from "../../../trace";
 import * as types from "../../../utils/types";
 import * as bindableResources from "./bindable-resources";
-import * as polymerExpressions from "../../../js-libs/polymer-expressions";
+
+const polymerExpressions = require("../../../js-libs/polymer-expressions");
+// import * as polymerExpressions from "../../../js-libs/polymer-expressions";
 
 export {
     Observable, WrappedValue, PropertyChangeData, EventData,

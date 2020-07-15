@@ -5,9 +5,11 @@ import { unsetValue, _evaluateCssVariableExpression, _evaluateCssCalcExpression,
 import {
     SyntaxTree,
     Keyframes as KeyframesDefinition,
-    parse as parseCss,
+    parse as parseCssType,
     Node as CssNode,
 } from "../../css";
+const parseCss: typeof parseCssType = require("../../css").parse;
+
 import {
     CSS3Parser,
     CSSNativeScript

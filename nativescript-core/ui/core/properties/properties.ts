@@ -1,4 +1,4 @@
-import * as reduceCSSCalc from "reduce-css-calc";
+const reduceCSSCalc = require("reduce-css-calc");
 
 // Definitions.
 import * as definitions from "../view-base";

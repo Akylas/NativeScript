@@ -2,7 +2,8 @@
 // https://github.com/NativeScript/nativescript-dev-webpack/issues/932
 
 import * as definition from ".";
-import * as easysax from "../js-libs/easysax";
+const easysax = require("../js-libs/easysax");
+import { EasySAXParser } from "../js-libs/easysax";
 
 export class ParserEventType implements definition.ParserEventType {
     static StartElement = "StartElement";
@@ -115,7 +116,7 @@ function _HandleAmpEntities(found: string, decimalValue: string, hexValue: strin
 
 export class XmlParser implements definition.XmlParser {
     //TODO: Add option to configure whether the parser should report ignorable whitespace, i.e. document formatting whitespace.
-    private _parser: easysax.EasySAXParser;
+    private _parser: EasySAXParser;
 
     private _processNamespaces: boolean;
     private _namespaceStack: Array<any>;
