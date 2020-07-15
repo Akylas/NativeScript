@@ -49,15 +49,5 @@
                 "inject": true
             }
         ]
-    },
-    "snapshot": {
-        "android": {
-            "tns-java-classes": {
-                "modules": [
-                    "ui/frame/activity",
-                    "ui/frame/fragment"
-                ]
-            }
-        }
     }
 }

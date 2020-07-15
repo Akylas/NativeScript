@@ -14,8 +14,6 @@ const hashSalt = Date.now().toString();
 module.exports = env => {
     // Add your custom Activities, Services and other Android app components here.
     const appComponents = [
-        "tns-core-modules/ui/frame",
-        "tns-core-modules/ui/frame/activity",
     ];
 
     const platform = env && (env.android && "android" || env.ios && "ios");
@@ -95,12 +93,10 @@ module.exports = env => {
             hashSalt
         },
         resolve: {
-            extensions: [".ts", ".js", ".scss", ".css"],
+            extensions: [".mjs", ".ts", ".js", ".scss", ".css"],
             // Resolve {N} system modules from tns-core-modules
             modules: [
-                resolve(__dirname, "node_modules/tns-core-modules"),
                 resolve(__dirname, "node_modules"),
-                "node_modules/tns-core-modules",
                 "node_modules",
             ],
             alias: {
