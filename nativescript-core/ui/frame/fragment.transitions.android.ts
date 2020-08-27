@@ -28,15 +28,17 @@ let AnimationListener: android.animation.Animator.AnimatorListener;
 
 interface ExpandedTransitionListener extends androidx.transition.Transition.TransitionListener {
     entry: ExpandedEntry;
+    backEntry?: BackstackEntry;
     transition: androidx.transition.Transition;
 }
 
 interface ExpandedAnimator extends android.animation.Animator {
     entry: ExpandedEntry;
+    backEntry?: BackstackEntry;
     transitionType?: string;
 }
 
-interface ExpandedEntry extends BackstackEntry {
+export interface ExpandedEntry extends BackstackEntry {
 
     enterTransitionListener: ExpandedTransitionListener;
     exitTransitionListener: ExpandedTransitionListener;
@@ -219,9 +221,10 @@ function getAnimationListener(): android.animation.Animator.AnimatorListener {
 
             onAnimationStart(animator: ExpandedAnimator): void {
                 const entry = animator.entry;
+                const backEntry = animator.backEntry;
                 addToWaitingQueue(entry);
                 if (traceEnabled()) {
-                    traceWrite(`START ${animator.transitionType} for ${entry.fragmentTag}`, traceCategories.Transition);
+                    traceWrite(`END ${animator.transitionType} for ${entry.fragmentTag} backEntry:${backEntry ? backEntry.fragmentTag : 'none'}`, traceCategories.Transition);
                 }
             }
 
@@ -232,10 +235,13 @@ function getAnimationListener(): android.animation.Animator.AnimatorListener {
             }
 
             onAnimationEnd(animator: ExpandedAnimator): void {
+                const entry = animator.entry;
+				const backEntry = animator.backEntry;
                 if (traceEnabled()) {
-                    traceWrite(`END ${animator.transitionType} for ${animator.entry.fragmentTag}`, traceCategories.Transition);
+                    traceWrite(`END ${animator.transitionType} for ${entry.fragmentTag} backEntry:${backEntry ? backEntry.fragmentTag : 'none'}`, traceCategories.Transition);
                 }
-                transitionOrAnimationCompleted(animator.entry);
+                transitionOrAnimationCompleted(entry, backEntry);
+				animator.backEntry = null;
             }
 
             onAnimationCancel(animator: ExpandedAnimator): void {
@@ -323,6 +329,7 @@ function getTransitionListener(entry: ExpandedEntry, transition: androidx.transi
     if (!TransitionListener) {
         @Interfaces([(<any>androidx).transition.Transition.TransitionListener])
         class TransitionListenerImpl extends java.lang.Object implements androidx.transition.Transition.TransitionListener {
+            backEntry?: BackstackEntry;
             constructor(public entry: ExpandedEntry, public transition: androidx.transition.Transition) {
                 super();
 
@@ -339,11 +346,13 @@ function getTransitionListener(entry: ExpandedEntry, transition: androidx.transi
 
             onTransitionEnd(transition: androidx.transition.Transition): void {
                 const entry = this.entry;
+                const backEntry = this.backEntry;
                 if (traceEnabled()) {
-                    traceWrite(`END ${toShortString(transition)} transition for ${entry.fragmentTag}`, traceCategories.Transition);
+                    traceWrite(`END ${toShortString(transition)} transition for ${entry.fragmentTag} backEntry:${backEntry ? backEntry.fragmentTag : 'none'}`, traceCategories.Transition);
                 }
 
-                transitionOrAnimationCompleted(entry);
+                transitionOrAnimationCompleted(entry, backEntry);
+				this.backEntry = null;
             }
 
             onTransitionResume(transition: androidx.transition.Transition): void {
@@ -646,7 +655,7 @@ export function addNativeTransitionListener(entry: ExpandedEntry, nativeTransiti
     return listener;
 }
 
-function transitionOrAnimationCompleted(entry: ExpandedEntry): void {
+function transitionOrAnimationCompleted(entry: ExpandedEntry, backEntry: BackstackEntry): void {
     const frameId = entry.frameId;
     const entries = waitingQueue.get(frameId);
     // https://github.com/NativeScript/NativeScript/issues/5759
@@ -673,7 +682,7 @@ function transitionOrAnimationCompleted(entry: ExpandedEntry): void {
         // Will be null if Frame is shown modally...
         // transitionOrAnimationCompleted fires again (probably bug in android).
         if (current) {
-            setTimeout(() => frame.setCurrent(current, navigationContext.navigationType));
+            setTimeout(() => frame.setCurrent(backEntry || current, navigationContext.navigationType));
         }
     } else {
         completedEntries.set(frameId, entry);

@@ -4,6 +4,7 @@ import {
     AndroidFragmentCallbacks, BackstackEntry, NavigationTransition
 } from ".";
 import { TransitionState } from "./frame-common";
+import { ExpandedEntry } from "./fragment.transitions.android";
 import { Page } from "../page";
 
 // Types.
@@ -444,7 +445,14 @@ export class Frame extends FrameBase {
             //transaction.setTransition(androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         }
 
-        transaction.replace(this.containerViewId, newFragment, newFragmentTag);
+        if (clearHistory || isReplace) {
+			transaction.replace(this.containerViewId, newFragment, newFragmentTag);
+		} else  {
+			transaction.add(this.containerViewId, newFragment, newFragmentTag);
+		}
+		if (this._currentEntry && this._currentEntry.entry.backstackVisible === false) {
+			transaction.remove(this._currentEntry.fragment);
+		}
         transaction.commitAllowingStateLoss();
     }
 
@@ -466,7 +474,25 @@ export class Frame extends FrameBase {
 
         _reverseTransitions(backstackEntry, this._currentEntry);
 
-        transaction.replace(this.containerViewId, backstackEntry.fragment, backstackEntry.fragmentTag);
+        const currentIndex =this.backStack.length;
+		const goBackToIndex = this.backStack.indexOf(backstackEntry);
+
+		// the order is important so that the transition listener called be 
+		// the one from the current entry we are going back from
+		if (this._currentEntry !== backstackEntry) {
+			const entry = this._currentEntry as ExpandedEntry;
+			// if we are going back we need to store where we are backing to
+			// so that we can set the current entry
+			// it only needs to be done on the return transition
+			if (entry.returnTransitionListener) {
+				entry.returnTransitionListener.backEntry = backstackEntry;
+			}
+
+			transaction.remove((this._currentEntry).fragment);	
+		}
+		for (let index = goBackToIndex + 1; index < currentIndex; index++) {
+			transaction.remove(this.backStack[index].fragment);
+		}
         transaction.commitAllowingStateLoss();
     }
 
