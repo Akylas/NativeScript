@@ -1,9 +1,9 @@
 {
-    "name": "@nativescript/core",
+    "name": "@akylas/nativescript",
     "main": "index",
     "types": "index.d.ts",
     "description": "NativeScript Core Modules",
-    "version": "6.5.15",
+    "version": "6.5.18",
     "homepage": "https://www.nativescript.org",
     "repository": {
         "type": "git",
@@ -19,11 +19,11 @@
     ],
     "license": "Apache-2.0",
     "dependencies": {
-        "css-tree": "^1.0.0-alpha.37",
+        "css-tree": "1.0.0-alpha.39",
         "nativescript-hook": "0.2.5",
         "reduce-css-calc": "^2.1.6",
         "semver": "6.3.0",
-        "tns-core-modules-widgets": "latest",
+        "tns-core-modules-widgets": "file:../tns-core-modules-widgets/dist/package",
         "tslib": "1.10.0"
     },
     "devDependencies": {
