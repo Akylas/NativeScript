@@ -4,10 +4,10 @@
 	"parserOptions": {
 		"ecmaVersion": 2018,
 		"sourceType": "module",
-		"project": ["packages/core/tsconfig.json", "packages/webpack/tsconfig.json"]
+		"project": ["packages/core/tsconfig.json", "packages/webpack/tsconfig.json", "packages/webpack5/tsconfig.json"]
 	},
 	"ignorePatterns": ["**/*"],
-	"plugins": ["@typescript-eslint", "@nrwl/nx"],
+	"plugins": ["prettier", "@typescript-eslint", "@nrwl/nx"],
 	"extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier", "prettier/@typescript-eslint"],
 	"rules": {
 		"@typescript-eslint/explicit-member-accessibility": "off",
