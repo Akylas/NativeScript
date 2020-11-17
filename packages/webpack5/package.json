@@ -5,8 +5,8 @@
   "main": "index.js",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "echo todo",
-		"test": "jest"
+    "build": "tsc",
+    "test": "jest"
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",
@@ -16,6 +16,9 @@
     "webpack": "^5.4.0"
   },
   "dependencies": {
-    "webpack-chain": "^6.5.1"
+    "clean-webpack-plugin": "^3.0.0",
+    "vue-loader": "^15.9.5",
+    "webpack-chain": "^6.5.1",
+    "webpack-merge": "^5.4.0"
   }
 }

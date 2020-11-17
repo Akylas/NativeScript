@@ -1,4 +1,4 @@
-import { __vue } from '@nativescript/webpack';
+import { __react } from '@nativescript/webpack';
 
 // todo: maybe mock baseConfig as we test it separately?
 // import Config from 'webpack-chain'
@@ -6,13 +6,13 @@ import { __vue } from '@nativescript/webpack';
 // 	return new Config()
 // })
 
-describe('vue configuration', () => {
+describe('react configuration', () => {
 	const platforms = ['ios', 'android'];
 
 	for (let platform of platforms) {
 		it(`for ${platform}`, () => {
 			expect(
-				__vue({
+				__react({
 					[platform]: true,
 				}).toString()
 			).toMatchSnapshot();
