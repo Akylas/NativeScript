@@ -87,6 +87,11 @@ export interface ShowModalOptions {
 		 * An optional parameter specifying whether the modal view can be dismissed when not in full-screen mode.
 		 */
 		cancelable?: boolean;
+
+		/**
+		 * An optional parameter specifying the windowSoftInputMode of the dialog window
+		 */
+		windowSoftInputMode?: number;
 	};
 	/**
 	 * An optional parameter specifying whether the modal view can be dismissed when not in full-screen mode.
@@ -238,6 +243,7 @@ export abstract class ViewBase extends Observable implements ViewBaseDefinition 
 
 	public id: string;
 	public className: string;
+	public disableCss: boolean;
 
 	public _domId: number;
 	public _context: any;
@@ -392,9 +398,14 @@ export abstract class ViewBase extends Observable implements ViewBaseDefinition 
 		if (this._isLoaded) {
 			return;
 		}
-
+		// the view is going to be layed out after
+		// no need for requestLayout which can be pretty slow because
+		// called a lot and going all up the chain to the page
+		this.suspendRequestLayout = true;
 		this._isLoaded = true;
-		this._cssState.onLoaded();
+		if (!this.disableCss) {
+			this._cssState.onLoaded();
+		}
 		this._resumeNativeUpdates(SuspendType.Loaded);
 
 		this.eachChild((child) => {
@@ -403,6 +414,7 @@ export abstract class ViewBase extends Observable implements ViewBaseDefinition 
 			return true;
 		});
 
+		this.suspendRequestLayout = false;
 		this._emit('loaded');
 	}
 
@@ -422,7 +434,9 @@ export abstract class ViewBase extends Observable implements ViewBaseDefinition 
 		});
 
 		this._isLoaded = false;
-		this._cssState.onUnloaded();
+		if (!this.disableCss) {
+			this._cssState.onUnloaded();
+		}
 		this._emit('unloaded');
 	}
 
@@ -619,8 +633,23 @@ export abstract class ViewBase extends Observable implements ViewBaseDefinition 
 		}
 	}
 
+
+	_requetLayoutNeeded = false;
+	get isLayoutRequestNeeded() {
+		return this._requetLayoutNeeded;
+	}
+	
+	_suspendRequestLayout = false;
+	set suspendRequestLayout(value: boolean) {
+		this._suspendRequestLayout = value;
+	}
+	get suspendRequestLayout() {
+		return this._suspendRequestLayout;
+	}
+
 	@profile
 	public requestLayout(): void {
+
 		// Default implementation for non View instances (like TabViewItem).
 		const parent = this.parent;
 		if (parent) {
@@ -1008,6 +1037,9 @@ export abstract class ViewBase extends Observable implements ViewBaseDefinition 
 	}
 
 	_onCssStateChange(): void {
+		if (this.disableCss) {
+			return;
+		}
 		this._cssState.onChange();
 		eachDescendant(this, (child: ViewBase) => {
 			child._cssState.onChange();
@@ -1017,6 +1049,9 @@ export abstract class ViewBase extends Observable implements ViewBaseDefinition 
 	}
 
 	_inheritStyleScope(styleScope: ssm.StyleScope): void {
+		if (this.disableCss) {
+			return;
+		}
 		// If we are styleScope don't inherit parent stylescope.
 		// TODO: Consider adding parent scope and merge selectors.
 		if (this._isStyleScopeHost) {
@@ -1104,6 +1139,9 @@ bindingContextProperty.register(ViewBase);
 export const classNameProperty = new Property<ViewBase, string>({
 	name: 'className',
 	valueChanged(view: ViewBase, oldValue: string, newValue: string) {
+		if (view.disableCss) {
+			return;
+		}
 		const cssClasses = view.cssClasses;
 		const rootViewsCssClasses = CSSUtils.getSystemCssClasses();
 
@@ -1123,7 +1161,6 @@ export const classNameProperty = new Property<ViewBase, string>({
 		if (typeof newValue === 'string' && newValue !== '') {
 			newValue.split(' ').forEach((c) => cssClasses.add(c));
 		}
-
 		view._onCssStateChange();
 	},
 });
@@ -1134,6 +1171,13 @@ export const idProperty = new Property<ViewBase, string>({
 	valueChanged: (view, oldValue, newValue) => view._onCssStateChange(),
 });
 idProperty.register(ViewBase);
+export const disableCssProperty = new InheritedProperty<ViewBase, boolean>({
+	name: 'disableCss',
+	defaultValue: false,
+	valueConverter: booleanConverter,
+});
+disableCssProperty.register(ViewBase);
+
 
 export function booleanConverter(v: string): boolean {
 	const lowercase = (v + '').toLowerCase();

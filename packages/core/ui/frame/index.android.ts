@@ -19,6 +19,7 @@ import { Builder } from '../builder';
 import { CSSUtils } from '../../css/system-classes';
 import { Device } from '../../platform';
 import { profile } from '../../profiling';
+import { ExpandedEntry } from './fragment.transitions.android';
 
 export * from './frame-common';
 
@@ -243,11 +244,6 @@ export class Frame extends FrameBase {
 
 	onUnloaded() {
 		super.onUnloaded();
-
-		// calling dispose fragment after super.onUnloaded() means we are not relying on the built-in Android logic
-		// to automatically remove child fragments when parent fragment is removed;
-		// this fixes issue with missing nested fragment on app suspend / resume;
-		this.disposeCurrentFragment();
 	}
 
 	private disposeCurrentFragment(): void {
@@ -326,6 +322,8 @@ export class Frame extends FrameBase {
 
 			// If we had real navigation process queue.
 			this._processNavigationQueue(entry.resolvedPage);
+
+
 		} else {
 			// Otherwise currentPage was recreated so this wasn't real navigation.
 			// Continue with next item in the queue.
@@ -438,7 +436,14 @@ export class Frame extends FrameBase {
 			//transaction.setTransition(androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		}
 
-		transaction.replace(this.containerViewId, newFragment, newFragmentTag);
+		if (clearHistory || isReplace) {
+			transaction.replace(this.containerViewId, newFragment, newFragmentTag);
+		} else  {
+			transaction.add(this.containerViewId, newFragment, newFragmentTag);
+		}
+		if (this._currentEntry && this._currentEntry.entry.backstackVisible === false) {
+			transaction.remove(this._currentEntry.fragment);
+		}
 		transaction.commitAllowingStateLoss();
 	}
 
@@ -448,7 +453,6 @@ export class Frame extends FrameBase {
 
 		const manager: androidx.fragment.app.FragmentManager = this._getFragmentManager();
 		const transaction = manager.beginTransaction();
-
 		if (!backstackEntry.fragment) {
 			// Happens on newer API levels. On older all fragments
 			// are recreated once activity is created.
@@ -460,7 +464,25 @@ export class Frame extends FrameBase {
 
 		_reverseTransitions(backstackEntry, this._currentEntry);
 
-		transaction.replace(this.containerViewId, backstackEntry.fragment, backstackEntry.fragmentTag);
+		const currentIndex =this.backStack.length;
+		const goBackToIndex = this.backStack.indexOf(backstackEntry);
+		
+		// the order is important so that the transition listener called be 
+		// the one from the current entry we are going back from
+		if (this._currentEntry !== backstackEntry) {
+			const entry = this._currentEntry as ExpandedEntry;
+			// if we are going back we need to store where we are backing to
+			// so that we can set the current entry
+			// it only needs to be done on the return transition
+			if (entry.returnTransitionListener) {
+				entry.returnTransitionListener.backEntry = backstackEntry;
+			}
+			
+			transaction.remove((this._currentEntry).fragment);	
+		}
+		for (let index = goBackToIndex + 1; index < currentIndex; index++) {
+			transaction.remove(this.backStack[index].fragment);
+		}
 
 		transaction.commitAllowingStateLoss();
 	}
@@ -753,6 +775,12 @@ function findPageForFragment(fragment: androidx.fragment.app.Fragment, frame: Fr
 		entry = current;
 	} else if (executingContext && executingContext.entry && executingContext.entry.fragmentTag === fragmentTag) {
 		entry = executingContext.entry;
+	} else {
+		frame.backStack.forEach(e=>{
+			if (e && e.fragmentTag === fragmentTag) {
+				entry = e;
+			}
+		})
 	}
 
 	let page: Page;
@@ -948,26 +976,11 @@ class FragmentCallbacksImplementation implements AndroidFragmentCallbacks {
 
 	@profile
 	public onDestroyView(fragment: org.nativescript.widgets.FragmentBase, superFunc: Function): void {
-		try {
 			if (Trace.isEnabled()) {
 				Trace.write(`${fragment}.onDestroyView()`, Trace.categories.NativeLifecycle);
 			}
-
-			const hasRemovingParent = fragment.getRemovingParentFragment();
-
-			if (hasRemovingParent) {
-				const nativeFrameView = this.frame.nativeViewProtected;
-				if (nativeFrameView) {
-					const bitmapDrawable = new android.graphics.drawable.BitmapDrawable(application.android.context.getResources(), this.backgroundBitmap);
-					this.frame._originalBackground = this.frame.backgroundColor || new Color('White');
-					nativeFrameView.setBackgroundDrawable(bitmapDrawable);
-					this.backgroundBitmap = null;
-				}
-			}
-		} finally {
 			superFunc.call(fragment);
 		}
-	}
 
 	@profile
 	public onDestroy(fragment: androidx.fragment.app.Fragment, superFunc: Function): void {
@@ -1000,17 +1013,7 @@ class FragmentCallbacksImplementation implements AndroidFragmentCallbacks {
 
 	@profile
 	public onPause(fragment: org.nativescript.widgets.FragmentBase, superFunc: Function): void {
-		try {
-			// Get view as bitmap and set it as background. This is workaround for the disapearing nested fragments.
-			// TODO: Consider removing it when update to androidx.fragment:1.2.0
-			const hasRemovingParent = fragment.getRemovingParentFragment();
-
-			if (hasRemovingParent) {
-				this.backgroundBitmap = this.loadBitmapFromView(this.frame.nativeViewProtected);
-			}
-		} finally {
 			superFunc.call(fragment);
-		}
 	}
 
 	@profile

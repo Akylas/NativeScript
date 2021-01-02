@@ -63,6 +63,9 @@ const statePressed = 16842919; // android.R.attr.state_pressed
 const stateEnabled = 16842910; // android.R.attr.state_enabled
 const styleAnimationDialog = 16973826; // android.R.style.Animation_Dialog
 
+const VERTICAL_GRAVITY_MASK = 112; // android.view.Gravity.VERTICAL_GRAVITY_MASK
+const HORIZONTAL_GRAVITY_MASK = 7; // android.view.Gravity.HORIZONTAL_GRAVITY_MASK
+
 const sdkVersion = lazy(() => parseInt(Device.sdkVersion));
 
 const modalMap = new Map<number, DialogOptions>();
@@ -76,6 +79,7 @@ interface DialogOptions {
 	animated: boolean;
 	stretched: boolean;
 	cancelable: boolean;
+	windowSoftInputMode: number;
 	shownCallback: () => void;
 	dismissCallback: () => void;
 }
@@ -168,6 +172,7 @@ function initializeDialogFragment() {
 	class DialogFragmentImpl extends androidx.fragment.app.DialogFragment {
 		public owner: View;
 		private _fullscreen: boolean;
+		private _windowSoftInputMode: number;
 		private _animated: boolean;
 		private _stretched: boolean;
 		private _cancelable: boolean;
@@ -192,6 +197,7 @@ function initializeDialogFragment() {
 			this._stretched = options.stretched;
 			this._dismissCallback = options.dismissCallback;
 			this._shownCallback = options.shownCallback;
+			this._windowSoftInputMode = options.windowSoftInputMode;
 			this.setStyle(androidx.fragment.app.DialogFragment.STYLE_NO_TITLE, 0);
 
 			let theme = this.getTheme();
@@ -229,6 +235,16 @@ function initializeDialogFragment() {
 			owner._setupAsRootView(this.getActivity());
 			owner._isAddedToNativeVisualTree = true;
 
+			// we need to set the window SoftInputMode here.
+			// it wont work is set in onStart
+			const window = this.getDialog().getWindow();
+			if (this._windowSoftInputMode !== undefined) {
+				window.setSoftInputMode(this._windowSoftInputMode);
+			} else {
+				// the dialog seems to not follow the default activity softinputmode,
+				// thus set we set it here.
+				window.setSoftInputMode((<androidx.appcompat.app.AppCompatActivity>owner._context).getWindow().getAttributes().softInputMode);
+			}
 			return owner.nativeViewProtected;
 		}
 
@@ -237,6 +253,8 @@ function initializeDialogFragment() {
 			if (this._fullscreen) {
 				const window = this.getDialog().getWindow();
 				const length = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+				// set the animations to use on showing and hiding the dialog
+				window.setWindowAnimations(16973826); //android.R.style.Animation_Dialog
 				window.setLayout(length, length);
 				// This removes the default backgroundDrawable so there are no margins.
 				window.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.WHITE));
@@ -450,7 +468,7 @@ export class View extends ViewCommon {
 	public initNativeView(): void {
 		super.initNativeView();
 		this._isClickable = this.nativeViewProtected.isClickable();
-
+		
 		if (this.hasListeners(ViewCommon.layoutChangedEvent)) {
 			this.setOnLayoutChangeListener();
 		}
@@ -477,7 +495,6 @@ export class View extends ViewCommon {
 		this.nativeViewProtected.setOnTouchListener(this.touchListener);
 
 		this.touchListenerIsSet = true;
-
 		if (this.nativeViewProtected.setClickable) {
 			this.nativeViewProtected.setClickable(this.isUserInteractionEnabled);
 		}
@@ -525,6 +542,11 @@ export class View extends ViewCommon {
 
 	@profile
 	public requestLayout(): void {
+		if (this._suspendRequestLayout) {
+			this._requetLayoutNeeded = true;
+			return;
+		}
+		this._requetLayoutNeeded = false;
 		super.requestLayout();
 		if (this.nativeViewProtected) {
 			this.nativeViewProtected.requestLayout();
@@ -672,10 +694,14 @@ export class View extends ViewCommon {
 		df.setArguments(args);
 
 		let cancelable = true;
+		let windowSoftInputMode: number;
 
-		if (options.android && (<any>options).android.cancelable !== undefined) {
-			cancelable = !!(<any>options).android.cancelable;
-			console.log('ShowModalOptions.android.cancelable is deprecated. Use ShowModalOptions.cancelable instead.');
+		if (options.android) {
+			if ((<any>options).android.cancelable !== undefined) {
+				cancelable = !!(<any>options).android.cancelable;
+				console.log('ShowModalOptions.android.cancelable is deprecated. Use ShowModalOptions.cancelable instead.');
+			}
+			windowSoftInputMode = (<any>options).android.windowSoftInputMode;
 		}
 
 		cancelable = options.cancelable !== undefined ? !!options.cancelable : cancelable;
@@ -686,6 +712,7 @@ export class View extends ViewCommon {
 			animated: !!options.animated,
 			stretched: !!options.stretched,
 			cancelable: cancelable,
+			windowSoftInputMode: windowSoftInputMode,
 			shownCallback: () => this._raiseShownModallyEvent(),
 			dismissCallback: () => this.closeModal(),
 		};
@@ -860,30 +887,32 @@ export class View extends ViewCommon {
 	[horizontalAlignmentProperty.setNative](value: HorizontalAlignment) {
 		const nativeView = this.nativeViewProtected;
 		const lp: any = nativeView.getLayoutParams() || new org.nativescript.widgets.CommonLayoutParams();
+		const gravity = lp.gravity;
+		const weight = lp.weight;
 		// Set only if params gravity exists.
 		if (lp.gravity !== undefined) {
 			switch (value) {
 				case 'left':
-					lp.gravity = android.view.Gravity.LEFT | (lp.gravity & android.view.Gravity.VERTICAL_GRAVITY_MASK);
-					if (lp.weight < 0) {
+					lp.gravity = 3 | (gravity & VERTICAL_GRAVITY_MASK); // android.view.Gravity.LEFT
+					if (weight < 0) {
 						lp.weight = -2;
 					}
 					break;
 				case 'center':
-					lp.gravity = android.view.Gravity.CENTER_HORIZONTAL | (lp.gravity & android.view.Gravity.VERTICAL_GRAVITY_MASK);
-					if (lp.weight < 0) {
+					lp.gravity = 1 | (gravity & VERTICAL_GRAVITY_MASK); // android.view.Gravity.CENTER_HORIZONTAL
+					if (weight < 0) {
 						lp.weight = -2;
 					}
 					break;
 				case 'right':
-					lp.gravity = android.view.Gravity.RIGHT | (lp.gravity & android.view.Gravity.VERTICAL_GRAVITY_MASK);
-					if (lp.weight < 0) {
+					lp.gravity = 5 | (gravity & VERTICAL_GRAVITY_MASK); // android.view.Gravity.RIGHT
+					if (weight < 0) {
 						lp.weight = -2;
 					}
 					break;
 				case 'stretch':
-					lp.gravity = android.view.Gravity.FILL_HORIZONTAL | (lp.gravity & android.view.Gravity.VERTICAL_GRAVITY_MASK);
-					if (lp.weight < 0) {
+					lp.gravity = 7 | (gravity & VERTICAL_GRAVITY_MASK); // android.view.Gravity.FILL_HORIZONTAL
+					if (weight < 0) {
 						lp.weight = -1;
 					}
 					break;
@@ -898,30 +927,32 @@ export class View extends ViewCommon {
 	[verticalAlignmentProperty.setNative](value: VerticalAlignment) {
 		const nativeView = this.nativeViewProtected;
 		const lp: any = nativeView.getLayoutParams() || new org.nativescript.widgets.CommonLayoutParams();
+		const gravity = lp.gravity;
+		const height = lp.height;
 		// Set only if params gravity exists.
-		if (lp.gravity !== undefined) {
+		if (gravity !== undefined) {
 			switch (value) {
 				case 'top':
-					lp.gravity = android.view.Gravity.TOP | (lp.gravity & android.view.Gravity.HORIZONTAL_GRAVITY_MASK);
-					if (lp.height < 0) {
+					lp.gravity = 48 | (gravity & HORIZONTAL_GRAVITY_MASK); // android.view.Gravity.TOP
+					if (height < 0) {
 						lp.height = -2;
 					}
 					break;
 				case 'middle':
-					lp.gravity = android.view.Gravity.CENTER_VERTICAL | (lp.gravity & android.view.Gravity.HORIZONTAL_GRAVITY_MASK);
-					if (lp.height < 0) {
+					lp.gravity = 16 | (gravity & HORIZONTAL_GRAVITY_MASK); // android.view.Gravity.CENTER_VERTICAL
+					if (height < 0) {
 						lp.height = -2;
 					}
 					break;
 				case 'bottom':
-					lp.gravity = android.view.Gravity.BOTTOM | (lp.gravity & android.view.Gravity.HORIZONTAL_GRAVITY_MASK);
-					if (lp.height < 0) {
+					lp.gravity = 80 | (gravity & HORIZONTAL_GRAVITY_MASK); // android.view.Gravity.BOTTOM
+					if (height < 0) {
 						lp.height = -2;
 					}
 					break;
 				case 'stretch':
-					lp.gravity = android.view.Gravity.FILL_VERTICAL | (lp.gravity & android.view.Gravity.HORIZONTAL_GRAVITY_MASK);
-					if (lp.height < 0) {
+					lp.gravity = 112 | (gravity & HORIZONTAL_GRAVITY_MASK); // android.view.Gravity.FILL_VERTICAL
+					if (height < 0) {
 						lp.height = -1;
 					}
 					break;

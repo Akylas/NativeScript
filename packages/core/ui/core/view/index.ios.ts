@@ -54,9 +54,21 @@ export class View extends ViewCommon implements ViewDefinition {
 		return (this._privateFlags & PFLAG_FORCE_LAYOUT) === PFLAG_FORCE_LAYOUT;
 	}
 
+	requestlayoutIfNeeded() {
+		if ( this.isLayoutRequired) {
+			this._requetLayoutNeeded = false;
+			this.requestLayout();
+		}
+	}
+
 	public requestLayout(): void {
-		super.requestLayout();
+		if (this._suspendRequestLayout) {
+			this._requetLayoutNeeded = true;
+			return;
+		}
+		this._requetLayoutNeeded = false;
 		this._privateFlags |= PFLAG_FORCE_LAYOUT;
+		super.requestLayout();
 
 		const nativeView = this.nativeViewProtected;
 		if (nativeView && nativeView.setNeedsLayout) {
@@ -262,7 +274,9 @@ export class View extends ViewCommon implements ViewDefinition {
 		if (majorVersion <= 10) {
 			return null;
 		}
-
+		if (this.iosIgnoreSafeArea) {
+            return frame;
+        }
 		if (!this.iosOverflowSafeArea || !this.iosOverflowSafeAreaEnabled) {
 			return IOSHelper.shrinkToSafeArea(this, frame);
 		} else if (this.nativeViewProtected && this.nativeViewProtected.window) {
@@ -275,7 +289,9 @@ export class View extends ViewCommon implements ViewDefinition {
 	public getSafeAreaInsets(): { left; top; right; bottom } {
 		const safeAreaInsets = this.nativeViewProtected && this.nativeViewProtected.safeAreaInsets;
 		const insets = { left: 0, top: 0, right: 0, bottom: 0 };
-
+		if (this.iosIgnoreSafeArea) {
+            return insets;
+        }
 		if (safeAreaInsets) {
 			insets.left = layout.round(layout.toDevicePixels(safeAreaInsets.left));
 			insets.top = layout.round(layout.toDevicePixels(safeAreaInsets.top));

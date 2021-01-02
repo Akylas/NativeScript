@@ -108,6 +108,9 @@ export abstract class ViewCommon extends ViewBase implements ViewDefinition {
 	}
 
 	public changeCssFile(cssFileName: string): void {
+		if (this.disableCss) {
+			return;
+		}
 		const scope = this._styleScope;
 		if (scope && cssFileName) {
 			scope.changeCssFile(cssFileName);
@@ -116,6 +119,9 @@ export abstract class ViewCommon extends ViewBase implements ViewDefinition {
 	}
 
 	public _updateStyleScope(cssFileName?: string, cssString?: string, css?: string): void {
+		if (this.disableCss) {
+			return;
+		}
 		let scope = this._styleScope;
 		if (!scope) {
 			scope = new StyleScope();
@@ -758,7 +764,8 @@ export abstract class ViewCommon extends ViewBase implements ViewDefinition {
 	public isUserInteractionEnabled: boolean;
 	public iosOverflowSafeArea: boolean;
 	public iosOverflowSafeAreaEnabled: boolean;
-
+	public iosIgnoreSafeArea: boolean;
+	
 	get isLayoutValid(): boolean {
 		return this._isLayoutValid;
 	}
@@ -1055,3 +1062,9 @@ export const iosOverflowSafeAreaEnabledProperty = new InheritedProperty<ViewComm
 	valueConverter: booleanConverter,
 });
 iosOverflowSafeAreaEnabledProperty.register(ViewCommon);
+export const iosIgnoreSafeAreaProperty = new InheritedProperty({
+    name: 'iosIgnoreSafeArea',
+    defaultValue: false,
+    valueConverter: booleanConverter,
+});
+iosIgnoreSafeAreaProperty.register(ViewCommon);
