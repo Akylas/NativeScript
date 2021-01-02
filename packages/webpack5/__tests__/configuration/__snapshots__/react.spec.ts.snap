@@ -1,23 +1,46 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`react configuration for android 1`] = `
+exports[`react configuration > android > adds ReactRefreshWebpackPlugin when HMR enabled 1`] = `
 "{
   mode: 'development',
+  externals: [
+    'package.json',
+    '~/package.json'
+  ],
+  devtool: 'inline-source-map',
+  target: 'node',
+  output: {
+    path: '__jest__/platforms/android/app/src/main/assets/app',
+    pathinfo: false,
+    publicPath: '',
+    libraryTarget: 'commonjs',
+    globalObject: 'global'
+  },
   resolve: {
     symlinks: true,
     alias: {
-      '~/package.json': 'package.json',
-      '~': '<TODO>appFullPath',
-      '@': '<TODO>appFullPath',
+      '~': '__jest__/src',
+      '@': '__jest__/src',
       'react-dom': 'react-nativescript'
     },
     extensions: [
-      '.tsx'
+      '.android.tsx',
+      '.tsx',
+      '.android.ts',
+      '.ts',
+      '.android.js',
+      '.js',
+      '.android.css',
+      '.css',
+      '.android.scss',
+      '.scss',
+      '.android.json',
+      '.json'
     ]
   },
   resolveLoader: {
     modules: [
-      '@nativescript/webpack/loaders',
+      'node_modules/@nativescript/webpack/dist/loaders',
       'node_modules'
     ]
   },
@@ -25,9 +48,12 @@ exports[`react configuration for android 1`] = `
     rules: [
       /* config.module.rule('ts') */
       {
-        test: /\\\\.(ts|tsx)$/,
+        test: [
+          /\\\\.ts$/,
+          /\\\\.tsx$/
+        ],
         use: [
-          /* config.module.rule('ts').use('react-hmr') */
+          /* config.module.rule('ts').use('babel-loader|react-refresh') */
           {
             loader: 'babel-loader',
             options: {
@@ -56,10 +82,18 @@ exports[`react configuration for android 1`] = `
       /* config.module.rule('js') */
       {
         test: /\\\\.js$/,
+        exclude: [
+          /node_modules/
+        ],
         use: [
           /* config.module.rule('js').use('babel-loader') */
           {
-            loader: 'babel-loader'
+            loader: 'babel-loader',
+            options: {
+              generatorOpts: {
+                compact: false
+              }
+            }
           }
         ]
       },
@@ -67,13 +101,24 @@ exports[`react configuration for android 1`] = `
       {
         test: /\\\\.css$/,
         use: [
+          /* config.module.rule('css').use('apply-css-loader') */
+          {
+            loader: 'apply-css-loader'
+          },
           /* config.module.rule('css').use('css2json-loader') */
           {
             loader: 'css2json-loader'
           },
-          /* config.module.rule('css').use('css-loader') */
+          /* config.module.rule('css').use('postcss-loader') */
           {
-            loader: 'css-loader'
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  'postcss-import'
+                ]
+              }
+            }
           }
         ]
       },
@@ -81,75 +126,193 @@ exports[`react configuration for android 1`] = `
       {
         test: /\\\\.scss$/,
         use: [
+          /* config.module.rule('scss').use('apply-css-loader') */
+          {
+            loader: 'apply-css-loader'
+          },
           /* config.module.rule('scss').use('css2json-loader') */
           {
             loader: 'css2json-loader'
           },
-          /* config.module.rule('scss').use('scss-loader') */
+          /* config.module.rule('scss').use('postcss-loader') */
           {
-            loader: 'scss-loader'
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  'postcss-import'
+                ]
+              }
+            }
+          },
+          /* config.module.rule('scss').use('sass-loader') */
+          {
+            loader: 'sass-loader'
           }
         ]
       }
     ]
   },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        defaultVendor: {
+          test: /[\\\\\\\\/]node_modules[\\\\\\\\/]/,
+          priority: -10,
+          name: 'vendor',
+          chunks: 'all'
+        }
+      }
+    },
+    minimizer: [
+      /* config.optimization.minimizer('TerserPlugin') */
+      new TerserPlugin(
+        {
+          terserOptions: {
+            compress: {
+              collapse_vars: false,
+              sequences: false
+            },
+            keep_fnames: true
+          }
+        }
+      )
+    ]
+  },
   plugins: [
-    /* config.plugin('clean') */
+    /* config.plugin('ForkTsCheckerWebpackPlugin') */
+    new ForkTsCheckerWebpackPlugin(
+      {
+        typescript: {
+          memoryLimit: 4096
+        }
+      }
+    ),
+    /* config.plugin('CleanWebpackPlugin') */
     new CleanWebpackPlugin(
       {
         cleanOnceBeforeBuildPatterns: [
-          'platforms/android/app/src/main/assets/app/**/*'
+          '__jest__/platforms/android/app/src/main/assets/app/**/*'
         ],
-        verbose: true
+        verbose: false
       }
     ),
-    /* config.plugin('define') */
+    /* config.plugin('PlatformSuffixPlugin') */
+    new PlatformSuffixPlugin(
+      {
+        platform: 'android'
+      }
+    ),
+    /* config.plugin('DefinePlugin') */
     new DefinePlugin(
       {
-        'global.NS_WEBPACK': true,
+        __DEV__: true,
+        __NS_WEBPACK__: true,
+        __CSS_PARSER__: '\\"css-tree\\"',
+        __ANDROID__: true,
+        __IOS__: false,
         'global.isAndroid': true,
         'global.isIOS': false,
         process: 'global.process',
-        __DEV__: 'true',
-        __TEST__: 'false',
+        __TEST__: false,
         'process.env.NODE_ENV': '\\"development\\"'
       }
     ),
-    /* config.plugin('copy') */
-    new CopyPluginTemp(
+    /* config.plugin('CopyWebpackPlugin') */
+    new CopyPlugin(
       {
-        patterns: []
+        patterns: [
+          {
+            from: 'assets/**',
+            context: '__jest__/src',
+            noErrorOnMissing: true,
+            globOptions: {
+              dot: false
+            }
+          },
+          {
+            from: 'fonts/**',
+            context: '__jest__/src',
+            noErrorOnMissing: true,
+            globOptions: {
+              dot: false
+            }
+          },
+          {
+            from: '**/*.+(jpg|png)',
+            context: '__jest__/src',
+            noErrorOnMissing: true,
+            globOptions: {
+              dot: false
+            }
+          }
+        ]
       }
     ),
-    /* config.plugin('watch-state-logger') */
-    new WatchStateLoggerPlugin()
+    /* config.plugin('WatchStatePlugin') */
+    new WatchStatePlugin(),
+    /* config.plugin('HotModuleReplacementPlugin') */
+    new HotModuleReplacementPlugin(),
+    /* config.plugin('ReactRefreshPlugin') */
+    new ReactRefreshPlugin(
+      {
+        overlay: false,
+        forceEnable: false,
+        exclude: /node_modules/i,
+        include: /\\\\.([jt]sx?|flow)$/i
+      }
+    )
   ],
   entry: {
     bundle: [
-      'todo/main'
+      '@nativescript/core/globals/index.js',
+      '__jest__/src/app.js'
     ]
   }
 }"
 `;
 
-exports[`react configuration for ios 1`] = `
+exports[`react configuration > android > base config 1`] = `
 "{
   mode: 'development',
+  externals: [
+    'package.json',
+    '~/package.json'
+  ],
+  devtool: 'inline-source-map',
+  target: 'node',
+  output: {
+    path: '__jest__/platforms/android/app/src/main/assets/app',
+    pathinfo: false,
+    publicPath: '',
+    libraryTarget: 'commonjs',
+    globalObject: 'global'
+  },
   resolve: {
     symlinks: true,
     alias: {
-      '~/package.json': 'package.json',
-      '~': '<TODO>appFullPath',
-      '@': '<TODO>appFullPath',
+      '~': '__jest__/src',
+      '@': '__jest__/src',
       'react-dom': 'react-nativescript'
     },
     extensions: [
-      '.tsx'
+      '.android.tsx',
+      '.tsx',
+      '.android.ts',
+      '.ts',
+      '.android.js',
+      '.js',
+      '.android.css',
+      '.css',
+      '.android.scss',
+      '.scss',
+      '.android.json',
+      '.json'
     ]
   },
   resolveLoader: {
     modules: [
-      '@nativescript/webpack/loaders',
+      'node_modules/@nativescript/webpack/dist/loaders',
       'node_modules'
     ]
   },
@@ -157,9 +320,262 @@ exports[`react configuration for ios 1`] = `
     rules: [
       /* config.module.rule('ts') */
       {
-        test: /\\\\.(ts|tsx)$/,
+        test: [
+          /\\\\.ts$/,
+          /\\\\.tsx$/
+        ],
         use: [
-          /* config.module.rule('ts').use('react-hmr') */
+          /* config.module.rule('ts').use('ts-loader') */
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+              allowTsInNodeModules: true,
+              compilerOptions: {
+                sourceMap: true,
+                declaration: false
+              },
+              getCustomTransformers: function () { /* omitted long function */ }
+            }
+          }
+        ]
+      },
+      /* config.module.rule('js') */
+      {
+        test: /\\\\.js$/,
+        exclude: [
+          /node_modules/
+        ],
+        use: [
+          /* config.module.rule('js').use('babel-loader') */
+          {
+            loader: 'babel-loader',
+            options: {
+              generatorOpts: {
+                compact: false
+              }
+            }
+          }
+        ]
+      },
+      /* config.module.rule('css') */
+      {
+        test: /\\\\.css$/,
+        use: [
+          /* config.module.rule('css').use('apply-css-loader') */
+          {
+            loader: 'apply-css-loader'
+          },
+          /* config.module.rule('css').use('css2json-loader') */
+          {
+            loader: 'css2json-loader'
+          },
+          /* config.module.rule('css').use('postcss-loader') */
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  'postcss-import'
+                ]
+              }
+            }
+          }
+        ]
+      },
+      /* config.module.rule('scss') */
+      {
+        test: /\\\\.scss$/,
+        use: [
+          /* config.module.rule('scss').use('apply-css-loader') */
+          {
+            loader: 'apply-css-loader'
+          },
+          /* config.module.rule('scss').use('css2json-loader') */
+          {
+            loader: 'css2json-loader'
+          },
+          /* config.module.rule('scss').use('postcss-loader') */
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  'postcss-import'
+                ]
+              }
+            }
+          },
+          /* config.module.rule('scss').use('sass-loader') */
+          {
+            loader: 'sass-loader'
+          }
+        ]
+      }
+    ]
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        defaultVendor: {
+          test: /[\\\\\\\\/]node_modules[\\\\\\\\/]/,
+          priority: -10,
+          name: 'vendor',
+          chunks: 'all'
+        }
+      }
+    },
+    minimizer: [
+      /* config.optimization.minimizer('TerserPlugin') */
+      new TerserPlugin(
+        {
+          terserOptions: {
+            compress: {
+              collapse_vars: false,
+              sequences: false
+            },
+            keep_fnames: true
+          }
+        }
+      )
+    ]
+  },
+  plugins: [
+    /* config.plugin('ForkTsCheckerWebpackPlugin') */
+    new ForkTsCheckerWebpackPlugin(
+      {
+        typescript: {
+          memoryLimit: 4096
+        }
+      }
+    ),
+    /* config.plugin('CleanWebpackPlugin') */
+    new CleanWebpackPlugin(
+      {
+        cleanOnceBeforeBuildPatterns: [
+          '__jest__/platforms/android/app/src/main/assets/app/**/*'
+        ],
+        verbose: false
+      }
+    ),
+    /* config.plugin('PlatformSuffixPlugin') */
+    new PlatformSuffixPlugin(
+      {
+        platform: 'android'
+      }
+    ),
+    /* config.plugin('DefinePlugin') */
+    new DefinePlugin(
+      {
+        __DEV__: true,
+        __NS_WEBPACK__: true,
+        __CSS_PARSER__: '\\"css-tree\\"',
+        __ANDROID__: true,
+        __IOS__: false,
+        'global.isAndroid': true,
+        'global.isIOS': false,
+        process: 'global.process',
+        __TEST__: false,
+        'process.env.NODE_ENV': '\\"development\\"'
+      }
+    ),
+    /* config.plugin('CopyWebpackPlugin') */
+    new CopyPlugin(
+      {
+        patterns: [
+          {
+            from: 'assets/**',
+            context: '__jest__/src',
+            noErrorOnMissing: true,
+            globOptions: {
+              dot: false
+            }
+          },
+          {
+            from: 'fonts/**',
+            context: '__jest__/src',
+            noErrorOnMissing: true,
+            globOptions: {
+              dot: false
+            }
+          },
+          {
+            from: '**/*.+(jpg|png)',
+            context: '__jest__/src',
+            noErrorOnMissing: true,
+            globOptions: {
+              dot: false
+            }
+          }
+        ]
+      }
+    ),
+    /* config.plugin('WatchStatePlugin') */
+    new WatchStatePlugin()
+  ],
+  entry: {
+    bundle: [
+      '@nativescript/core/globals/index.js',
+      '__jest__/src/app.js'
+    ]
+  }
+}"
+`;
+
+exports[`react configuration > ios > adds ReactRefreshWebpackPlugin when HMR enabled 1`] = `
+"{
+  mode: 'development',
+  externals: [
+    'package.json',
+    '~/package.json'
+  ],
+  devtool: 'inline-source-map',
+  target: 'node',
+  output: {
+    path: '__jest__/platforms/ios/__jest__/app',
+    pathinfo: false,
+    publicPath: '',
+    libraryTarget: 'commonjs',
+    globalObject: 'global'
+  },
+  resolve: {
+    symlinks: true,
+    alias: {
+      '~': '__jest__/src',
+      '@': '__jest__/src',
+      'react-dom': 'react-nativescript'
+    },
+    extensions: [
+      '.ios.tsx',
+      '.tsx',
+      '.ios.ts',
+      '.ts',
+      '.ios.js',
+      '.js',
+      '.ios.css',
+      '.css',
+      '.ios.scss',
+      '.scss',
+      '.ios.json',
+      '.json'
+    ]
+  },
+  resolveLoader: {
+    modules: [
+      'node_modules/@nativescript/webpack/dist/loaders',
+      'node_modules'
+    ]
+  },
+  module: {
+    rules: [
+      /* config.module.rule('ts') */
+      {
+        test: [
+          /\\\\.ts$/,
+          /\\\\.tsx$/
+        ],
+        use: [
+          /* config.module.rule('ts').use('babel-loader|react-refresh') */
           {
             loader: 'babel-loader',
             options: {
@@ -188,10 +604,18 @@ exports[`react configuration for ios 1`] = `
       /* config.module.rule('js') */
       {
         test: /\\\\.js$/,
+        exclude: [
+          /node_modules/
+        ],
         use: [
           /* config.module.rule('js').use('babel-loader') */
           {
-            loader: 'babel-loader'
+            loader: 'babel-loader',
+            options: {
+              generatorOpts: {
+                compact: false
+              }
+            }
           }
         ]
       },
@@ -199,13 +623,24 @@ exports[`react configuration for ios 1`] = `
       {
         test: /\\\\.css$/,
         use: [
+          /* config.module.rule('css').use('apply-css-loader') */
+          {
+            loader: 'apply-css-loader'
+          },
           /* config.module.rule('css').use('css2json-loader') */
           {
             loader: 'css2json-loader'
           },
-          /* config.module.rule('css').use('css-loader') */
+          /* config.module.rule('css').use('postcss-loader') */
           {
-            loader: 'css-loader'
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  'postcss-import'
+                ]
+              }
+            }
           }
         ]
       },
@@ -213,55 +648,403 @@ exports[`react configuration for ios 1`] = `
       {
         test: /\\\\.scss$/,
         use: [
+          /* config.module.rule('scss').use('apply-css-loader') */
+          {
+            loader: 'apply-css-loader'
+          },
           /* config.module.rule('scss').use('css2json-loader') */
           {
             loader: 'css2json-loader'
           },
-          /* config.module.rule('scss').use('scss-loader') */
+          /* config.module.rule('scss').use('postcss-loader') */
           {
-            loader: 'scss-loader'
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  'postcss-import'
+                ]
+              }
+            }
+          },
+          /* config.module.rule('scss').use('sass-loader') */
+          {
+            loader: 'sass-loader'
           }
         ]
       }
     ]
   },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        defaultVendor: {
+          test: /[\\\\\\\\/]node_modules[\\\\\\\\/]/,
+          priority: -10,
+          name: 'vendor',
+          chunks: 'all'
+        }
+      }
+    },
+    minimizer: [
+      /* config.optimization.minimizer('TerserPlugin') */
+      new TerserPlugin(
+        {
+          terserOptions: {
+            compress: {
+              collapse_vars: true,
+              sequences: true
+            },
+            keep_fnames: true
+          }
+        }
+      )
+    ]
+  },
   plugins: [
-    /* config.plugin('clean') */
+    /* config.plugin('ForkTsCheckerWebpackPlugin') */
+    new ForkTsCheckerWebpackPlugin(
+      {
+        typescript: {
+          memoryLimit: 4096
+        }
+      }
+    ),
+    /* config.plugin('CleanWebpackPlugin') */
     new CleanWebpackPlugin(
       {
         cleanOnceBeforeBuildPatterns: [
-          'platforms/ios/[todo]/app/**/*'
+          '__jest__/platforms/ios/__jest__/app/**/*'
         ],
-        verbose: true
+        verbose: false
       }
     ),
-    /* config.plugin('define') */
+    /* config.plugin('PlatformSuffixPlugin') */
+    new PlatformSuffixPlugin(
+      {
+        platform: 'ios'
+      }
+    ),
+    /* config.plugin('DefinePlugin') */
     new DefinePlugin(
       {
-        'global.NS_WEBPACK': true,
+        __DEV__: true,
+        __NS_WEBPACK__: true,
+        __CSS_PARSER__: '\\"css-tree\\"',
+        __ANDROID__: false,
+        __IOS__: true,
         'global.isAndroid': false,
         'global.isIOS': true,
         process: 'global.process',
-        __DEV__: 'true',
-        __TEST__: 'false',
+        __TEST__: false,
         'process.env.NODE_ENV': '\\"development\\"'
       }
     ),
-    /* config.plugin('copy') */
-    new CopyPluginTemp(
+    /* config.plugin('CopyWebpackPlugin') */
+    new CopyPlugin(
       {
-        patterns: []
+        patterns: [
+          {
+            from: 'assets/**',
+            context: '__jest__/src',
+            noErrorOnMissing: true,
+            globOptions: {
+              dot: false
+            }
+          },
+          {
+            from: 'fonts/**',
+            context: '__jest__/src',
+            noErrorOnMissing: true,
+            globOptions: {
+              dot: false
+            }
+          },
+          {
+            from: '**/*.+(jpg|png)',
+            context: '__jest__/src',
+            noErrorOnMissing: true,
+            globOptions: {
+              dot: false
+            }
+          }
+        ]
       }
     ),
-    /* config.plugin('watch-state-logger') */
-    new WatchStateLoggerPlugin()
+    /* config.plugin('WatchStatePlugin') */
+    new WatchStatePlugin(),
+    /* config.plugin('HotModuleReplacementPlugin') */
+    new HotModuleReplacementPlugin(),
+    /* config.plugin('ReactRefreshPlugin') */
+    new ReactRefreshPlugin(
+      {
+        overlay: false,
+        forceEnable: false,
+        exclude: /node_modules/i,
+        include: /\\\\.([jt]sx?|flow)$/i
+      }
+    )
   ],
   entry: {
-    inspector_modules: [
-      'tns_modules/@nativescript/core/inspector_modules'
-    ],
     bundle: [
-      'todo/main'
+      '@nativescript/core/globals/index.js',
+      '__jest__/src/app.js'
+    ],
+    'tns_modules/@nativescript/core/inspector_modules': [
+      '@nativescript/core/inspector_modules'
+    ]
+  }
+}"
+`;
+
+exports[`react configuration > ios > base config 1`] = `
+"{
+  mode: 'development',
+  externals: [
+    'package.json',
+    '~/package.json'
+  ],
+  devtool: 'inline-source-map',
+  target: 'node',
+  output: {
+    path: '__jest__/platforms/ios/__jest__/app',
+    pathinfo: false,
+    publicPath: '',
+    libraryTarget: 'commonjs',
+    globalObject: 'global'
+  },
+  resolve: {
+    symlinks: true,
+    alias: {
+      '~': '__jest__/src',
+      '@': '__jest__/src',
+      'react-dom': 'react-nativescript'
+    },
+    extensions: [
+      '.ios.tsx',
+      '.tsx',
+      '.ios.ts',
+      '.ts',
+      '.ios.js',
+      '.js',
+      '.ios.css',
+      '.css',
+      '.ios.scss',
+      '.scss',
+      '.ios.json',
+      '.json'
+    ]
+  },
+  resolveLoader: {
+    modules: [
+      'node_modules/@nativescript/webpack/dist/loaders',
+      'node_modules'
+    ]
+  },
+  module: {
+    rules: [
+      /* config.module.rule('ts') */
+      {
+        test: [
+          /\\\\.ts$/,
+          /\\\\.tsx$/
+        ],
+        use: [
+          /* config.module.rule('ts').use('ts-loader') */
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+              allowTsInNodeModules: true,
+              compilerOptions: {
+                sourceMap: true,
+                declaration: false
+              },
+              getCustomTransformers: function () { /* omitted long function */ }
+            }
+          }
+        ]
+      },
+      /* config.module.rule('js') */
+      {
+        test: /\\\\.js$/,
+        exclude: [
+          /node_modules/
+        ],
+        use: [
+          /* config.module.rule('js').use('babel-loader') */
+          {
+            loader: 'babel-loader',
+            options: {
+              generatorOpts: {
+                compact: false
+              }
+            }
+          }
+        ]
+      },
+      /* config.module.rule('css') */
+      {
+        test: /\\\\.css$/,
+        use: [
+          /* config.module.rule('css').use('apply-css-loader') */
+          {
+            loader: 'apply-css-loader'
+          },
+          /* config.module.rule('css').use('css2json-loader') */
+          {
+            loader: 'css2json-loader'
+          },
+          /* config.module.rule('css').use('postcss-loader') */
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  'postcss-import'
+                ]
+              }
+            }
+          }
+        ]
+      },
+      /* config.module.rule('scss') */
+      {
+        test: /\\\\.scss$/,
+        use: [
+          /* config.module.rule('scss').use('apply-css-loader') */
+          {
+            loader: 'apply-css-loader'
+          },
+          /* config.module.rule('scss').use('css2json-loader') */
+          {
+            loader: 'css2json-loader'
+          },
+          /* config.module.rule('scss').use('postcss-loader') */
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  'postcss-import'
+                ]
+              }
+            }
+          },
+          /* config.module.rule('scss').use('sass-loader') */
+          {
+            loader: 'sass-loader'
+          }
+        ]
+      }
+    ]
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        defaultVendor: {
+          test: /[\\\\\\\\/]node_modules[\\\\\\\\/]/,
+          priority: -10,
+          name: 'vendor',
+          chunks: 'all'
+        }
+      }
+    },
+    minimizer: [
+      /* config.optimization.minimizer('TerserPlugin') */
+      new TerserPlugin(
+        {
+          terserOptions: {
+            compress: {
+              collapse_vars: true,
+              sequences: true
+            },
+            keep_fnames: true
+          }
+        }
+      )
+    ]
+  },
+  plugins: [
+    /* config.plugin('ForkTsCheckerWebpackPlugin') */
+    new ForkTsCheckerWebpackPlugin(
+      {
+        typescript: {
+          memoryLimit: 4096
+        }
+      }
+    ),
+    /* config.plugin('CleanWebpackPlugin') */
+    new CleanWebpackPlugin(
+      {
+        cleanOnceBeforeBuildPatterns: [
+          '__jest__/platforms/ios/__jest__/app/**/*'
+        ],
+        verbose: false
+      }
+    ),
+    /* config.plugin('PlatformSuffixPlugin') */
+    new PlatformSuffixPlugin(
+      {
+        platform: 'ios'
+      }
+    ),
+    /* config.plugin('DefinePlugin') */
+    new DefinePlugin(
+      {
+        __DEV__: true,
+        __NS_WEBPACK__: true,
+        __CSS_PARSER__: '\\"css-tree\\"',
+        __ANDROID__: false,
+        __IOS__: true,
+        'global.isAndroid': false,
+        'global.isIOS': true,
+        process: 'global.process',
+        __TEST__: false,
+        'process.env.NODE_ENV': '\\"development\\"'
+      }
+    ),
+    /* config.plugin('CopyWebpackPlugin') */
+    new CopyPlugin(
+      {
+        patterns: [
+          {
+            from: 'assets/**',
+            context: '__jest__/src',
+            noErrorOnMissing: true,
+            globOptions: {
+              dot: false
+            }
+          },
+          {
+            from: 'fonts/**',
+            context: '__jest__/src',
+            noErrorOnMissing: true,
+            globOptions: {
+              dot: false
+            }
+          },
+          {
+            from: '**/*.+(jpg|png)',
+            context: '__jest__/src',
+            noErrorOnMissing: true,
+            globOptions: {
+              dot: false
+            }
+          }
+        ]
+      }
+    ),
+    /* config.plugin('WatchStatePlugin') */
+    new WatchStatePlugin()
+  ],
+  entry: {
+    bundle: [
+      '@nativescript/core/globals/index.js',
+      '__jest__/src/app.js'
+    ],
+    'tns_modules/@nativescript/core/inspector_modules': [
+      '@nativescript/core/inspector_modules'
     ]
   }
 }"

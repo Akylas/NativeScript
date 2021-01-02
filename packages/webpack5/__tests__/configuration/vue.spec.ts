@@ -1,21 +1,16 @@
-import { __vue } from '@nativescript/webpack';
+import Config from 'webpack-chain';
+import vue from '../../src/configuration/vue';
+import { init } from '../../src';
 
-// todo: maybe mock baseConfig as we test it separately?
-// import Config from 'webpack-chain'
-// jest.mock('../../src/configuration/base', () => () => {
-// 	return new Config()
-// })
-
-describe('vue configuration', () => {
+describe.only('vue configuration', () => {
 	const platforms = ['ios', 'android'];
 
 	for (let platform of platforms) {
 		it(`for ${platform}`, () => {
-			expect(
-				__vue({
-					[platform]: true,
-				}).toString()
-			).toMatchSnapshot();
+			init({
+				[platform]: true,
+			});
+			expect(vue(new Config()).toString()).toMatchSnapshot();
 		});
 	}
 });

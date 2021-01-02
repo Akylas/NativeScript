@@ -16,8 +16,10 @@
 		"paths": {
 			"@nativescript/webpack": ["src"]
 		},
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"stripInternal": true
 	},
-	"include": ["src"],
+	"include": ["src", "scripts", "__tests__"],
 	"exclude": ["node_modules"]
 }

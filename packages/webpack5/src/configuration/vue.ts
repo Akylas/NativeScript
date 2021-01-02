@@ -1,14 +1,19 @@
-import base from './base';
-import Config from 'webpack-chain';
 import { VueLoaderPlugin } from 'vue-loader';
-import { IWebpackEnv } from './index';
 import { merge } from 'webpack-merge';
-// todo: add base configuration for vue
-export default function (env: IWebpackEnv): Config {
-	const config = base(env);
+import Config from 'webpack-chain';
+
+import { env as _env, IWebpackEnv } from '../index';
+import { getPlatformName } from '../helpers/platform';
+import base from './base';
+
+export default function (config: Config, env: IWebpackEnv = _env): Config {
+	base(config, env);
+
+	const platform = getPlatformName();
 
 	// resolve .vue files
-	config.resolve.extensions.prepend('.vue');
+	// the order is reversed because we are using prepend!
+	config.resolve.extensions.prepend('.vue').prepend(`.${platform}.vue`);
 
 	// add a rule for .vue files
 	config.module
@@ -19,10 +24,9 @@ export default function (env: IWebpackEnv): Config {
 		.tap((options) => {
 			return {
 				...options,
-				compiler: 'nativescript-vue-template-compiler',
+				compiler: require('nativescript-vue-template-compiler'),
 			};
-		})
-		.end();
+		});
 
 	// set up ts support in vue files
 	config.module
@@ -35,8 +39,26 @@ export default function (env: IWebpackEnv): Config {
 			});
 		});
 
-	// add VueLoaderPlugin
-	config.plugin('vue').use(VueLoaderPlugin);
+	config.plugin('ForkTsCheckerWebpackPlugin').tap((args) => {
+		args[0] = merge(args[0], {
+			typescript: {
+				extensions: {
+					vue: {
+						enabled: true,
+						compiler: 'nativescript-vue-template-compiler',
+					},
+				},
+			},
+		});
+		return args;
+	});
+
+	// add VueLoaderPlugin as the first plugin
+	config
+		.plugin('VueLoaderPlugin')
+		// @ts-ignore
+		.before(config.plugins.values()[0].name)
+		.use(VueLoaderPlugin);
 
 	// add an alias for vue, since some plugins may try to import it
 	config.resolve.alias.set('vue', 'nativescript-vue');
