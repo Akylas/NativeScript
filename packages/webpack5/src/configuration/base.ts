@@ -117,7 +117,7 @@ export default function (config: Config, env: IWebpackEnv): Config {
 	config.resolve.alias.set('~', getEntryDirPath()).set('@', getEntryDirPath());
 
 	// resolve symlinks
-	config.resolve.symlinks(true);
+	config.resolve.symlinks(false);
 
 	if (platform === 'android') {
 		const modules = env.modules || [];
