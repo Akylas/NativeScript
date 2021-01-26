@@ -22,17 +22,25 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 		.test(/\.svelte$/)
 		.exclude.add(/node_modules/)
 		.end()
-		.use('svelte-loader-hot')
-		.loader('svelte-loader-hot')
+		.use('svelte-loader')
+		.loader('svelte-loader')
 		.tap((options) => {
 			return {
 				...options,
-				dev: !production,
+				compilerOptions: {
+					dev: !production,
+				},
 				preprocess: getSvelteConfigPreprocessor(),
 				hotReload: !production,
+				emitCss: production,
 				hotOptions: {
 					injectCss: false,
 					native: true,
+					// Prevent doing a full reload on next HMR update after fatal error
+					noReload: false,
+	  
+					// Try to recover after runtime errors in component init
+					optimistic: false,
 				},
 				// Suppress A11y warnings
 				onwarn(warning, warn) {
