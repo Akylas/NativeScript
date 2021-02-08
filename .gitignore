@@ -6,10 +6,11 @@
 /out-tsc
 
 # dependencies
-**/node_modules
-**/package-lock.json
-**/yarn.lock
-**/pnpm.lock
+node_modules
+package-lock.json
+yarn-lock.json
+pnpm-lock.yaml
+
 
 # IDEs and editors
 /.idea
