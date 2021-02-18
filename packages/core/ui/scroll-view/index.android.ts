@@ -158,8 +158,6 @@ export class ScrollView extends ScrollViewBase {
 		}
 	}
 
-	}
-
 	private _lastScrollX = -1;
 	private _lastScrollY = -1;
 	private _onScrollChanged() {
