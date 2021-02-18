@@ -28,7 +28,7 @@ export function projectUsesCustomFlavor(): boolean {
  * Utility to determine the project flavor based on installed dependencies
  * (vue, angular, react, svelete, typescript, javascript...)
  */
-export function determineProjectFlavor(): keyof typeof defaultConfigs | false {
+export function determineProjectFlavor(): keyof typeof defaultConfigs {
 	const dependencies = getAllDependencies();
 
 	if (dependencies.includes('nativescript-vue')) {
@@ -65,5 +65,5 @@ export function determineProjectFlavor(): keyof typeof defaultConfigs | false {
 		Please use webpack.useConfig('<flavor>') to explicitly set the base config.
 	`);
 
-	return false;
+	return undefined;
 }
