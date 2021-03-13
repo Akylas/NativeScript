@@ -12,8 +12,11 @@ import helpers from './helpers';
 export interface IWebpackEnv {
 	[name: string]: any;
 
+	env?: string;
+
 	appPath?: string;
 	appResourcesPath?: string;
+	appComponents?: string[];
 
 	nativescriptLibPath?: string;
 
@@ -21,6 +24,10 @@ export interface IWebpackEnv {
 	ios?: boolean;
 	// for custom platforms
 	platform?: string;
+
+	// angular specific
+	configuration?: string;
+	projectName?: string;
 
 	production?: boolean;
 	report?: boolean;

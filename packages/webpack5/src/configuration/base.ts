@@ -3,11 +3,12 @@ import Config from 'webpack-chain';
 import { resolve } from 'path';
 
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
+import FilterWarningsPlugin from 'webpack-filter-warnings-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 
 // import { WatchStateLoggerPlugin } from '../plugins/WatchStateLoggerPlugin';
+import { getProjectFilePath, getProjectRootPath } from '../helpers/project';
 import { PlatformSuffixPlugin } from '../plugins/PlatformSuffixPlugin';
 import { addCopyRule, applyCopyRules } from '../helpers/copyRules';
 import { WatchStatePlugin } from '../plugins/WatchStatePlugin';
@@ -15,7 +16,9 @@ import { getValue } from '../helpers/config';
 import { projectUsesCustomFlavor } from '../helpers/flavor';
 import { getProjectRootPath } from '../helpers/project';
 import { hasDependency } from '../helpers/dependencies';
-import { IWebpackEnv } from '../index';
+import { applyDotEnvPlugin } from '../helpers/dotEnv';
+import { env as _env, IWebpackEnv } from '../index';
+import { getIPS } from '../helpers/host';
 import {
 	getPlatformName,
 	getAbsoluteDistPath,
@@ -23,7 +26,7 @@ import {
 	getEntryPath,
 } from '../helpers/platform';
 
-export default function (config: Config, env: IWebpackEnv): Config {
+export default function (config: Config, env: IWebpackEnv = _env): Config {
 	const entryPath = getEntryPath();
 	const platform = getPlatformName();
 	const mode = env.production ? 'production' : 'development';
@@ -54,10 +57,20 @@ export default function (config: Config, env: IWebpackEnv): Config {
 		.add('@nativescript/core/globals/index.js')
 		.add(entryPath);
 
+	// Add android app components to the bundle to SBG can generate the java classes
+	if (platform === 'android') {
+		const appComponents = env.appComponents || [];
+		appComponents.push('@nativescript/core/ui/frame');
+		appComponents.push('@nativescript/core/ui/frame/activity');
+		appComponents.map((component) => {
+			config.entry('bundle').add(component);
+		});
+	}
+
 	// inspector_modules
 	config.when(shouldIncludeInspectorModules(), (config) => {
 		config
-			.entry('tns_modules/@nativescript/core/inspector_modules')
+			.entry('tns_modules/inspector_modules')
 			.add('@nativescript/core/inspector_modules');
 	});
 
@@ -66,7 +79,15 @@ export default function (config: Config, env: IWebpackEnv): Config {
 		.pathinfo(false)
 		.publicPath('')
 		.libraryTarget('commonjs')
-		.globalObject('global');
+		.globalObject('global')
+		.set('clean', true);
+
+	config.watchOptions({
+		ignored: [
+			`${getProjectFilePath('platforms')}/platforms/**`,
+			`${env.appResourcesPath ?? getProjectFilePath('App_Resources')}/**`
+		]
+	})
 
 	// Set up Terser options
 	config.optimization.minimizer('TerserPlugin').use(TerserPlugin, [
@@ -186,6 +207,14 @@ export default function (config: Config, env: IWebpackEnv): Config {
 			},
 		});
 
+	config.module
+		.rule('workers')
+		.test(/\.(js|ts)$/)
+		.exclude.add(/node_modules/)
+		.end()
+		.use('nativescript-worker-loader')
+		.loader('nativescript-worker-loader')
+
 	// default PostCSS options to use
 	// projects can change settings
 	// via postcss.config.js
@@ -229,14 +258,6 @@ export default function (config: Config, env: IWebpackEnv): Config {
 		.use('sass-loader')
 		.loader('sass-loader');
 
-	// items to clean
-	config.plugin('CleanWebpackPlugin').use(CleanWebpackPlugin, [
-		{
-			cleanOnceBeforeBuildPatterns: [`${getAbsoluteDistPath()}/**/*`],
-			verbose: !!env.verbose,
-		},
-	]);
-
 	// config.plugin('NormalModuleReplacementPlugin').use(NormalModuleReplacementPlugin, [
 	// 	/.*/,
 	// 	request => {
@@ -253,11 +274,28 @@ export default function (config: Config, env: IWebpackEnv): Config {
 		},
 	]);
 
+	// Filter common undesirable warnings
+	config.plugin('FilterWarningsPlugin').use(FilterWarningsPlugin, [
+		{
+			/**
+			 * This rule hides
+			 * +-------------------------------------------------------------------------------+
+			 * | WARNING in ./node_modules/@angular/core/fesm2015/core.js 29714:15-102         |
+			 * | System.import() is deprecated and will be removed soon. Use import() instead. |
+			 * | For more info visit https://webpack.js.org/guides/code-splitting/             |
+			 * +-------------------------------------------------------------------------------+
+			 */
+			exclude: /System.import\(\) is deprecated/,
+		},
+	]);
+
 	// todo: refine defaults
 	config.plugin('DefinePlugin').use(DefinePlugin, [
 		{
 			__DEV__: mode === 'development',
 			__NS_WEBPACK__: true,
+            __NS_DEV_HOST_IPS__:
+				mode === 'development' ? JSON.stringify(getIPS()) : `[]`,
 			__UI_USE_XML_PARSER__: true,
 			__UI_USE_EXTERNAL_RENDERER__: projectUsesCustomFlavor(),
 			__CSS_PARSER__: JSON.stringify(getValue('cssParser')), // todo: replace from config value
@@ -271,6 +309,9 @@ export default function (config: Config, env: IWebpackEnv): Config {
 			// profile: '() => {}',
 		},
 	]);
+
+	// enable DotEnv
+	applyDotEnvPlugin(config);
 
 	// set up default copy rules
 	addCopyRule('assets/**');

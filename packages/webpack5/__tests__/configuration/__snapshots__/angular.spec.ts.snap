@@ -9,12 +9,19 @@ exports[`angular configuration for android 1`] = `
   ],
   devtool: 'inline-source-map',
   target: 'node',
+  watchOptions: {
+    ignored: [
+      '__jest__/platforms/platforms/**',
+      '__jest__/App_Resources/**'
+    ]
+  },
   output: {
     path: '__jest__/platforms/android/app/src/main/assets/app',
     pathinfo: false,
     publicPath: '',
     libraryTarget: 'commonjs',
-    globalObject: 'global'
+    globalObject: 'global',
+    clean: true
   },
   resolve: {
     symlinks: true,
@@ -33,6 +40,10 @@ exports[`angular configuration for android 1`] = `
       '.scss',
       '.android.json',
       '.json'
+    ],
+    mainFields: [
+      'module',
+      'main'
     ]
   },
   resolveLoader: {
@@ -58,6 +69,19 @@ exports[`angular configuration for android 1`] = `
                 compact: false
               }
             }
+          }
+        ]
+      },
+      /* config.module.rule('workers') */
+      {
+        test: /\\\\.(js|ts)$/,
+        exclude: [
+          /node_modules/
+        ],
+        use: [
+          /* config.module.rule('workers').use('nativescript-worker-loader') */
+          {
+            loader: 'nativescript-worker-loader'
           }
         ]
       },
@@ -171,27 +195,16 @@ exports[`angular configuration for android 1`] = `
     ]
   },
   plugins: [
-    /* config.plugin('ForkTsCheckerWebpackPlugin') */
-    new ForkTsCheckerWebpackPlugin(
-      {
-        typescript: {
-          memoryLimit: 4096
-        }
-      }
-    ),
-    /* config.plugin('CleanWebpackPlugin') */
-    new CleanWebpackPlugin(
-      {
-        cleanOnceBeforeBuildPatterns: [
-          '__jest__/platforms/android/app/src/main/assets/app/**/*'
-        ],
-        verbose: false
-      }
-    ),
     /* config.plugin('PlatformSuffixPlugin') */
     new PlatformSuffixPlugin(
       {
         platform: 'android'
+      }
+    ),
+    /* config.plugin('FilterWarningsPlugin') */
+    new FilterWarningsPlugin(
+      {
+        exclude: /System.import\\\\(\\\\) is deprecated/
       }
     ),
     /* config.plugin('DefinePlugin') */
@@ -199,6 +212,7 @@ exports[`angular configuration for android 1`] = `
       {
         __DEV__: true,
         __NS_WEBPACK__: true,
+        __NS_DEV_HOST_IPS__: '[\\"127.0.0.1\\",\\"192.168.0.10\\"]',
         __CSS_PARSER__: '\\"css-tree\\"',
         __ANDROID__: true,
         __IOS__: false,
@@ -216,7 +230,8 @@ exports[`angular configuration for android 1`] = `
             context: '__jest__/src',
             noErrorOnMissing: true,
             globOptions: {
-              dot: false
+              dot: false,
+              ignore: []
             }
           },
           {
@@ -224,7 +239,8 @@ exports[`angular configuration for android 1`] = `
             context: '__jest__/src',
             noErrorOnMissing: true,
             globOptions: {
-              dot: false
+              dot: false,
+              ignore: []
             }
           },
           {
@@ -232,7 +248,8 @@ exports[`angular configuration for android 1`] = `
             context: '__jest__/src',
             noErrorOnMissing: true,
             globOptions: {
-              dot: false
+              dot: false,
+              ignore: []
             }
           }
         ]
@@ -254,7 +271,9 @@ exports[`angular configuration for android 1`] = `
   entry: {
     bundle: [
       '@nativescript/core/globals/index.js',
-      '__jest__/src/app.js'
+      '__jest__/src/app.js',
+      '@nativescript/core/ui/frame',
+      '@nativescript/core/ui/frame/activity'
     ]
   }
 }"
@@ -269,12 +288,19 @@ exports[`angular configuration for ios 1`] = `
   ],
   devtool: 'inline-source-map',
   target: 'node',
+  watchOptions: {
+    ignored: [
+      '__jest__/platforms/platforms/**',
+      '__jest__/App_Resources/**'
+    ]
+  },
   output: {
-    path: '__jest__/platforms/ios/__jest__/app',
+    path: '__jest__/platforms/ios/jest/app',
     pathinfo: false,
     publicPath: '',
     libraryTarget: 'commonjs',
-    globalObject: 'global'
+    globalObject: 'global',
+    clean: true
   },
   resolve: {
     symlinks: true,
@@ -293,6 +319,10 @@ exports[`angular configuration for ios 1`] = `
       '.scss',
       '.ios.json',
       '.json'
+    ],
+    mainFields: [
+      'module',
+      'main'
     ]
   },
   resolveLoader: {
@@ -318,6 +348,19 @@ exports[`angular configuration for ios 1`] = `
                 compact: false
               }
             }
+          }
+        ]
+      },
+      /* config.module.rule('workers') */
+      {
+        test: /\\\\.(js|ts)$/,
+        exclude: [
+          /node_modules/
+        ],
+        use: [
+          /* config.module.rule('workers').use('nativescript-worker-loader') */
+          {
+            loader: 'nativescript-worker-loader'
           }
         ]
       },
@@ -431,27 +474,16 @@ exports[`angular configuration for ios 1`] = `
     ]
   },
   plugins: [
-    /* config.plugin('ForkTsCheckerWebpackPlugin') */
-    new ForkTsCheckerWebpackPlugin(
-      {
-        typescript: {
-          memoryLimit: 4096
-        }
-      }
-    ),
-    /* config.plugin('CleanWebpackPlugin') */
-    new CleanWebpackPlugin(
-      {
-        cleanOnceBeforeBuildPatterns: [
-          '__jest__/platforms/ios/__jest__/app/**/*'
-        ],
-        verbose: false
-      }
-    ),
     /* config.plugin('PlatformSuffixPlugin') */
     new PlatformSuffixPlugin(
       {
         platform: 'ios'
+      }
+    ),
+    /* config.plugin('FilterWarningsPlugin') */
+    new FilterWarningsPlugin(
+      {
+        exclude: /System.import\\\\(\\\\) is deprecated/
       }
     ),
     /* config.plugin('DefinePlugin') */
@@ -459,6 +491,7 @@ exports[`angular configuration for ios 1`] = `
       {
         __DEV__: true,
         __NS_WEBPACK__: true,
+        __NS_DEV_HOST_IPS__: '[\\"127.0.0.1\\",\\"192.168.0.10\\"]',
         __CSS_PARSER__: '\\"css-tree\\"',
         __ANDROID__: false,
         __IOS__: true,
@@ -476,7 +509,8 @@ exports[`angular configuration for ios 1`] = `
             context: '__jest__/src',
             noErrorOnMissing: true,
             globOptions: {
-              dot: false
+              dot: false,
+              ignore: []
             }
           },
           {
@@ -484,7 +518,8 @@ exports[`angular configuration for ios 1`] = `
             context: '__jest__/src',
             noErrorOnMissing: true,
             globOptions: {
-              dot: false
+              dot: false,
+              ignore: []
             }
           },
           {
@@ -492,7 +527,8 @@ exports[`angular configuration for ios 1`] = `
             context: '__jest__/src',
             noErrorOnMissing: true,
             globOptions: {
-              dot: false
+              dot: false,
+              ignore: []
             }
           }
         ]
@@ -516,7 +552,7 @@ exports[`angular configuration for ios 1`] = `
       '@nativescript/core/globals/index.js',
       '__jest__/src/app.js'
     ],
-    'tns_modules/@nativescript/core/inspector_modules': [
+    'tns_modules/inspector_modules': [
       '@nativescript/core/inspector_modules'
     ]
   }
