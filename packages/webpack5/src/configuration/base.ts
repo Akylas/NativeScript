@@ -14,7 +14,6 @@ import { addCopyRule, applyCopyRules } from '../helpers/copyRules';
 import { WatchStatePlugin } from '../plugins/WatchStatePlugin';
 import { getValue } from '../helpers/config';
 import { projectUsesCustomFlavor } from '../helpers/flavor';
-import { getProjectRootPath } from '../helpers/project';
 import { hasDependency } from '../helpers/dependencies';
 import { applyDotEnvPlugin } from '../helpers/dotEnv';
 import { env as _env, IWebpackEnv } from '../index';
