@@ -83,7 +83,7 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 
 	config.watchOptions({
 		ignored: [
-			`${getProjectFilePath('platforms')}/platforms/**`,
+			`${getProjectFilePath('platforms')}/**`,
 			`${env.appResourcesPath ?? getProjectFilePath('App_Resources')}/**`
 		]
 	})
@@ -139,21 +139,14 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 	// resolve symlinks
 	config.resolve.symlinks(true);
 
-	if (platform === 'android') {
-		const modules = env.modules || [];
-		modules.push(...[
-			'@nativescript/core/ui/frame',
-			'@nativescript/core/ui/frame/activity',
-		]);
-		console.log('android-app-components-loader', entryPath, modules);
-		config.module
-			.rule('main_entry').include.add(entryPath);
-		config.module
-			.rule('main_entry')
-			.use('android-app-components-loader')
-			.loader('android-app-components-loader')
-			.options({ modules:modules.map(m => m.replace(`.${platform}`, "")) });
-	}
+	config.module.rule('bundle')
+		.enforce('post')
+		.test(entryPath)
+		.use('nativescript-hot-loader')
+		.loader('nativescript-hot-loader')
+		.options({
+			injectHMRRuntime: true
+		})
 
 	// set up ts support
 	config.module
@@ -293,7 +286,7 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 		{
 			__DEV__: mode === 'development',
 			__NS_WEBPACK__: true,
-            __NS_DEV_HOST_IPS__:
+			__NS_DEV_HOST_IPS__:
 				mode === 'development' ? JSON.stringify(getIPS()) : `[]`,
 			__UI_USE_XML_PARSER__: true,
 			__UI_USE_EXTERNAL_RENDERER__: projectUsesCustomFlavor(),
