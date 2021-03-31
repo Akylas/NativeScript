@@ -3,13 +3,12 @@ import Config from 'webpack-chain';
 import { resolve } from 'path';
 
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
-import FilterWarningsPlugin from 'webpack-filter-warnings-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import TerserPlugin from 'terser-webpack-plugin';
 
-// import { WatchStateLoggerPlugin } from '../plugins/WatchStateLoggerPlugin';
 import { getProjectFilePath, getProjectRootPath } from '../helpers/project';
 import { PlatformSuffixPlugin } from '../plugins/PlatformSuffixPlugin';
+import { applyFileReplacements } from '../helpers/fileReplacements';
 import { addCopyRule, applyCopyRules } from '../helpers/copyRules';
 import { WatchStatePlugin } from '../plugins/WatchStatePlugin';
 import { getValue } from '../helpers/config';
@@ -84,9 +83,9 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 	config.watchOptions({
 		ignored: [
 			`${getProjectFilePath('platforms')}/**`,
-			`${env.appResourcesPath ?? getProjectFilePath('App_Resources')}/**`
-		]
-	})
+			`${env.appResourcesPath ?? getProjectFilePath('App_Resources')}/**`,
+		],
+	});
 
 	// Set up Terser options
 	config.optimization.minimizer('TerserPlugin').use(TerserPlugin, [
@@ -139,14 +138,21 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 	// resolve symlinks
 	config.resolve.symlinks(true);
 
-	config.module.rule('bundle')
+	config.module
+		.rule('bundle')
 		.enforce('post')
 		.test(entryPath)
+		.use('app-css-loader')
+		.loader('app-css-loader')
+		.options({
+			platform,
+		})
+		.end()
 		.use('nativescript-hot-loader')
 		.loader('nativescript-hot-loader')
 		.options({
-			injectHMRRuntime: true
-		})
+			injectHMRRuntime: true,
+		});
 
 	// set up ts support
 	config.module
@@ -205,7 +211,7 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 		.exclude.add(/node_modules/)
 		.end()
 		.use('nativescript-worker-loader')
-		.loader('nativescript-worker-loader')
+		.loader('nativescript-worker-loader');
 
 	// default PostCSS options to use
 	// projects can change settings
@@ -267,25 +273,27 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 	]);
 
 	// Filter common undesirable warnings
-	config.plugin('FilterWarningsPlugin').use(FilterWarningsPlugin, [
-		{
+	config.set(
+		'ignoreWarnings',
+		(config.get('ignoreWarnings') ?? []).concat([
 			/**
 			 * This rule hides
-			 * +-------------------------------------------------------------------------------+
-			 * | WARNING in ./node_modules/@angular/core/fesm2015/core.js 29714:15-102         |
-			 * | System.import() is deprecated and will be removed soon. Use import() instead. |
-			 * | For more info visit https://webpack.js.org/guides/code-splitting/             |
-			 * +-------------------------------------------------------------------------------+
+			 * +-----------------------------------------------------------------------------------------+
+			 * | WARNING in ./node_modules/@angular/core/fesm2015/core.js 29714:15-102                   |
+			 * | System.import() is deprecated and will be removed soon. Use import() instead.           |
+			 * | For more info visit https://webpack.js.org/guides/code-splitting/                       |
+			 * +-----------------------------------------------------------------------------------------+
 			 */
-			exclude: /System.import\(\) is deprecated/,
-		},
-	]);
+			/System.import\(\) is deprecated/,
+		])
+	);
 
 	// todo: refine defaults
 	config.plugin('DefinePlugin').use(DefinePlugin, [
 		{
 			__DEV__: mode === 'development',
 			__NS_WEBPACK__: true,
+			__NS_ENV_VERBOSE__: !!env.verbose,
 			__NS_DEV_HOST_IPS__:
 				mode === 'development' ? JSON.stringify(getIPS()) : `[]`,
 			__UI_USE_XML_PARSER__: true,
@@ -305,6 +313,9 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 	// enable DotEnv
 	applyDotEnvPlugin(config);
 
+	// replacements
+	applyFileReplacements(config);
+
 	// set up default copy rules
 	addCopyRule('assets/**');
 	addCopyRule('fonts/**');
@@ -312,8 +323,6 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 
 	applyCopyRules(config);
 
-	// add the WatchStateLogger plugin used to notify the CLI of build state
-	// config.plugin('WatchStateLoggerPlugin').use(WatchStateLoggerPlugin);
 	config.plugin('WatchStatePlugin').use(WatchStatePlugin);
 
 	config.when(env.hmr, (config) => {

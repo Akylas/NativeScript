@@ -15,6 +15,9 @@ exports[`base configuration for android 1`] = `
       '__jest__/App_Resources/**'
     ]
   },
+  ignoreWarnings: [
+    /System.import\\\\(\\\\) is deprecated/
+  ],
   output: {
     path: '__jest__/platforms/android/app/src/main/assets/app',
     pathinfo: false,
@@ -55,6 +58,13 @@ exports[`base configuration for android 1`] = `
         enforce: 'post',
         test: '__jest__/src/app.js',
         use: [
+          /* config.module.rule('bundle').use('app-css-loader') */
+          {
+            loader: 'app-css-loader',
+            options: {
+              platform: 'android'
+            }
+          },
           /* config.module.rule('bundle').use('nativescript-hot-loader') */
           {
             loader: 'nativescript-hot-loader',
@@ -213,17 +223,12 @@ exports[`base configuration for android 1`] = `
         platform: 'android'
       }
     ),
-    /* config.plugin('FilterWarningsPlugin') */
-    new FilterWarningsPlugin(
-      {
-        exclude: /System.import\\\\(\\\\) is deprecated/
-      }
-    ),
     /* config.plugin('DefinePlugin') */
     new DefinePlugin(
       {
         __DEV__: true,
         __NS_WEBPACK__: true,
+        __NS_ENV_VERBOSE__: false,
         __NS_DEV_HOST_IPS__: '[\\"127.0.0.1\\",\\"192.168.0.10\\"]',
         __CSS_PARSER__: '\\"css-tree\\"',
         __ANDROID__: true,
@@ -296,6 +301,9 @@ exports[`base configuration for ios 1`] = `
       '__jest__/App_Resources/**'
     ]
   },
+  ignoreWarnings: [
+    /System.import\\\\(\\\\) is deprecated/
+  ],
   output: {
     path: '__jest__/platforms/ios/jest/app',
     pathinfo: false,
@@ -336,6 +344,13 @@ exports[`base configuration for ios 1`] = `
         enforce: 'post',
         test: '__jest__/src/app.js',
         use: [
+          /* config.module.rule('bundle').use('app-css-loader') */
+          {
+            loader: 'app-css-loader',
+            options: {
+              platform: 'ios'
+            }
+          },
           /* config.module.rule('bundle').use('nativescript-hot-loader') */
           {
             loader: 'nativescript-hot-loader',
@@ -494,17 +509,12 @@ exports[`base configuration for ios 1`] = `
         platform: 'ios'
       }
     ),
-    /* config.plugin('FilterWarningsPlugin') */
-    new FilterWarningsPlugin(
-      {
-        exclude: /System.import\\\\(\\\\) is deprecated/
-      }
-    ),
     /* config.plugin('DefinePlugin') */
     new DefinePlugin(
       {
         __DEV__: true,
         __NS_WEBPACK__: true,
+        __NS_ENV_VERBOSE__: false,
         __NS_DEV_HOST_IPS__: '[\\"127.0.0.1\\",\\"192.168.0.10\\"]',
         __CSS_PARSER__: '\\"css-tree\\"',
         __ANDROID__: false,
