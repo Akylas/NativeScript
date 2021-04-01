@@ -295,10 +295,10 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 			__NS_WEBPACK__: true,
 			__NS_ENV_VERBOSE__: !!env.verbose,
 			__NS_DEV_HOST_IPS__:
-				mode === 'development' ? JSON.stringify(getIPS()) : `[]`,
+			mode === 'development' ? JSON.stringify(getIPS()) : `[]`,
 			__UI_USE_XML_PARSER__: true,
 			__UI_USE_EXTERNAL_RENDERER__: projectUsesCustomFlavor(),
-			__CSS_PARSER__: JSON.stringify(getValue('cssParser')), // todo: replace from config value
+			__CSS_PARSER__: JSON.stringify(getValue('cssParser')),
 			__ANDROID__: platform === 'android',
 			__IOS__: platform === 'ios',
 			/* for compat only */ 'global.isAndroid': platform === 'android',

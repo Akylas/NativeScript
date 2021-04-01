@@ -63,7 +63,6 @@ export default {
 		getPlatformName,
 	},
 	project: {
-		convertSlashesInPath,
 		getProjectRootPath,
 		getPackageJson,
 	},
