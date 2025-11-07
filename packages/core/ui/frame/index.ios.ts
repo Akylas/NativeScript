@@ -24,10 +24,11 @@ let navDepth: number = -1;
 let navControllerDelegate: UINavigationControllerDelegate = null;
 
 export class Frame extends FrameBase {
-	declare viewController: UINavigationControllerImpl;
-	public _ios: iOSFrame;
+	viewController: UINavigationControllerImpl;
 	iosNavigationBarClass: typeof NSObject;
 	iosToolbarClass: typeof NSObject;
+
+	private _ios: iOSFrame;
 
 	constructor() {
 		super();
@@ -41,7 +42,13 @@ export class Frame extends FrameBase {
 			this._pushInFrameStack();
 		}
 
-		return this.viewController.view;
+		// View controller can be disposed during view disposal, so make sure to create a new one if not defined
+		if (!this._ios) {
+			this._ios = new iOSFrame(this);
+			this.viewController = this._ios.controller;
+		}
+
+		return this._ios.controller.view;
 	}
 
 	public disposeNativeView() {
@@ -719,9 +726,7 @@ export function _getNativeCurve(transition: NavigationTransition): UIViewAnimati
 	return UIViewAnimationCurve.EaseInOut;
 }
 
-/* tslint:disable */
 class iOSFrame implements iOSFrameDefinition {
-	/* tslint:enable */
 	private _controller: UINavigationControllerImpl;
 	private _showNavigationBar: boolean;
 	private _navBarVisibility: 'auto' | 'never' | 'always' = 'auto';

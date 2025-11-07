@@ -107,8 +107,7 @@ class UITabBarControllerDelegateImpl extends NSObject implements UITabBarControl
 		const owner = this._owner?.deref();
 		if (owner) {
 			// "< More" cannot be visible after clicking on the main tab bar buttons.
-			const backToMoreWillBeVisible = false;
-			owner._handleTwoNavigationBars(backToMoreWillBeVisible);
+			owner._handleTwoNavigationBars(false);
 		}
 
 		if (tabBarController.selectedViewController === viewController) {
@@ -125,7 +124,7 @@ class UITabBarControllerDelegateImpl extends NSObject implements UITabBarControl
 
 		const owner = this._owner?.deref();
 		if (owner) {
-			owner._onViewControllerShown(viewController);
+			owner._onViewControllerShown(tabBarController, viewController);
 		}
 	}
 }
@@ -152,7 +151,7 @@ class UINavigationControllerDelegateImpl extends NSObject implements UINavigatio
 		if (owner) {
 			// If viewController is one of our tab item controllers, then "< More" will be visible shortly.
 			// Otherwise viewController is the UIMoreListController which shows the list of all tabs beyond the 4th tab.
-			const backToMoreWillBeVisible = owner._ios.viewControllers.containsObject(viewController);
+			const backToMoreWillBeVisible = navigationController.tabBarController?.viewControllers?.containsObject(viewController);
 			owner._handleTwoNavigationBars(backToMoreWillBeVisible);
 		}
 	}
@@ -165,7 +164,7 @@ class UINavigationControllerDelegateImpl extends NSObject implements UINavigatio
 		navigationController.navigationBar.topItem.rightBarButtonItem = null;
 		const owner = this._owner?.deref();
 		if (owner) {
-			owner._onViewControllerShown(viewController);
+			owner._onViewControllerShown(navigationController.tabBarController, viewController);
 		}
 	}
 }
@@ -270,18 +269,26 @@ export class TabViewItem extends TabViewItemBase {
 }
 
 export class TabView extends TabViewBase {
-	declare viewController: UITabBarControllerImpl;
-	declare items: TabViewItem[];
-	public _ios: UITabBarControllerImpl;
+	public viewController: UITabBarControllerImpl;
+	public items: TabViewItem[];
+
 	private _delegate: UITabBarControllerDelegateImpl;
 	private _moreNavigationControllerDelegate: UINavigationControllerDelegateImpl;
 	private _iconsCache = {};
+	private _ios: UITabBarControllerImpl;
+	private _actionBarHiddenByTabView: boolean;
 
 	constructor() {
 		super();
-
 		this.viewController = this._ios = UITabBarControllerImpl.initWithOwner(new WeakRef(this));
-		this.nativeViewProtected = this._ios.view;
+	}
+
+	createNativeView() {
+		// View controller can be disposed during view disposal, so make sure to create a new one if not defined
+		if (!this._ios) {
+			this.viewController = this._ios = UITabBarControllerImpl.initWithOwner(new WeakRef(this));
+		}
+		return this._ios.view;
 	}
 
 	initNativeView() {
@@ -293,6 +300,8 @@ export class TabView extends TabViewBase {
 	disposeNativeView() {
 		this._delegate = null;
 		this._moreNavigationControllerDelegate = null;
+		this.viewController = null;
+		this._ios = null;
 		super.disposeNativeView();
 	}
 
@@ -306,12 +315,19 @@ export class TabView extends TabViewBase {
 			selectedView._pushInFrameStackRecursive();
 		}
 
-		this._ios.delegate = this._delegate;
+		if (this._ios) {
+			this._ios.delegate = this._delegate;
+		}
 	}
 
 	public onUnloaded() {
-		this._ios.delegate = null;
-		this._ios.moreNavigationController.delegate = null;
+		if (this._ios) {
+			this._ios.delegate = null;
+
+			if (this._ios.moreNavigationController) {
+				this._ios.moreNavigationController.delegate = null;
+			}
+		}
 		super.onUnloaded();
 	}
 
@@ -365,13 +381,13 @@ export class TabView extends TabViewBase {
 		this.setMeasuredDimension(widthAndState, heightAndState);
 	}
 
-	public _onViewControllerShown(viewController: UIViewController) {
+	public _onViewControllerShown(tabBarController: UITabBarController, viewController: UIViewController) {
 		// This method could be called with the moreNavigationController or its list controller, so we have to check.
 		if (Trace.isEnabled()) {
 			Trace.write('TabView._onViewControllerShown(' + viewController + ');', Trace.categories.Debug);
 		}
-		if (this._ios.viewControllers && this._ios.viewControllers.containsObject(viewController)) {
-			this.selectedIndex = this._ios.viewControllers.indexOfObject(viewController);
+		if (tabBarController?.viewControllers && tabBarController.viewControllers.containsObject(viewController)) {
+			this.selectedIndex = tabBarController.viewControllers.indexOfObject(viewController);
 		} else {
 			if (Trace.isEnabled()) {
 				Trace.write('TabView._onViewControllerShown: viewController is not one of our viewControllers', Trace.categories.Debug);
@@ -379,14 +395,18 @@ export class TabView extends TabViewBase {
 		}
 	}
 
-	private _actionBarHiddenByTabView: boolean;
 	public _handleTwoNavigationBars(backToMoreWillBeVisible: boolean) {
 		if (Trace.isEnabled()) {
 			Trace.write(`TabView._handleTwoNavigationBars(backToMoreWillBeVisible: ${backToMoreWillBeVisible})`, Trace.categories.Debug);
 		}
 
 		// The "< Back" and "< More" navigation bars should not be visible simultaneously.
-		const page = this.page || this._selectedView?.page || (<any>this)._selectedView?.currentPage;
+		let page = this.page || this._selectedView?.page;
+
+		if (!page && this._selectedView instanceof Frame) {
+			page = this._selectedView.currentPage;
+		}
+
 		if (!page || !page.frame) {
 			return;
 		}
@@ -394,9 +414,14 @@ export class TabView extends TabViewBase {
 		const actionBarVisible = page.frame._getNavBarVisible(page);
 
 		if (backToMoreWillBeVisible && actionBarVisible) {
-			page.frame.ios._disableNavBarAnimation = true;
-			page.actionBarHidden = true;
-			page.frame.ios._disableNavBarAnimation = false;
+			if (page.frame.ios) {
+				page.frame.ios._disableNavBarAnimation = true;
+				page.actionBarHidden = true;
+				page.frame.ios._disableNavBarAnimation = false;
+			} else {
+				page.actionBarHidden = true;
+			}
+
 			this._actionBarHiddenByTabView = true;
 			if (Trace.isEnabled()) {
 				Trace.write(`TabView hid action bar`, Trace.categories.Debug);
@@ -406,9 +431,14 @@ export class TabView extends TabViewBase {
 		}
 
 		if (!backToMoreWillBeVisible && this._actionBarHiddenByTabView) {
-			page.frame.ios._disableNavBarAnimation = true;
-			page.actionBarHidden = false;
-			page.frame.ios._disableNavBarAnimation = false;
+			if (page.frame.ios) {
+				page.frame.ios._disableNavBarAnimation = true;
+				page.actionBarHidden = false;
+				page.frame.ios._disableNavBarAnimation = false;
+			} else {
+				page.actionBarHidden = false;
+			}
+
 			this._actionBarHiddenByTabView = undefined;
 			if (Trace.isEnabled()) {
 				Trace.write(`TabView restored action bar`, Trace.categories.Debug);
@@ -447,7 +477,6 @@ export class TabView extends TabViewBase {
 		const length = items ? items.length : 0;
 		if (length === 0) {
 			this._ios.viewControllers = null;
-
 			return;
 		}
 
