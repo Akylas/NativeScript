@@ -192,7 +192,12 @@ export default function (context: ts.TransformationContext, ...args) {
 			}
 			if (ts.isBlock(node)) {
 				const [stmts, changed] = transformStatements(node.statements, false);
-				return changed ? factory.updateBlock(node, stmts) : node;
+				if (changed) {
+					return factory.updateBlock(node, stmts);
+				}
+				// Even if transformStatements didn't change anything, we still need to visit children
+				// in case there are nested blocks
+				return ts.visitEachChild(node, visitNode, context);
 			}
 			if (ts.isModuleBlock(node)) {
 				const [stmts, changed] = transformStatements(node.statements, false);
