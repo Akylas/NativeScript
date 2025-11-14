@@ -635,7 +635,6 @@ export class iOSApplication extends ApplicationCommon {
 			const newLayoutDirection = this.getLayoutDirectionValue(layoutDirection);
 			this.setLayoutDirection(newLayoutDirection);
 		});
-
 		let subRootView = this._subRootView;
 
 		subRootView = this.createRootView(view);

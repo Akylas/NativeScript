@@ -9,7 +9,7 @@
 		"moduleResolution": "bundler",
 		"emitDecoratorMetadata": false,
 		"experimentalDecorators": true,
-		"noEmitOnError": false,
+		"noEmitOnError": true,
 		"noEmitHelpers": true,
 		"diagnostics": true,
 		"skipLibCheck": true,

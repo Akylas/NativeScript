@@ -160,36 +160,6 @@ export class TextBase extends TextBaseCommon {
 		this._tappable = false;
 	}
 
-	// public resetNativeView(): void {
-	// 	super.resetNativeView();
-	// 	const nativeView = this.nativeTextViewProtected;
-	// 	// We reset it here too because this could be changed by multiple properties - whiteSpace, secure, textTransform
-	// 	nativeView.setSingleLine(this._isSingleLine);
-	// 	nativeView.setTransformationMethod(this._defaultTransformationMethod);
-	// 	this._defaultTransformationMethod = null;
-
-	// 	if (this._paintFlags !== undefined) {
-	// 		nativeView.setPaintFlags(this._paintFlags);
-	// 		this._paintFlags = undefined;
-	// 	}
-
-	// 	if (this._minLines !== -1) {
-	// 		nativeView.setMinLines(this._minLines);
-	// 	} else {
-	// 		nativeView.setMinHeight(this._minHeight);
-	// 	}
-
-	// 	this._minHeight = this._minLines = undefined;
-
-	// 	if (this._maxLines !== -1) {
-	// 		nativeView.setMaxLines(this._maxLines);
-	// 	} else {
-	// 		nativeView.setMaxHeight(this._maxHeight);
-	// 	}
-
-	// 	this._maxHeight = this._maxLines = undefined;
-	// }
-
 	[textProperty.getDefault](): symbol | number {
 		return resetSymbol;
 	}
@@ -212,12 +182,6 @@ export class TextBase extends TextBaseCommon {
 	}
 	[formattedTextProperty.setNative](value: FormattedString) {
 		const nativeView = this.nativeTextViewProtected;
-		// TODO: does not seem needed anymore as native textTransform behaves correctly with spannableStringBuilder
-		// if (!value) {
-		// 	if (nativeView instanceof android.widget.Button && nativeView.getTransformationMethod() instanceof TextTransformation) {
-		// 		nativeView.setTransformationMethod(this._defaultTransformationMethod);
-		// 	}
-		// }
 
 		// Don't change the transformation method if this is secure TextField or we'll lose the hiding characters.
 		if ((<any>this).secure) {
@@ -227,31 +191,12 @@ export class TextBase extends TextBaseCommon {
 		const spannableStringBuilder = this.createFormattedTextNative(value);
 		nativeView.setText(<any>spannableStringBuilder);
 		this._setTappableState(isStringTappable(value));
-
-		// textProperty.nativeValueChange(this, value === null || value === undefined ? '' : value.toString());
-
-		// TODO: this seems not needed anymore. textTransform and spannableStringBuilder work ok
-		// if (spannableStringBuilder && nativeView instanceof android.widget.Button && !(nativeView.getTransformationMethod() instanceof TextTransformation)) {
-		// 	// Replace Android Button's default transformation (in case the developer has not already specified a text-transform) method
-		// 	// with our transformation method which can handle formatted text.
-		// 	// Otherwise, the default tranformation method of the Android Button will overwrite and ignore our spannableStringBuilder.
-		// 	nativeView.setTransformationMethod(new TextTransformation(this));
-		// }
 	}
 
 	[textTransformProperty.getDefault](): CoreTypes.TextTransformType {
 		return 'initial';
 	}
 	[textTransformProperty.setNative](value: CoreTypes.TextTransformType) {
-		// if (value === 'initial') {
-		// 	this.nativeTextViewProtected.setTransformationMethod(this._defaultTransformationMethod);
-		// 	return;
-		// }
-		// // Don't change the transformation method if this is secure TextField or we'll lose the hiding characters.
-		// if ((<any>this).secure) {
-		// 	return;
-		// }
-		// this.nativeTextViewProtected.setTransformationMethod(new TextTransformation(this));
 	}
 
 	[textAlignmentProperty.getDefault](): CoreTypes.TextAlignmentType {

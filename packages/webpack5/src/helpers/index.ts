@@ -1,16 +1,23 @@
 import { merge } from 'webpack-merge';
 
+import {
+	getPackageJson,
+	getProjectRootPath,
+	getProjectFilePath,
+} from './project';
+import { addVirtualEntry, addVirtualModule } from './virtualModules';
+import { applyFileReplacements } from './fileReplacements';
 import { addCopyRule, removeCopyRule } from './copyRules';
 import { error, info, warn, warnOnce } from './log';
 import { determineProjectFlavor, projectUsesCustomFlavor } from './flavor';
 import { readTsConfig } from './typescript';
 import { getValue } from './config';
+import { getIPS } from './host';
 import {
 	getAllDependencies,
 	hasDependency,
 	getDependencyPath,
 } from './dependencies';
-import { getPackageJson, getProjectRootPath } from './project';
 import {
 	addPlatform,
 	getAbsoluteDistPath,
@@ -30,6 +37,7 @@ export default {
 	merge,
 	addCopyRule,
 	removeCopyRule,
+	applyFileReplacements,
 	config: {
 		getValue,
 	},
@@ -42,14 +50,14 @@ export default {
 		determineProjectFlavor,
 		projectUsesCustomFlavor,
 	},
+	host: {
+		getIPS,
+	},
 	log: {
 		error,
 		info,
 		warn,
-	},
-	project: {
-		getProjectRootPath,
-		getPackageJson,
+		warnOnce,
 	},
 	platform: {
 		addPlatform,
@@ -59,6 +67,15 @@ export default {
 		getEntryPath,
 		getPlatform,
 		getPlatformName,
+	},
+	project: {
+		getProjectFilePath,
+		getProjectRootPath,
+		getPackageJson,
+	},
+	virtualModules: {
+		addVirtualEntry,
+		addVirtualModule,
 	},
 	tsconfig: {
 		readTsConfig,

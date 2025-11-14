@@ -173,14 +173,14 @@ function _test_PageNavigation_EventSequence(withTransition: boolean) {
 			? {
 					name: 'slide',
 					duration: 10,
-			  }
+				}
 			: undefined,
 	};
 
 	helper.navigateWithEntry(navigationEntry);
 	helper.goBack();
 
-	const expectedEventSequence = ['navigatingTo', 'loaded', 'navigatedTo', 'navigatingFrom', 'navigatedFrom', 'unloaded'];
+	const expectedEventSequence = ['navigatingTo', 'loaded', 'navigatedTo', 'navigatingFrom', 'unloaded', 'navigatedFrom'];
 	TKUnit.arrayAssert(eventSequence, expectedEventSequence, 'Actual event sequence is not equal to expected. Actual: ' + eventSequence + '; Expected: ' + expectedEventSequence);
 }
 

@@ -490,7 +490,7 @@ export function runAll(testSelector?: string) {
 		new TestInfo(() => {
 			running = true;
 			startTime = TKUnit.time();
-		})
+		}),
 	);
 	for (const name in allTests) {
 		if (singleModuleName && singleModuleName !== name.toLowerCase()) {
@@ -540,7 +540,7 @@ export function runAll(testSelector?: string) {
 		new TestInfo(function () {
 			testsQueue = [];
 			running = false;
-		})
+		}),
 	);
 
 	TKUnit.runTests(testsQueue, 0);

@@ -218,18 +218,12 @@ public class Utils {
 			count++;
 			ViewGroup parent = (ViewGroup) view.getParent();
 			parent.setClipChildren(false);
+			parent.setClipToPadding(false);
+			// removing clipping from all breaks the ui
+			if (count == 1) {
+				break;
+			}
 		}
-		// int count = 0;
-		// while (view.getParent() != null && view.getParent() instanceof ViewGroup) {
-		// 	count++;
-		// 	ViewGroup parent = (ViewGroup) view.getParent();
-		// 	parent.setClipChildren(false);
-		// 	parent.setClipToPadding(false);
-		// 	// removing clipping from all breaks the ui
-		// 	if (count == 1) {
-		// 		break;
-		// 	}
-		// }
 	}
 
 	public interface AsyncImageCallback {
