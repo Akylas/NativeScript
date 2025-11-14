@@ -15,7 +15,7 @@
     "@nativescript/android": "*",
     "@nativescript/core": "*",
     "@nativescript/ios": "*",
-     "@nativescript/vite": "*",
+    "@nativescript/vite": "*",
     "@nativescript/webpack": "*",
     "typescript": "~5.8.0"
   }
