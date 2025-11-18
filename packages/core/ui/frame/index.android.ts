@@ -76,8 +76,6 @@ export class Frame extends FrameBase {
 	private _containerViewId = -1;
 	private _tearDownPending = false;
 	private _attachedToWindow = false;
-	_defaultOverflowEdge: number;
-	_defaultOverflowEdgeValue: string;
 	/**
 	 * This property indicates that the view is to be reused as a root view or has been previously disposed.
 	 */
@@ -88,7 +86,6 @@ export class Frame extends FrameBase {
 	constructor() {
 		super();
 		this._android = new AndroidFrame(this);
-		this.androidOverflowEdge = 'ignore';
 	}
 
 	public static reloadPage(context?: ModuleContext): void {
