@@ -11,6 +11,7 @@ import { Trace } from '../../trace';
 import { SlideTransition } from '../transition/slide-transition';
 import { FadeTransition } from '../transition/fade-transition';
 import { SharedTransition } from '../transition/shared-transition';
+import type { Transition } from '../transition';
 
 export * from './frame-common';
 
@@ -70,7 +71,11 @@ export class Frame extends FrameBase {
 		}
 
 		this._removeFromFrameStack();
-		this.viewController = null;
+
+		if (this.viewController) {
+			this.viewController.lastExecutingTransition = null;
+			this.viewController = null;
+		}
 
 		// This was the last frame so we can get rid of the controller delegate reference
 		if (this._isFrameStackEmpty()) {
@@ -456,6 +461,9 @@ class UINavigationControllerAnimatedDelegate extends NSObject implements UINavig
 			}
 		}
 
+		// Keep a strong reference of the last executing transition to prevent gc from collecting it
+		navigationController.lastExecutingTransition = transition;
+
 		if (transition?.iosNavigatedController) {
 			return transition.iosNavigatedController(navigationController, operation, fromVC, toVC);
 		}
@@ -480,6 +488,7 @@ class UINavigationControllerAnimatedDelegate extends NSObject implements UINavig
 @NativeClass
 class UINavigationControllerImpl extends UINavigationController {
 	private _owner: WeakRef<Frame>;
+	public lastExecutingTransition: Transition;
 
 	public static initWithOwner(owner: WeakRef<Frame>): UINavigationControllerImpl {
 		const navigationBarClass = owner.deref()?.iosNavigationBarClass ?? null;
