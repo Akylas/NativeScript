@@ -462,7 +462,7 @@ class UINavigationControllerAnimatedDelegate extends NSObject implements UINavig
 		}
 
 		// Keep a strong reference of the last executing transition to prevent gc from collecting it
-		navigationController.lastExecutingTransition = transition;
+		navigationController['lastExecutingTransition'] = transition;
 
 		if (transition?.iosNavigatedController) {
 			return transition.iosNavigatedController(navigationController, operation, fromVC, toVC);
