@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.9.11](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.10...@akylas/nativescript@8.9.11) (2026-01-07)
+
+
+### Bug Fixes
+
+* **ios:** only requestLayout if prop actually changed preventing endless collectionview refresh ([78c71a9](https://github.com/Akylas/NativeScript/commit/78c71a9ba3b9917ef840a33acef5f35df183867d))
+
 ### [8.9.10](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.6...@akylas/nativescript@8.9.10) (2025-10-04)
 
 
