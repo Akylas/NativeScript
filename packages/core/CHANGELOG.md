@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.9.12](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.10...@akylas/nativescript@8.9.12) (2026-01-16)
+
+
+### Features
+
+* **android:** API Level 35+ OnBackPressed handling ([#10938](https://github.com/Akylas/NativeScript/issues/10938)) ([ccceb88](https://github.com/Akylas/NativeScript/commit/ccceb8844ff730bb08a806b8c5a8d1c027240026))
+* **search-bar:** clear button color support ([#10903](https://github.com/Akylas/NativeScript/issues/10903)) ([b7579c9](https://github.com/Akylas/NativeScript/commit/b7579c91acd059fbc2c056247adcb738dfdffc28))
+
+
+### Bug Fixes
+
+* **android:** Android 16 back press navigation failure ([#11006](https://github.com/Akylas/NativeScript/issues/11006)) ([844c3df](https://github.com/Akylas/NativeScript/commit/844c3df8951fbc3c75b907ef2f04241301c24144))
+* **application:** remove dupe cssChanged event handler definition ([#10892](https://github.com/Akylas/NativeScript/issues/10892)) ([b49ba05](https://github.com/Akylas/NativeScript/commit/b49ba05f67c7ac80b087ef9ca3a9f9b9cbdf3a4c))
+* **ios:** allow creating missing view controllers on reused views ([#10941](https://github.com/Akylas/NativeScript/issues/10941)) ([a038d44](https://github.com/Akylas/NativeScript/commit/a038d4489aebf6e4bd020742918a5da8860fd522))
+* **ios:** only requestLayout if prop actually changed preventing endless collectionview refresh ([78c71a9](https://github.com/Akylas/NativeScript/commit/78c71a9ba3b9917ef840a33acef5f35df183867d))
+* **ios:** prevent gc from collecting current navigation transition ([#10967](https://github.com/Akylas/NativeScript/issues/10967)) ([bd7aae7](https://github.com/Akylas/NativeScript/commit/bd7aae76e333df95330a46c01e6d34b233072bfd))
+* **RootLayout:** close shade cover when topmost popup doesn't need it ([#11007](https://github.com/Akylas/NativeScript/issues/11007)) ([f5128a4](https://github.com/Akylas/NativeScript/commit/f5128a48006720acee4e401e6901ce5744d71541))
+
 ### [8.9.11](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.10...@akylas/nativescript@8.9.11) (2026-01-07)
 
 
