@@ -908,11 +908,8 @@ export function setActivityCallbacks(activity: androidx.appcompat.app.AppCompatA
 	activity[CALLBACKS] = new ActivityCallbacksImplementation();
 	if (OnBackPressedCallback && !activity['_onBackPressed']) {
 		const callback = new OnBackPressedCallback(true);
-
 		callback['_activity'] = new WeakRef(activity);
-
 		activity['_onBackPressed'] = true;
-
 		(activity as androidx.activity.ComponentActivity).getOnBackPressedDispatcher().addCallback(activity, callback);
 	}
 }

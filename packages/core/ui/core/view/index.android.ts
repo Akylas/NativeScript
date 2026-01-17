@@ -84,14 +84,11 @@ if (SDK_VERSION >= 33) {
 
 			if (!dialog) {
 				// disable the callback and call super to avoid infinite loop
-
 				this.setEnabled(false);
-
 				return;
 			}
 
 			const view = dialog.fragment.owner;
-
 			const args: AndroidActivityBackPressedEventData = {
 				eventName: 'activityBackPressed',
 				object: view,
@@ -110,9 +107,7 @@ if (SDK_VERSION >= 33) {
 
 			if (!args.cancel) {
 				this.setEnabled(false);
-
 				dialog.getOnBackPressedDispatcher().onBackPressed();
-
 				this.setEnabled(true);
 			}
 		},
@@ -178,12 +173,8 @@ function initializeDialogFragment() {
 
 			if (SDK_VERSION >= 33 && OnBackPressedCallback) {
 				const callback = new OnBackPressedCallback(true);
-
 				callback['_dialog'] = new WeakRef(this);
-
-				// @ts-ignore
-
-				this.getOnBackPressedDispatcher().addCallback(this, callback);
+				(this as any).getOnBackPressedDispatcher().addCallback(this, callback);
 			}
 
 			return global.__native(this);
