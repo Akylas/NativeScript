@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.9.13](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.12...@akylas/nativescript@8.9.13) (2026-01-17)
+
+
+### Bug Fixes
+
+* android native-api-usage crash fix with dialogs ([57172c8](https://github.com/Akylas/NativeScript/commit/57172c87f3a42c70479c9e291ca675a8181fed28))
+
 ### [8.9.12](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.10...@akylas/nativescript@8.9.12) (2026-01-16)
 
 
