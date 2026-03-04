@@ -123,6 +123,9 @@ class UILabelClickHandlerImpl extends NSObject {
 }
 
 export class TextBase extends TextBaseCommon {
+	 //TODO: remove as it needs to be added after TS 5.7 change https://github.com/microsoft/TypeScript/pull/59860
+    [key: symbol]: (...args: any[]) => any | void;
+
 	declare nativeViewProtected: UITextField | UITextView | UILabel | UIButton;
 	public _spanRanges: NSRange[];
 
