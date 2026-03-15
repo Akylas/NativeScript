@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.9.14](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.13...@akylas/nativescript@8.9.14) (2026-03-15)
+
+
+### Bug Fixes
+
+* **core:** android activity recreation fix ([9f46dd1](https://github.com/Akylas/NativeScript/commit/9f46dd1fa7c8bb40c045ea9e70ee491953f7b2a7))
+
 ### [8.9.13](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.12...@akylas/nativescript@8.9.13) (2026-01-17)
 
 
