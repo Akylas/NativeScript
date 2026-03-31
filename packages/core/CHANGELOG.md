@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.9.15](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.14...@akylas/nativescript@8.9.15) (2026-03-31)
+
+
+### Bug Fixes
+
+* **core:** android fix for editable change not working ([14f70ad](https://github.com/Akylas/NativeScript/commit/14f70adc41bbb085110495e79b6639e11926bf81))
+
 ### [8.9.14](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.13...@akylas/nativescript@8.9.14) (2026-03-15)
 
 
