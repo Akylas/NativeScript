@@ -41,6 +41,7 @@ let sharedA11YObservable: AndroidSharedA11YObservable;
 
 function updateAccessibilityState(): void {
 	const accessibilityManager = getAndroidAccessibilityManager();
+	ensureStateListener();
 	if (!accessibilityManager) {
 		sharedA11YObservable.set(accessibilityStateEnabledPropName, false);
 		sharedA11YObservable.set(touchExplorationStateEnabledPropName, false);
