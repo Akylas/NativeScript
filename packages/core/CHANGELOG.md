@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.9.16](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.15...@akylas/nativescript@8.9.16) (2026-05-13)
+
+
+### Bug Fixes
+
+* **core:** do not catch errors in ApplicationSettings. Let the user handle it ([2f8d10a](https://github.com/Akylas/NativeScript/commit/2f8d10a997ce6a5c40bee0b8c1437e1fbdb6c8a8))
+* log cleanup ([6d8ddd6](https://github.com/Akylas/NativeScript/commit/6d8ddd6e95eaca6bb651f3ff84015a07b5054b5b))
+
 ### [8.9.15](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.14...@akylas/nativescript@8.9.15) (2026-03-31)
 
 
