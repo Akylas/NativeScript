@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.9.17](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.16...@akylas/nativescript@8.9.17) (2026-05-13)
+
+
+### Bug Fixes
+
+* **core:** prevent accessibility error on accessibility change event ([bf12bbb](https://github.com/Akylas/NativeScript/commit/bf12bbb567442520a6785e2079089909c62ce07e))
+
 ### [8.9.16](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.15...@akylas/nativescript@8.9.16) (2026-05-13)
 
 
