@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.21](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@9.0.20...@akylas/nativescript@9.0.21) (2026-06-04)
+
+### Bug Fixes
+
+* **android:** accessibility fix ([e51ffa1](https://github.com/Akylas/NativeScript/commit/e51ffa1b7a7678c5191a59d25709fb8a05fd7a06))
+
 ### [9.0.20](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.17...@akylas/nativescript@9.0.20) (2026-06-04)
 
 ### 🩹 Fixes
