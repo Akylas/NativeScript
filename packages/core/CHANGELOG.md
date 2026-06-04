@@ -1,4 +1,8 @@
-## 9.0.20 (2026-05-27)
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [9.0.20](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.17...@akylas/nativescript@9.0.20) (2026-06-04)
 
 ### 🩹 Fixes
 
