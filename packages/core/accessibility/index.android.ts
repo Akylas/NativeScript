@@ -14,6 +14,8 @@ import { setA11yUpdatePropertiesCallback } from '../application/helpers-common';
 export * from './accessibility-common';
 export * from './accessibility-types';
 export * from './font-scale';
+export { getAndroidAccessibilityManager };
+
 
 export function getFontScale(): number {
 	return getCurrentFontScale();
@@ -430,11 +432,11 @@ export function isAccessibilityServiceEnabled(): boolean {
 		const accessibilityManager = getAndroidAccessibilityManager();
 		if (accessibilityManager) {
 			if (accessibilityStateChangeListener) {
-				accessibilityManager.removeAccessibilityStateChangeListener(accessibilityManager, accessibilityStateChangeListener);
+				accessibilityManager.removeAccessibilityStateChangeListener(accessibilityStateChangeListener);
 			}
 
 			if (touchExplorationStateChangeListener) {
-				accessibilityManager.removeTouchExplorationStateChangeListener(accessibilityManager, touchExplorationStateChangeListener);
+				accessibilityManager.removeTouchExplorationStateChangeListener(touchExplorationStateChangeListener);
 			}
 		}
 
