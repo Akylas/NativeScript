@@ -2,7 +2,7 @@ import type { Point, Position } from './view-interfaces';
 import type { GestureTypes, GestureEventData } from '../../gestures';
 import { getNativeScriptGlobals } from '../../../globals/global-utils';
 import { ViewCommon, isEnabledProperty, originXProperty, originYProperty, isUserInteractionEnabledProperty, testIDProperty, AndroidHelper, statusBarStyleProperty } from './view-common';
-import { paddingLeftProperty, paddingTopProperty, paddingRightProperty, paddingBottomProperty, directionProperty } from '../../styling/style-properties';
+import { directionProperty } from '../../styling/style-properties';
 import { layout } from '../../../utils';
 import { Trace } from '../../../trace';
 import { ShowModalOptions, hiddenProperty } from '../view-base';
@@ -735,6 +735,20 @@ export class View extends ViewCommon {
 		return false;
 	}
 
+	public override _setDefaultPaddings(insets: android.graphics.Rect): void {
+		if (insets) {
+			this._defaultPaddingTop = insets.top;
+			this._defaultPaddingRight = insets.right;
+			this._defaultPaddingBottom = insets.bottom;
+			this._defaultPaddingLeft = insets.left;
+		} else {
+			this._defaultPaddingTop = 0;
+			this._defaultPaddingRight = 0;
+			this._defaultPaddingBottom = 0;
+			this._defaultPaddingLeft = 0;
+		}
+	}
+
 	public getLocationInWindow(): Point {
 		if (!this.nativeViewProtected || !this.nativeViewProtected.getWindowToken()) {
 			return undefined;
@@ -1347,16 +1361,10 @@ export class View extends ViewCommon {
 			const nativeView = this.nativeViewProtected;
 			nativeView.setBackground(value);
 
-			const style = this.style;
-			const paddingTop = paddingTopProperty.isSet(style) ? this.effectivePaddingTop : this._defaultPaddingTop;
-			const paddingRight = paddingRightProperty.isSet(style) ? this.effectivePaddingRight : this._defaultPaddingRight;
-			const paddingBottom = paddingBottomProperty.isSet(style) ? this.effectivePaddingBottom : this._defaultPaddingBottom;
-			const paddingLeft = paddingLeftProperty.isSet(style) ? this.effectivePaddingLeft : this._defaultPaddingLeft;
-
 			if (this._isPaddingRelative) {
-				nativeView.setPaddingRelative(paddingLeft, paddingTop, paddingRight, paddingBottom);
+				nativeView.setPaddingRelative(this.effectivePaddingLeft, this.effectivePaddingTop, this.effectivePaddingRight, this.effectivePaddingBottom);
 			} else {
-				nativeView.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+				nativeView.setPadding(this.effectivePaddingLeft, this.effectivePaddingTop, this.effectivePaddingRight, this.effectivePaddingBottom);
 			}
 		}
 	}

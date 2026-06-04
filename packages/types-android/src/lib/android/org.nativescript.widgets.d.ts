@@ -247,6 +247,8 @@
 
             export class LayoutBase extends android.view.ViewGroup {
                 constructor(context: android.content.Context);
+                public getPassThroughParent(): boolean;
+                public setPassThroughParent(value: boolean): void;
             }
 
             export class AbsoluteLayout extends LayoutBase {

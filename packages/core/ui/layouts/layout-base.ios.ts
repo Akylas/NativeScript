@@ -40,6 +40,6 @@ export class LayoutBase extends LayoutBaseCommon {
 	}
 
 	[isPassThroughParentEnabledProperty.setNative](value: boolean) {
-		(<any>this.nativeViewProtected).setPassThroughParent(value);
+		this.nativeViewProtected.setPassThroughParent(value);
 	}
 }

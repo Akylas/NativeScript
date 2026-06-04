@@ -25,7 +25,7 @@ let currentFontScaleClass = '';
 let currentFontScaleCategory = '';
 let currentA11YServiceClass = '';
 
-function ensureClasses() {
+function ensureA11yClasses() {
 	if (accessibilityServiceObservable) {
 		return;
 	}
@@ -62,7 +62,7 @@ function applyFontScaleToRootViews(): void {
 }
 
 export function initAccessibilityCssHelper(): void {
-	ensureClasses();
+	ensureA11yClasses();
 
 	Application.on(Application.fontScaleChangedEvent, () => {
 		updateCurrentHelperClasses();

@@ -1,4 +1,4 @@
-import { AlignSelf, Flex, FlexFlow, FlexGrow, FlexShrink, FlexWrapBefore, Order } from '../../layouts/flexbox-layout';
+import { AlignSelf, FlexGrow, FlexShrink, FlexWrapBefore, Order } from '../../layouts/flexbox-layout';
 import { Page } from '../../page';
 import { CoreTypes, Trace } from '../../styling/styling-shared';
 import { Property, CssProperty, CssAnimationProperty, InheritedProperty, clearInheritedProperties, propagateInheritableProperties, propagateInheritableCssProperties, initNativeView } from '../properties';
@@ -8,12 +8,10 @@ import { Binding } from '../bindable';
 import { BindingOptions } from '../bindable/bindable-types';
 import { Observable, PropertyChangeData, WrappedValue } from '../../../data/observable';
 import { Style } from '../../styling/style';
-import { paddingTopProperty, paddingRightProperty, paddingBottomProperty, paddingLeftProperty } from '../../styling/style-properties';
 import type { ModalTransition } from '../../transition/modal-transition';
 
 // TODO: Remove this import!
 import { getClass } from '../../../utils/types';
-import { unsetValue } from '../properties/property-shared';
 
 import { profile } from '../../../profiling';
 
@@ -350,6 +348,17 @@ export abstract class ViewBase extends Observable {
 	private _style: Style;
 	private _isLoaded: boolean = false;
 
+	private _effectivePaddingTop: number = null;
+	private _effectivePaddingRight: number = null;
+	private _effectivePaddingBottom: number = null;
+	private _effectivePaddingLeft: number = null;
+
+	protected _defaultPaddingTop: number = 0;
+	protected _defaultPaddingRight: number = 0;
+	protected _defaultPaddingBottom: number = 0;
+	protected _defaultPaddingLeft: number = 0;
+	protected _isPaddingRelative: boolean;
+
 	/**
 	 * @deprecated
 	 */
@@ -542,20 +551,10 @@ export abstract class ViewBase extends Observable {
 	public effectiveMarginRight: number;
 	public effectiveMarginBottom: number;
 	public effectiveMarginLeft: number;
-	public effectivePaddingTop: number;
-	public effectivePaddingRight: number;
-	public effectivePaddingBottom: number;
-	public effectivePaddingLeft: number;
 	public effectiveBorderTopWidth: number;
 	public effectiveBorderRightWidth: number;
 	public effectiveBorderBottomWidth: number;
 	public effectiveBorderLeftWidth: number;
-
-	public _defaultPaddingTop: number;
-	public _defaultPaddingRight: number;
-	public _defaultPaddingBottom: number;
-	public _defaultPaddingLeft: number;
-	public _isPaddingRelative: boolean;
 
 	/**
 	 * @private
@@ -650,6 +649,38 @@ export abstract class ViewBase extends Observable {
 	}
 	set ['class'](v: string) {
 		this.className = v;
+	}
+
+	get effectivePaddingTop(): number {
+		return this._effectivePaddingTop != null ? this._effectivePaddingTop : this._defaultPaddingTop;
+	}
+	set effectivePaddingTop(v: number) {
+		this._effectivePaddingTop = v;
+	}
+
+	get effectivePaddingRight(): number {
+		return this._effectivePaddingRight != null ? this._effectivePaddingRight : this._defaultPaddingRight;
+	}
+	set effectivePaddingRight(v: number) {
+		this._effectivePaddingRight = v;
+	}
+
+	get effectivePaddingBottom(): number {
+		return this._effectivePaddingBottom != null ? this._effectivePaddingBottom : this._defaultPaddingBottom;
+	}
+	set effectivePaddingBottom(v: number) {
+		this._effectivePaddingBottom = v;
+	}
+
+	get effectivePaddingLeft(): number {
+		return this._effectivePaddingLeft != null ? this._effectivePaddingLeft : this._defaultPaddingLeft;
+	}
+	set effectivePaddingLeft(v: number) {
+		this._effectivePaddingLeft = v;
+	}
+
+	getEffectivePaddingShorthand(): string {
+		return `${this.effectivePaddingTop} ${this.effectivePaddingRight} ${this.effectivePaddingBottom} ${this.effectivePaddingLeft}`;
 	}
 
 	/**
@@ -752,6 +783,10 @@ export abstract class ViewBase extends Observable {
 		}
 	}
 
+	public _setDefaultPaddings(insets: any): void {
+		// Overridden
+	}
+	
 	public _suspendNativeUpdates(type: SuspendType, recursive = false, shouldSuspendRequestLayout = false): void {
 		if (shouldSuspendRequestLayout) {
 			this.suspendRequestLayout = true;
@@ -1240,24 +1275,7 @@ export abstract class ViewBase extends Observable {
 						nativeView.defaultPaddings = DEFAULT_VIEW_PADDINGS.get(className);
 					}
 
-					this._defaultPaddingTop = result.top;
-					this._defaultPaddingRight = result.right;
-					this._defaultPaddingBottom = result.bottom;
-					this._defaultPaddingLeft = result.left;
-
-					const style = this.style;
-					if (!paddingTopProperty.isSet(style)) {
-						this.effectivePaddingTop = this._defaultPaddingTop;
-					}
-					if (!paddingRightProperty.isSet(style)) {
-						this.effectivePaddingRight = this._defaultPaddingRight;
-					}
-					if (!paddingBottomProperty.isSet(style)) {
-						this.effectivePaddingBottom = this._defaultPaddingBottom;
-					}
-					if (!paddingLeftProperty.isSet(style)) {
-						this.effectivePaddingLeft = this._defaultPaddingLeft;
-					}
+					this._setDefaultPaddings(result);
 				}
 			}
 		} else {
@@ -1581,7 +1599,7 @@ export abstract class ViewBase extends Observable {
 	 * Method is intended to be overridden by inheritors and used as "protected"
 	 */
 	public _dialogClosed(): void {
-		eachDescendant(this, (child: ViewBase) => {
+		this.eachChild((child: ViewBase) => {
 			child._dialogClosed();
 
 			return true;
@@ -1592,7 +1610,7 @@ export abstract class ViewBase extends Observable {
 	 * Method is intended to be overridden by inheritors and used as "protected"
 	 */
 	public _onRootViewReset(): void {
-		eachDescendant(this, (child: ViewBase) => {
+		this.eachChild((child: ViewBase) => {
 			child._onRootViewReset();
 
 			return true;
@@ -1615,18 +1633,10 @@ ViewBase.prototype.effectiveMarginTop = 0;
 ViewBase.prototype.effectiveMarginRight = 0;
 ViewBase.prototype.effectiveMarginBottom = 0;
 ViewBase.prototype.effectiveMarginLeft = 0;
-ViewBase.prototype.effectivePaddingTop = 0;
-ViewBase.prototype.effectivePaddingRight = 0;
-ViewBase.prototype.effectivePaddingBottom = 0;
-ViewBase.prototype.effectivePaddingLeft = 0;
 ViewBase.prototype.effectiveBorderTopWidth = 0;
 ViewBase.prototype.effectiveBorderRightWidth = 0;
 ViewBase.prototype.effectiveBorderBottomWidth = 0;
 ViewBase.prototype.effectiveBorderLeftWidth = 0;
-ViewBase.prototype._defaultPaddingTop = 0;
-ViewBase.prototype._defaultPaddingRight = 0;
-ViewBase.prototype._defaultPaddingBottom = 0;
-ViewBase.prototype._defaultPaddingLeft = 0;
 ViewBase.prototype._isViewBase = true;
 ViewBase.prototype.recycleNativeView = 'never';
 ViewBase.prototype.reusable = false;
