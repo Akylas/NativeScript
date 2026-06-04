@@ -13631,7 +13631,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hasown@npm:^2.0.0, hasown@npm:^2.0.2":
+"hasown@npm:^2.0.0, hasown@npm:^2.0.3":
+  version: 2.0.4
+  resolution: "hasown@npm:2.0.4"
+  dependencies:
+    function-bind: "npm:^1.1.2"
+  checksum: 10/13823863ae48161068b4c51606a3128451c66f14545a5169d667fe9fca168dcd38c27570c7a299e32ef844b8da3d55def7fe88602f8970d4311fb543ee88001a
+  languageName: node
+  linkType: hard
+
+"hasown@npm:^2.0.2":
   version: 2.0.2
   resolution: "hasown@npm:2.0.2"
   dependencies:
@@ -14139,12 +14148,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-accessor-descriptor@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "is-accessor-descriptor@npm:1.0.1"
+"is-accessor-descriptor@npm:^1.0.1, is-accessor-descriptor@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "is-accessor-descriptor@npm:1.0.2"
   dependencies:
-    hasown: "npm:^2.0.0"
-  checksum: 10/df0d1da1a320e57c594e6f9b52dab8a6bece6dc90e51689d05ac8e5247164aa3eb3e9c66b37027bebfc0ea5fcce6d9503dbc41dccd82f4b57add79a307735365
+    hasown: "npm:^2.0.3"
+  checksum: 10/c9248865812f91e766cd4d3c40189c87acfb804e8f7bc0723bd2273ff9c58100d1c0c69739aaf928bf621938fd9a93aa8bdc78570fbc233be954fbaa6d4761e5
   languageName: node
   linkType: hard
 
@@ -14201,22 +14210,22 @@ __metadata:
   linkType: hard
 
 "is-descriptor@npm:^0.1.0":
-  version: 0.1.7
-  resolution: "is-descriptor@npm:0.1.7"
+  version: 0.1.8
+  resolution: "is-descriptor@npm:0.1.8"
   dependencies:
     is-accessor-descriptor: "npm:^1.0.1"
     is-data-descriptor: "npm:^1.0.1"
-  checksum: 10/38783182c3d83f839a9fa3e87b4d6de11fa9639833ed98993ea51aea2296b2da155121956e148695a738228871d1057c5f963d0b1c857bb8a4a38d8dd9ceeb56
+  checksum: 10/baf11b3b01f8f327b2843a55fb86c3abc07a40e47a427e6800ad153b4ac9ec285cd8664aa63acee4cac29c5f34e29891efb4464b58c52bdfbb8ed6e958b2c028
   languageName: node
   linkType: hard
 
 "is-descriptor@npm:^1.0.0, is-descriptor@npm:^1.0.2":
-  version: 1.0.3
-  resolution: "is-descriptor@npm:1.0.3"
+  version: 1.0.4
+  resolution: "is-descriptor@npm:1.0.4"
   dependencies:
-    is-accessor-descriptor: "npm:^1.0.1"
+    is-accessor-descriptor: "npm:^1.0.2"
     is-data-descriptor: "npm:^1.0.1"
-  checksum: 10/b940d04d93adaffb749b3ca7f7f6d73dd3c5582b674f372513ecb5511a8a3f3ff4a24f4c1161cb10e48fe4886f9e84c09fa71785def27905ca8df1197e563dc6
+  checksum: 10/b6d4e5cb1b6696d619fb4c5efe8714aaa78eb939ed024ffd6d16a135232c37c1a55cf7e6a5a7b263e7217f2a53f49a50e7ee085d1af4b293061b24075703b773
   languageName: node
   linkType: hard
 

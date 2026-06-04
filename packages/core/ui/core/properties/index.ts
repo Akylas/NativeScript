@@ -835,6 +835,9 @@ export class CssAnimationProperty<T extends Style, U> implements CssAnimationPro
 								}
 							}
 						}
+						if (property.affectsLayout) {
+							view.requestLayout();
+						}
 					}
 					const eventName = property.eventName;
 					if (computedValueChanged && (!__UI_USE_EXTERNAL_RENDERER__ || !view._suspendNativeUpdatesCount) && this.hasListeners(eventName)) {
@@ -845,9 +848,6 @@ export class CssAnimationProperty<T extends Style, U> implements CssAnimationPro
 							value,
 							oldValue,
 						});
-					}
-					if (property.affectsLayout) {
-						view.requestLayout();
 					}
 				},
 			};

@@ -372,6 +372,10 @@ export abstract class EditableTextBase extends EditableTextBaseCommon {
 			}
 			nativeView.setKeyListener(null);
 		}
+		nativeView.setFocusable(value);
+		nativeView.setFocusableInTouchMode(value);
+		nativeView.setLongClickable(value);
+		nativeView.setClickable(value);
 	}
 
 	[selectableProperty.getDefault](): boolean {

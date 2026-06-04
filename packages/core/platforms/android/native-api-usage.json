@@ -211,6 +211,7 @@
         "androidx.activity:OnBackPressedDispatcher",
         "androidx.activity:ComponentActivity",
         "androidx.activity:ComponentDialog",
+        "androidx.appcompat.app:AppCompatDialog",
         "androidx.appcompat.app:AppCompatActivity",
         "androidx.appcompat.app:AppCompatDialog",
         "androidx.appcompat.widget:AppCompatTextView",

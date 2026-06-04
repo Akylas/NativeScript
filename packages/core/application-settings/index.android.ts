@@ -32,16 +32,7 @@ export function getBoolean(key: string, defaultValue?: boolean): boolean {
 		return;
 	}
 	if (hasKey(key)) {
-		try {
-			return sharedPreferences.getBoolean(key, false);
-		} catch (ex) {
-			Application.notify({
-				eventName: Application.uncaughtErrorEvent,
-				object: Application,
-				android: ex,
-				error: wrapNativeException(ex),
-			} as DiscardedErrorEventData);
-		}
+		return sharedPreferences.getBoolean(key, false);
 	}
 
 	return defaultValue;
@@ -52,16 +43,7 @@ export function getString(key: string, defaultValue?: string): string {
 		return;
 	}
 	if (hasKey(key)) {
-		try {
-			return sharedPreferences.getString(key, '');
-		} catch (ex) {
-			Application.notify({
-				eventName: Application.uncaughtErrorEvent,
-				object: Application,
-				android: ex,
-				error: wrapNativeException(ex),
-			} as DiscardedErrorEventData);
-		}
+		return sharedPreferences.getString(key, '');
 	}
 
 	return defaultValue;
@@ -74,25 +56,7 @@ export function getNumber(key: string, defaultValue?: number): number {
 	if (hasKey(key)) {
 		let val;
 
-		// TODO: Remove this migration step in a future release
-		try {
-			val = sharedPreferences.getLong(key, long(0));
-		} catch (err) {
-			try {
-				// If value is old, it might have been stored as a float so we store it anew as a long value to avoid errors
-				const oldVal = sharedPreferences.getFloat(key, float(0.0));
-				setNumber(key, oldVal);
-
-				val = sharedPreferences.getLong(key, long(0));
-			} catch (ex) {
-				Application.notify({
-					eventName: Application.uncaughtErrorEvent,
-					object: Application,
-					android: ex,
-					error: wrapNativeException(ex),
-				} as DiscardedErrorEventData);
-			}
-		}
+		val = sharedPreferences.getLong(key, long(0));
 		// SharedPreferences has no getter or setter for double so we retrieve value as a long and convert it to double
 		return java.lang.Double.longBitsToDouble(val);
 	}

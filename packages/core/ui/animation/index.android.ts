@@ -67,8 +67,8 @@ export function _resolveAnimationCurve(curve: string | CubicBezierAnimationCurve
 				return (<any>androidx).core.view.animation.PathInterpolatorCompat.create(curve.x1, curve.y1, curve.x2, curve.y2);
 			} else if (curve && (<any>curve).getInterpolation) {
 				return <android.view.animation.Interpolator>curve;
-			} else if (<any>curve instanceof android.view.animation.LinearInterpolator) {
-				return <android.view.animation.Interpolator>curve;
+			} else if (<any>curve instanceof android.animation.TimeInterpolator) {
+				return <android.animation.TimeInterpolator>curve;
 			} else {
 				throw new Error(`Invalid animation curve: ${curve}`);
 			}

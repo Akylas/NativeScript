@@ -95,7 +95,6 @@ if (SDK_VERSION >= 33) {
 			}
 
 			const view = dialog.fragment.owner;
-
 			const args: AndroidActivityBackPressedEventData = {
 				eventName: 'activityBackPressed',
 				object: view,
@@ -105,6 +104,7 @@ if (SDK_VERSION >= 33) {
 
 			// Fist fire application.android global event
 			getNativeScriptGlobals().events.notify(args);
+			Application.android.notify(args);
 
 			if (args.cancel) {
 				return;

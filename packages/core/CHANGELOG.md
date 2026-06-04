@@ -294,6 +294,67 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.9.17](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.16...@akylas/nativescript@8.9.17) (2026-05-13)
+
+
+### Bug Fixes
+
+* **core:** prevent accessibility error on accessibility change event ([bf12bbb](https://github.com/Akylas/NativeScript/commit/bf12bbb567442520a6785e2079089909c62ce07e))
+
+### [8.9.16](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.15...@akylas/nativescript@8.9.16) (2026-05-13)
+
+
+### Bug Fixes
+
+* **core:** do not catch errors in ApplicationSettings. Let the user handle it ([2f8d10a](https://github.com/Akylas/NativeScript/commit/2f8d10a997ce6a5c40bee0b8c1437e1fbdb6c8a8))
+* log cleanup ([6d8ddd6](https://github.com/Akylas/NativeScript/commit/6d8ddd6e95eaca6bb651f3ff84015a07b5054b5b))
+
+### [8.9.15](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.14...@akylas/nativescript@8.9.15) (2026-03-31)
+
+
+### Bug Fixes
+
+* **core:** android fix for editable change not working ([14f70ad](https://github.com/Akylas/NativeScript/commit/14f70adc41bbb085110495e79b6639e11926bf81))
+
+### [8.9.14](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.13...@akylas/nativescript@8.9.14) (2026-03-15)
+
+
+### Bug Fixes
+
+* **core:** android activity recreation fix ([9f46dd1](https://github.com/Akylas/NativeScript/commit/9f46dd1fa7c8bb40c045ea9e70ee491953f7b2a7))
+
+### [8.9.13](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.12...@akylas/nativescript@8.9.13) (2026-01-17)
+
+
+### Bug Fixes
+
+* android native-api-usage crash fix with dialogs ([57172c8](https://github.com/Akylas/NativeScript/commit/57172c87f3a42c70479c9e291ca675a8181fed28))
+
+### [8.9.12](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.10...@akylas/nativescript@8.9.12) (2026-01-16)
+
+
+### Features
+
+* **android:** API Level 35+ OnBackPressed handling ([#10938](https://github.com/Akylas/NativeScript/issues/10938)) ([ccceb88](https://github.com/Akylas/NativeScript/commit/ccceb8844ff730bb08a806b8c5a8d1c027240026))
+* **search-bar:** clear button color support ([#10903](https://github.com/Akylas/NativeScript/issues/10903)) ([b7579c9](https://github.com/Akylas/NativeScript/commit/b7579c91acd059fbc2c056247adcb738dfdffc28))
+
+
+### Bug Fixes
+
+* **android:** Android 16 back press navigation failure ([#11006](https://github.com/Akylas/NativeScript/issues/11006)) ([844c3df](https://github.com/Akylas/NativeScript/commit/844c3df8951fbc3c75b907ef2f04241301c24144))
+* **application:** remove dupe cssChanged event handler definition ([#10892](https://github.com/Akylas/NativeScript/issues/10892)) ([b49ba05](https://github.com/Akylas/NativeScript/commit/b49ba05f67c7ac80b087ef9ca3a9f9b9cbdf3a4c))
+* **ios:** allow creating missing view controllers on reused views ([#10941](https://github.com/Akylas/NativeScript/issues/10941)) ([a038d44](https://github.com/Akylas/NativeScript/commit/a038d4489aebf6e4bd020742918a5da8860fd522))
+* **ios:** only requestLayout if prop actually changed preventing endless collectionview refresh ([78c71a9](https://github.com/Akylas/NativeScript/commit/78c71a9ba3b9917ef840a33acef5f35df183867d))
+* **ios:** prevent gc from collecting current navigation transition ([#10967](https://github.com/Akylas/NativeScript/issues/10967)) ([bd7aae7](https://github.com/Akylas/NativeScript/commit/bd7aae76e333df95330a46c01e6d34b233072bfd))
+* **RootLayout:** close shade cover when topmost popup doesn't need it ([#11007](https://github.com/Akylas/NativeScript/issues/11007)) ([f5128a4](https://github.com/Akylas/NativeScript/commit/f5128a48006720acee4e401e6901ce5744d71541))
+
+### [8.9.11](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.10...@akylas/nativescript@8.9.11) (2026-01-07)
+
+
+### Bug Fixes
+
+* **ios:** only requestLayout if prop actually changed preventing endless collectionview refresh ([78c71a9](https://github.com/Akylas/NativeScript/commit/78c71a9ba3b9917ef840a33acef5f35df183867d))
+
 ### [8.9.10](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@8.9.6...@akylas/nativescript@8.9.10) (2025-10-04)
 
 

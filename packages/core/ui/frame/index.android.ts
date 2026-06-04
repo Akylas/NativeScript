@@ -581,6 +581,10 @@ export class Frame extends FrameBase {
 	protected _disposeBackstackEntry(entry: BackstackEntry): void {
 		if (entry.fragment) {
 			_clearFragment(entry);
+			const fragmentManager = entry.fragment.getParentFragmentManager();
+			const transaction = fragmentManager.beginTransaction();
+			transaction.remove(entry.fragment);
+			transaction.commitNowAllowingStateLoss();
 			entry.fragment = null;
 		}
 
