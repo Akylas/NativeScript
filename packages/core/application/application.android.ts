@@ -10,7 +10,6 @@ import { fontScaleChanged } from '../accessibility/font-scale.android';
 import { androidGetForegroundActivity, androidGetStartActivity, androidSetForegroundActivity, androidSetStartActivity } from './helpers';
 import { getImageFetcher, getNativeApp, getRootView, initImageCache, setApplicationPropertiesCallback, setAppMainEntry, setNativeApp, setRootView, setToggleApplicationEventListenersCallback } from './helpers-common';
 import { getNativeScriptGlobals } from '../globals/global-utils';
-import type { AndroidApplication as IAndroidApplication } from './application';
 import lazy from '../utils/lazy';
 
 declare class NativeScriptLifecycleCallbacks extends android.app.Application.ActivityLifecycleCallbacks {}
@@ -619,7 +618,6 @@ export class AndroidApplication extends ApplicationCommon {
 export * from './application-common';
 export const Application = new AndroidApplication();
 export const iOSApplication = undefined;
-
 
 const applicationEvents: string[] = [Application.orientationChangedEvent, Application.systemAppearanceChangedEvent];
 function toggleApplicationEventListeners(toAdd: boolean, callback: (args: ApplicationEventData) => void) {

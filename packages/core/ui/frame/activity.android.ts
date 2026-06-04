@@ -2,7 +2,6 @@ import '../../globals';
 import { setActivityCallbacks } from '.';
 import { Application } from '../../application';
 import { isEmbedded } from '../embedding';
-
 const EMPTY_FN = () => {};
 declare const com: any;
 

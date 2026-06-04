@@ -14,6 +14,7 @@ import { Trace } from '../../trace';
 import { SlideTransition } from '../transition/slide-transition';
 import { FadeTransition } from '../transition/fade-transition';
 import { SharedTransition } from '../transition/shared-transition';
+import type { Transition } from '../transition';
 
 export * from './frame-common';
 
@@ -73,7 +74,11 @@ export class Frame extends FrameBase {
 		}
 
 		this._removeFromFrameStack();
-		this.viewController = null;
+
+		if (this.viewController) {
+			this.viewController.lastExecutingTransition = null;
+			this.viewController = null;
+		}
 
 		// This was the last frame so we can get rid of the controller delegate reference
 		if (this._isFrameStackEmpty()) {
@@ -267,7 +272,7 @@ export class Frame extends FrameBase {
 	public _updateActionBar(page?: Page, disableNavBarAnimation = false): void {
 		super._updateActionBar(page);
 
-		if (page && this.currentPage && this.currentPage.modal === page) {
+		if (!this._ios || (page && this.currentPage && this.currentPage.modal === page)) {
 			return;
 		}
 
@@ -475,6 +480,9 @@ class UINavigationControllerDelegateImpl extends NSObject implements UINavigatio
 			}
 		}
 
+		// Keep a strong reference of the last executing transition to prevent gc from collecting it
+		navigationController.lastExecutingTransition = transition;
+
 		if (transition?.iosNavigatedController) {
 			return transition.iosNavigatedController(navigationController, operation, fromVC, toVC);
 		}
@@ -503,12 +511,14 @@ class UINavigationControllerDelegateImpl extends NSObject implements UINavigatio
 		if (owner) {
 			owner._onViewControllerShown(viewController);
 		}
+		IOSHelper.invalidateStatusBarAppearance(navigationController, 'navigationControllerDidShowViewControllerAnimated');
 	}
 }
 
 @NativeClass
 class UINavigationControllerImpl extends UINavigationController {
 	private _owner: WeakRef<Frame>;
+	public lastExecutingTransition: Transition;
 
 	public static initWithOwner(owner: WeakRef<Frame>): UINavigationControllerImpl {
 		const navigationBarClass = owner.deref()?.iosNavigationBarClass ?? null;
@@ -571,41 +581,54 @@ class UINavigationControllerImpl extends UINavigationController {
 		const navigationTransition = <NavigationTransition>viewController[TRANSITION];
 		const owner = this._owner?.deref?.();
 
+		const logTag = 'UINavigationControllerImpl.pushViewControllerAnimated';
 		if (Trace.isEnabled()) {
-			Trace.write(`UINavigationControllerImpl.pushViewControllerAnimated(${viewController}, ${animated}); transition: ${JSON.stringify(navigationTransition)}`, Trace.categories.NativeLifecycle);
+			Trace.write(`${logTag}(${viewController}, ${animated}); transition: ${JSON.stringify(navigationTransition)}`, Trace.categories.NativeLifecycle);
 		}
 
 		const nativeTransition = _getNativeTransition(navigationTransition, true, owner?.direction);
 		if (!animated || !navigationTransition || !nativeTransition) {
 			super.pushViewControllerAnimated(viewController, animated);
+			IOSHelper.invalidateStatusBarAppearance(this, logTag);
 			return;
 		}
 
 		this.animateWithDuration(navigationTransition, nativeTransition, 'push', () => {
 			super.pushViewControllerAnimated(viewController, false);
 		});
+		IOSHelper.invalidateStatusBarAppearance(this, logTag);
 	}
 
 	@profile
 	public setViewControllersAnimated(viewControllers: NSArray<any>, animated: boolean): void {
-		const viewController = viewControllers.lastObject;
-		const navigationTransition = <NavigationTransition>viewController[TRANSITION];
-		const owner = this._owner?.deref?.();
+		const viewController = viewControllers?.lastObject;
+		const navigationTransition = viewController ? <NavigationTransition>viewController[TRANSITION] : null;
 
 		if (Trace.isEnabled()) {
 			Trace.write(`UINavigationControllerImpl.setViewControllersAnimated(${viewControllers}, ${animated}); transition: ${JSON.stringify(navigationTransition)}`, Trace.categories.NativeLifecycle);
 		}
 
-		const nativeTransition = _getNativeTransition(navigationTransition, true, owner?.direction);
-		if (!animated || !navigationTransition || !nativeTransition) {
-			super.setViewControllersAnimated(viewControllers, animated);
+		const logTag = 'UINavigationControllerImpl.setViewControllersAnimated';
 
+		if (!animated || !navigationTransition) {
+			super.setViewControllersAnimated(viewControllers, animated);
+			IOSHelper.invalidateStatusBarAppearance(this, logTag);
+			return;
+		}
+
+		const owner = this._owner?.deref?.();
+		const nativeTransition = _getNativeTransition(navigationTransition, true, owner?.direction);
+
+		if (!nativeTransition) {
+			super.setViewControllersAnimated(viewControllers, animated);
+			IOSHelper.invalidateStatusBarAppearance(this, logTag);
 			return;
 		}
 
 		this.animateWithDuration(navigationTransition, nativeTransition, 'set', () => {
 			super.setViewControllersAnimated(viewControllers, false);
 		});
+		IOSHelper.invalidateStatusBarAppearance(this, logTag);
 	}
 
 	public popViewControllerAnimated(animated: boolean): UIViewController {
@@ -689,6 +712,12 @@ class UINavigationControllerImpl extends UINavigationController {
 	// @ts-ignore
 	public get childViewControllerForStatusBarStyle() {
 		return this.topViewController;
+	}
+
+	// @ts-ignore
+	public get preferredStatusBarStyle(): UIStatusBarStyle {
+		const top = this.topViewController;
+		return top?.preferredStatusBarStyle ?? UIStatusBarStyle.Default;
 	}
 }
 

@@ -84,7 +84,6 @@ let OnBackPressedCallback;
 if (SDK_VERSION >= 33) {
 	OnBackPressedCallback = (androidx.activity.OnBackPressedCallback as any).extend({
 		handleOnBackPressed() {
-			console.log('OnBackPressedCallback handleOnBackPressed called');
 			const dialog = this['_dialog']?.get();
 
 			if (!dialog) {
@@ -271,13 +270,9 @@ function initializeDialogFragment() {
 			this._animationStyle = options.style;
 			this.setStyle(androidx.fragment.app.DialogFragment.STYLE_NO_TITLE, 0);
 
-			let theme = this.getTheme();
-			if (this._fullscreen) {
-				// In fullscreen mode, get the application's theme.
-				theme = this.getActivity().getApplicationInfo().theme;
-			}
-
+			const theme = this._fullscreen ? this.getActivity().getApplicationInfo().theme : this.getTheme();
 			const dialog = new DialogImpl(this, this.getActivity(), theme);
+
 
 			// do not override alignment unless fullscreen modal will be shown;
 			// otherwise we might break component-level layout:

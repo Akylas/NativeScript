@@ -1,6 +1,6 @@
 {
 	"name": "@akylas/nativescript-webpack",
-	"version": "5.0.25-alpha.1",
+	"version": "5.0.36-next.3",
 	"main": "dist/index.js",
 	"files": [
 		"dist"
@@ -10,8 +10,7 @@
 	"scripts": {
 		"build": "tsc --project tsconfig.lib.json",
 		"test": "jest",
-		"copy-stubs": "mkdirp dist/stubs && cp -R src/stubs/* dist/stubs",
-		"prepack": "npm run test && npm run build && npm run copy-stubs && chmod +x dist/bin/index.js"
+		"copy-stubs": "mkdirp dist/stubs && cp -R src/stubs/* dist/stubs"
 	},
 	"dependencies": {
 		"@babel/core": "^7.23.3",
@@ -78,5 +77,28 @@
 		"nativescript-vue-template-compiler": {
 			"optional": true
 		}
-	}
+	},
+	"homepage": "https://docs.nativescript.org/configuration/webpack",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/NativeScript/NativeScript"
+	},
+	"author": {
+		"name": "Igor Randjelovic",
+		"email": "rigor789@gmail.com"
+	},
+	"contributors": [
+		{
+			"name": "NativeScript",
+			"email": "oss@nativescript.org"
+		}
+	],
+	"keywords": [
+		"NativeScript",
+		"JavaScript",
+		"Android",
+		"iOS",
+		"TypeScript",
+		"webpack"
+	]
 }

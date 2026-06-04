@@ -37,6 +37,12 @@ function accessibilityEventHelper(view: View, eventType: number) {
 		}
 		return;
 	}
+	const eventName = accessibilityEventTypeMap.get(eventType);
+	if (!eventName) {
+		Trace.write(`accessibilityEventHelper: unknown eventType: ${eventType}`, Trace.categories.Accessibility, Trace.messageType.error);
+
+		return;
+	}
 
 	switch (eventType) {
 		case 1 /* android.view.accessibility.AccessibilityEvent.TYPE_VIEW_CLICKED */: {
@@ -96,7 +102,7 @@ let TNSAccessibilityDelegate: android.view.View.androidviewViewAccessibilityDele
 
 const androidViewToTNSView = new WeakMap<android.view.View, WeakRef<View>>();
 let accessibilityEventMap: Map<AndroidAccessibilityEvent, number>;
-let accessibilityEventTypeMap: Map<number, string>;
+let accessibilityEventTypeMap: Map<number, AndroidAccessibilityEvent>;
 
 function ensureNativeClasses() {
 	if (TNSAccessibilityDelegate) {
@@ -261,6 +267,111 @@ function ensureNativeClasses() {
 	}
 
 	TNSAccessibilityDelegate = new TNSAccessibilityDelegateImpl();
+
+	accessibilityEventMap = new Map<AndroidAccessibilityEvent, number>([
+		/**
+		 * Invalid selection/focus position.
+		 */
+		[AndroidAccessibilityEvent.INVALID_POSITION, android.view.accessibility.AccessibilityEvent.INVALID_POSITION],
+		/**
+		 * Maximum length of the text fields.
+		 */
+		[AndroidAccessibilityEvent.MAX_TEXT_LENGTH, android.view.accessibility.AccessibilityEvent.MAX_TEXT_LENGTH],
+		/**
+		 * Represents the event of clicking on a android.view.View like android.widget.Button, android.widget.CompoundButton, etc.
+		 */
+		[AndroidAccessibilityEvent.VIEW_CLICKED, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_CLICKED],
+		/**
+		 * Represents the event of long clicking on a android.view.View like android.widget.Button, android.widget.CompoundButton, etc.
+		 */
+		[AndroidAccessibilityEvent.VIEW_LONG_CLICKED, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_LONG_CLICKED],
+		/**
+		 * Represents the event of selecting an item usually in the context of an android.widget.AdapterView.
+		 */
+		[AndroidAccessibilityEvent.VIEW_SELECTED, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_SELECTED],
+		/**
+		 * Represents the event of setting input focus of a android.view.View.
+		 */
+		[AndroidAccessibilityEvent.VIEW_FOCUSED, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_FOCUSED],
+		/**
+		 * Represents the event of changing the text of an android.widget.EditText.
+		 */
+		[AndroidAccessibilityEvent.VIEW_TEXT_CHANGED, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED],
+		/**
+		 * Represents the event of opening a android.widget.PopupWindow, android.view.Menu, android.app.Dialog, etc.
+		 */
+		[AndroidAccessibilityEvent.WINDOW_STATE_CHANGED, android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED],
+		/**
+		 * Represents the event showing a android.app.Notification.
+		 */
+		[AndroidAccessibilityEvent.NOTIFICATION_STATE_CHANGED, android.view.accessibility.AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED],
+		/**
+		 * Represents the event of a hover enter over a android.view.View.
+		 */
+		[AndroidAccessibilityEvent.VIEW_HOVER_ENTER, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_HOVER_ENTER],
+		/**
+		 * Represents the event of a hover exit over a android.view.View.
+		 */
+		[AndroidAccessibilityEvent.VIEW_HOVER_EXIT, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_HOVER_EXIT],
+		/**
+		 * Represents the event of starting a touch exploration gesture.
+		 */
+		[AndroidAccessibilityEvent.TOUCH_EXPLORATION_GESTURE_START, android.view.accessibility.AccessibilityEvent.TYPE_TOUCH_EXPLORATION_GESTURE_START],
+		/**
+		 * Represents the event of ending a touch exploration gesture.
+		 */
+		[AndroidAccessibilityEvent.TOUCH_EXPLORATION_GESTURE_END, android.view.accessibility.AccessibilityEvent.TYPE_TOUCH_EXPLORATION_GESTURE_END],
+		/**
+		 * Represents the event of changing the content of a window and more specifically the sub-tree rooted at the event's source.
+		 */
+		[AndroidAccessibilityEvent.WINDOW_CONTENT_CHANGED, android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED],
+		/**
+		 * Represents the event of scrolling a view.
+		 */
+		[AndroidAccessibilityEvent.VIEW_SCROLLED, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_SCROLLED],
+		/**
+		 * Represents the event of changing the selection in an android.widget.EditText.
+		 */
+		[AndroidAccessibilityEvent.VIEW_TEXT_SELECTION_CHANGED, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED],
+		/**
+		 * Represents the event of an application making an announcement.
+		 */
+		[AndroidAccessibilityEvent.ANNOUNCEMENT, android.view.accessibility.AccessibilityEvent.TYPE_ANNOUNCEMENT],
+		/**
+		 * Represents the event of gaining accessibility focus.
+		 */
+		[AndroidAccessibilityEvent.VIEW_ACCESSIBILITY_FOCUSED, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED],
+		/**
+		 * Represents the event of clearing accessibility focus.
+		 */
+		[AndroidAccessibilityEvent.VIEW_ACCESSIBILITY_FOCUS_CLEARED, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED],
+		/**
+		 * Represents the event of traversing the text of a view at a given movement granularity.
+		 */
+		[AndroidAccessibilityEvent.VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY],
+		/**
+		 * Represents the event of beginning gesture detection.
+		 */
+		[AndroidAccessibilityEvent.GESTURE_DETECTION_START, android.view.accessibility.AccessibilityEvent.TYPE_GESTURE_DETECTION_START],
+		/**
+		 * Represents the event of ending gesture detection.
+		 */
+		[AndroidAccessibilityEvent.GESTURE_DETECTION_END, android.view.accessibility.AccessibilityEvent.TYPE_GESTURE_DETECTION_END],
+		/**
+		 * Represents the event of the user starting to touch the screen.
+		 */
+		[AndroidAccessibilityEvent.TOUCH_INTERACTION_START, android.view.accessibility.AccessibilityEvent.TYPE_TOUCH_INTERACTION_START],
+		/**
+		 * Represents the event of the user ending to touch the screen.
+		 */
+		[AndroidAccessibilityEvent.TOUCH_INTERACTION_END, android.view.accessibility.AccessibilityEvent.TYPE_TOUCH_INTERACTION_END],
+		/**
+		 * Mask for AccessibilityEvent all types.
+		 */
+		[AndroidAccessibilityEvent.ALL_MASK, android.view.accessibility.AccessibilityEvent.TYPES_ALL_MASK],
+	]);
+
+	accessibilityEventTypeMap = new Map([...accessibilityEventMap].map(([k, v]) => [v, k]));
 }
 
 let accessibilityStateChangeListener: androidx.core.view.accessibility.AccessibilityManagerCompat.AccessibilityStateChangeListener;
@@ -282,8 +393,8 @@ export function isAccessibilityServiceEnabled(): boolean {
 	}
 
 	const accessibilityManager = getAndroidAccessibilityManager();
-	const AccessibilityManagerCompat = androidx.core.view.accessibility.AccessibilityManagerCompat;
-	accessibilityStateChangeListener = new AccessibilityManagerCompat.AccessibilityStateChangeListener({
+	
+	accessibilityStateChangeListener = new android.view.accessibility.AccessibilityManager.AccessibilityStateChangeListener({
 		onAccessibilityStateChanged(enabled) {
 			updateAccessibilityServiceState();
 
@@ -292,19 +403,21 @@ export function isAccessibilityServiceEnabled(): boolean {
 			}
 		},
 	});
+	accessibilityManager.addAccessibilityStateChangeListener(accessibilityStateChangeListener);
 
-	touchExplorationStateChangeListener = new AccessibilityManagerCompat.TouchExplorationStateChangeListener({
-		onTouchExplorationStateChanged(enabled) {
-			updateAccessibilityServiceState();
 
-			if (Trace.isEnabled()) {
-				Trace.write(`TouchExplorationStateChangeListener state changed to: ${!!enabled}`, Trace.categories.Accessibility);
-			}
-		},
-	});
+	if (SDK_VERSION >= 19) {
+		touchExplorationStateChangeListener = new android.view.accessibility.AccessibilityManager.TouchExplorationStateChangeListener({
+			onTouchExplorationStateChanged(enabled) {
+				updateAccessibilityServiceState();
 
-	AccessibilityManagerCompat.addAccessibilityStateChangeListener(accessibilityManager, accessibilityStateChangeListener);
-	AccessibilityManagerCompat.addTouchExplorationStateChangeListener(accessibilityManager, touchExplorationStateChangeListener);
+				if (Trace.isEnabled()) {
+					Trace.write(`TouchExplorationStateChangeListener state changed to: ${!!enabled}`, Trace.categories.Accessibility);
+				}
+			},
+		});
+		accessibilityManager.addTouchExplorationStateChangeListener(touchExplorationStateChangeListener);
+	}
 
 	updateAccessibilityServiceState();
 
@@ -317,11 +430,11 @@ export function isAccessibilityServiceEnabled(): boolean {
 		const accessibilityManager = getAndroidAccessibilityManager();
 		if (accessibilityManager) {
 			if (accessibilityStateChangeListener) {
-				AccessibilityManagerCompat.removeAccessibilityStateChangeListener(accessibilityManager, accessibilityStateChangeListener);
+				accessibilityManager.removeAccessibilityStateChangeListener(accessibilityManager, accessibilityStateChangeListener);
 			}
 
 			if (touchExplorationStateChangeListener) {
-				AccessibilityManagerCompat.removeTouchExplorationStateChangeListener(accessibilityManager, touchExplorationStateChangeListener);
+				accessibilityManager.removeTouchExplorationStateChangeListener(accessibilityManager, touchExplorationStateChangeListener);
 			}
 		}
 
@@ -382,14 +495,23 @@ export function sendAccessibilityEvent(view: View, eventType: AndroidAccessibili
 
 	if (!eventType) {
 		if (Trace.isEnabled()) {
-			Trace.write(`endAccessibilityEvent(${view}, ${eventType}, ${text}): no eventName provided`, Trace.categories.Accessibility);
+			Trace.write(`sendAccessibilityEvent(${view}, ${eventType}, ${text}): no eventName provided`, Trace.categories.Accessibility);
 		}
 
 		return;
 	}
 
+	if (!isAccessibilityServiceEnabled()) {
+		if (Trace.isEnabled()) {
+			Trace.write(`sendAccessibilityEvent(${view}, ${eventType}, ${text}): TalkBack not enabled`, Trace.categories.Accessibility);
+		}
+
+		return;
+	}
+
+	const eventInt = accessibilityEventMap.get(eventType);
 	if (!text) {
-		return androidView.sendAccessibilityEvent(eventType);
+		return androidView.sendAccessibilityEvent(eventInt);
 	}
 
 	const accessibilityEvent = android.view.accessibility.AccessibilityEvent.obtain(eventType);
@@ -401,7 +523,9 @@ export function sendAccessibilityEvent(view: View, eventType: AndroidAccessibili
 		Trace.write(`sendAccessibilityEvent(${view}: send event with text: '${JSON.stringify(text)}'`, Trace.categories.Accessibility);
 	}
 
-	accessibilityEvent.getText().add(text);
+	if (text) {
+		accessibilityEvent.getText().add(text);
+	}
 
 	getAndroidAccessibilityManager().sendAccessibilityEvent(accessibilityEvent);
 }

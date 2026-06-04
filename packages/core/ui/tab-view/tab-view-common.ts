@@ -13,6 +13,7 @@ export const traceCategory = 'TabView';
 
 @CSSType('TabViewItem')
 export abstract class TabViewItemBase extends ViewBase implements TabViewItemDefinition, AddChildFromBuilder {
+	role: string;
 	private _title = '';
 	private _view: View;
 	private _iconSource: string;

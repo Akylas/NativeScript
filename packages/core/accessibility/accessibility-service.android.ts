@@ -1,3 +1,4 @@
+import { getApplicationContext } from '../application/helpers.android';
 import { Application, ApplicationEventData } from '../application';
 import { Observable } from '../data/observable';
 import { Trace } from '../trace';
@@ -8,7 +9,8 @@ import { CommonA11YServiceEnabledObservable, SharedA11YObservable } from './acce
 let accessibilityManager: android.view.accessibility.AccessibilityManager;
 export function getAndroidAccessibilityManager(): android.view.accessibility.AccessibilityManager | null {
 	if (!accessibilityManager) {
-		const context = Utils.android.getApplicationContext() as android.content.Context;
+		const context = getApplicationContext();
+
 		if (!context) {
 			return null;
 		}
@@ -40,6 +42,10 @@ let touchExplorationStateChangeListener: android.view.accessibility.Accessibilit
 let sharedA11YObservable: AndroidSharedA11YObservable;
 
 function updateAccessibilityState(): void {
+	if (!sharedA11YObservable) {
+		return;
+	}
+	
 	const accessibilityManager = getAndroidAccessibilityManager();
 	if (!accessibilityManager) {
 		sharedA11YObservable.set(accessibilityStateEnabledPropName, false);

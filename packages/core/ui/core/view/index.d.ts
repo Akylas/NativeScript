@@ -9,7 +9,7 @@ import { LinearGradient } from '../../styling/linear-gradient';
 import { InheritedProperty, Property } from '../properties';
 import { ViewBase } from '../view-base';
 import { GlassEffectType, ViewCommon } from './view-common';
-import type { Point, ShownModallyData } from './view-interfaces';
+import type { Point, ShownModallyData, Size } from './view-interfaces';
 
 export * from './view-common';
 // helpers (these are okay re-exported here)
@@ -652,6 +652,11 @@ export abstract class View extends ViewCommon {
 	 * Gets if layout is valid. This is a read-only property.
 	 */
 	isLayoutValid: boolean;
+
+	/**
+	 * Native background states. This is a read-only property.
+	 */
+	nativeBackgroundState?: 'unset' | 'invalid' | 'drawn';
 
 	/**
 	 * Gets the CSS fully qualified type name.

@@ -45,8 +45,6 @@ function applyRootCssClass(cssClasses: string[], newCssClass: string): void {
 
 	const rootModalViews = <Array<View>>rootView._getRootModalViews();
 	rootModalViews.forEach((rootModalView) => Application.applyCssClass(rootModalView, cssClasses, newCssClass));
-
-	// Note: SDK version classes are applied separately to avoid redundant work
 }
 
 function applyFontScaleToRootViews(): void {
@@ -68,7 +66,6 @@ export function initAccessibilityCssHelper(): void {
 
 	Application.on(Application.fontScaleChangedEvent, () => {
 		updateCurrentHelperClasses();
-
 		applyFontScaleToRootViews();
 	});
 

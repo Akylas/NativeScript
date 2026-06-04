@@ -12,6 +12,6 @@ export default {
 		packageManager: 'yarn',
 		additionalPathsToClean: ['.ns-vite-build'],
 	},
-	bundler: 'vite',
-	bundlerConfigPath: 'vite.config.ts',
+	// bundler: 'vite',
+	// bundlerConfigPath: 'vite.config.ts',
 } as NativeScriptConfig;

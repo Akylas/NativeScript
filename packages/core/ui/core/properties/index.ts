@@ -218,7 +218,7 @@ function getPropertySetter<T extends ViewBase, U>(property: Property<T, U>) {
 			value = wrapped ? WrappedValue.unwrap(boxedValue) : boxedValue;
 
 			if (property.valueConverter && typeof value === 'string') {
-				value = property.valueConverter(value);
+				value = property.valueConverter.call(this, value);
 			}
 			if (property instanceof CoercibleProperty) {
 				this[property.coerceKey] = value;
@@ -797,7 +797,7 @@ export class CssAnimationProperty<T extends Style, U> implements CssAnimationPro
 						}
 					} else {
 						if (property.valueConverter && typeof boxedValue === 'string') {
-							boxedValue = property.valueConverter(boxedValue);
+							boxedValue = property.valueConverter.call(this, boxedValue);
 						}
 						this[symbol] = boxedValue;
 						if (this[computedSource] <= propertySource) {

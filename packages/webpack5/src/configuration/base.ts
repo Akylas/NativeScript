@@ -24,7 +24,6 @@ import { applyDotEnvPlugin } from '../helpers/dotEnv';
 import { env as _env, IWebpackEnv } from '../index';
 import { getValue } from '../helpers/config';
 import { getIPS } from '../helpers/host';
-import FixSourceMapUrlPlugin from '../plugins/FixSourceMapUrlPlugin';
 import {
 	getAvailablePlatforms,
 	getAbsoluteDistPath,
@@ -42,12 +41,16 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 	// set mode
 	config.mode(mode);
 
-	// use source map files by default with v9+
+	// Inline source maps for v9+ dev builds.
+	// Chrome DevTools cannot fetch external .map files in this debugging
+	// flow: bundled DevTools blocks http:// via CSP, the appspot frontend
+	// hits the same CSP, and the iOS V8 inspector backend fetch is blocked
+	// by App Transport Security. A `data:` URL inlined in the bundle
+	// sidesteps all three since DevTools handles it without any network
+	// request. Production builds keep their configured devtool unchanged.
 	function useSourceMapFiles() {
 		if (mode === 'development') {
-			// in development we always use source-map files with v9+ runtimes
-			// they are parsed and mapped to display in-flight app error screens
-			env.sourceMap = 'source-map';
+			env.sourceMap = 'inline-source-map';
 		}
 	}
 	// determine target output by @nativescript/* runtime version
@@ -98,6 +101,13 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 				env.commonjs = true;
 			}
 		}
+	} else {
+		env.commonjs = true;
+	}
+
+	if (env.hmr) {
+		// HMR webpack should use CommonJS
+		env.commonjs = true;
 	}
 
 	// config.stats({
@@ -177,13 +187,6 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 	// Use devtool for both CommonJS and ESM - let webpack handle source mapping properly
 	config.devtool(sourceMapType);
 
-	// For ESM builds, fix the sourceMappingURL to use correct paths
-	if (!env.commonjs && sourceMapType && sourceMapType !== 'hidden-source-map') {
-		config
-			.plugin('FixSourceMapUrlPlugin')
-			.use(FixSourceMapUrlPlugin as any, [{ outputPath }]);
-	}
-
 	// when using hidden-source-map, output source maps to the `platforms/{platformName}-sourceMaps` folder
 	if (env.sourceMap === 'hidden-source-map') {
 		const sourceMapAbsolutePath = getProjectFilePath(
@@ -260,6 +263,15 @@ export default function (config: Config, env: IWebpackEnv = _env): Config {
 		if (env === null || env === void 0 ? void 0 : env.uniqueBundle) {
 			config.output.filename(`[name].${env.uniqueBundle}.mjs`);
 		}
+		// Prevent webpack from generating Node-style ESM shims for __dirname/__filename.
+		// For output modules, webpack defaults these to a fileURLToPath(import.meta.url) helper
+		// imported from bare "url", which does not match the NativeScript iOS runtime contract.
+		// The runtime already provides import.meta.dirname and initializes global.__dirname,
+		// so webpack's helper is redundant and can misresolve in bundle/worker contexts.
+		// ESM app or dependency code should use import.meta.dirname/import.meta.url instead
+		// of expecting webpack to synthesize __dirname/__filename.
+		config.node.set('__dirname', false);
+		config.node.set('__filename', false);
 	}
 
 	config.watchOptions({

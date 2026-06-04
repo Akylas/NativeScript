@@ -55,6 +55,10 @@ export class View extends ViewCommon {
 	 */
 	_nativeBackgroundState: 'unset' | 'invalid' | 'drawn';
 
+	get nativeBackgroundState(): 'unset' | 'invalid' | 'drawn' {
+		return this._nativeBackgroundState;
+	}
+
 	/**
 	 * Glass effect configuration
 	 */
@@ -121,8 +125,7 @@ export class View extends ViewCommon {
 
 	public measure(widthMeasureSpec: number, heightMeasureSpec: number): void {
 		const measureSpecsChanged = this._setCurrentMeasureSpecs(widthMeasureSpec, heightMeasureSpec);
-		const forceLayout = (this._privateFlags & PFLAG_FORCE_LAYOUT) === PFLAG_FORCE_LAYOUT;
-		if (this.nativeViewProtected && (forceLayout || measureSpecsChanged)) {
+		if (this.nativeViewProtected && (this.isLayoutRequested || measureSpecsChanged)) {
 			// first clears the measured dimension flag
 			this._privateFlags &= ~PFLAG_MEASURED_DIMENSION_SET;
 
@@ -148,7 +151,7 @@ export class View extends ViewCommon {
 			this.layoutNativeView(left, top, right, bottom);
 		}
 
-		const needsLayout = boundsChanged || (this._privateFlags & PFLAG_LAYOUT_REQUIRED) === PFLAG_LAYOUT_REQUIRED;
+		const needsLayout = boundsChanged || this.isLayoutRequired;
 		if (needsLayout) {
 			let position: Position;
 
@@ -290,9 +293,8 @@ export class View extends ViewCommon {
 
 	get isLayoutValid(): boolean {
 		if (this.nativeViewProtected) {
-			return this._isLayoutValid;
+			return !this.isLayoutRequested;
 		}
-
 		return false;
 	}
 
@@ -828,7 +830,12 @@ export class View extends ViewCommon {
 		return this.nativeViewProtected.hidden;
 	}
 	[hiddenProperty.setNative](value: boolean) {
-		this.nativeViewProtected.hidden = value;
+		const nativeView: NativeScriptUIView = <NativeScriptUIView>this.nativeViewProtected;
+		nativeView.hidden = value;
+		// Apply visibility value to shadows as well
+		if (nativeView.outerShadowContainerLayer) {
+			nativeView.outerShadowContainerLayer.hidden = nativeView.hidden;
+		}
 	}
 
 	[visibilityProperty.getDefault](): CoreTypes.VisibilityType {
@@ -978,13 +985,11 @@ export class View extends ViewCommon {
 		const variant = config ? config.variant : (value as GlassEffectVariant);
 		const defaultDuration = 0.3;
 		const duration = config ? (config.animateChangeDuration ?? defaultDuration) : defaultDuration;
-
-		let effect: UIGlassEffect | UIGlassContainerEffect | UIVisualEffect;
+		const glassSupported = supportsGlass();
+		let effect: UIVisualEffect = UIVisualEffect.new();
 
 		// Create the appropriate effect based on type and variant
-		if (!value || ['identity', 'none'].includes(variant)) {
-			effect = UIVisualEffect.new();
-		} else {
+		if (value && !['identity', 'none'].includes(variant) && glassSupported) {
 			if (options.effectType === 'glass') {
 				const styleFn = options.toGlassStyleFn || this.toUIGlassStyle.bind(this);
 				effect = UIGlassEffect.effectWithStyle(styleFn(variant));
@@ -1025,20 +1030,13 @@ export class View extends ViewCommon {
 	}
 	[statusBarStyleProperty.setNative](value: 'light' | 'dark') {
 		this.style.statusBarStyle = value;
-		const parent = this.parent;
-		if (parent) {
-			const ctrl = parent.ios?.controller;
-			if (ctrl && ctrl instanceof UINavigationController) {
-				const navigationBar = ctrl.navigationBar;
-				if (!navigationBar) return;
+		this.updateStatusBarStyle(value);
+	}
 
-				if (typeof value === 'string') {
-					navigationBar.barStyle = value === 'dark' ? UIBarStyle.Black : UIBarStyle.Default;
-				} else {
-					navigationBar.barStyle = value;
-				}
-			}
-		}
+	updateStatusBarStyle(value: 'dark' | 'light') {
+		// iOS requires a controller invalidation to re-evaluate `preferredStatusBarStyle`.
+		const ownerController = this.viewController || IOSHelper.getParentWithViewController(this as any)?.viewController;
+		IOSHelper.invalidateStatusBarAppearance(ownerController, `View.updateStatusBarStyle:${value}`);
 	}
 
 	[iosGlassEffectProperty.setNative](value: GlassEffectType) {
@@ -1144,9 +1142,9 @@ export class View extends ViewCommon {
 		if (supportsGlass()) {
 			switch (value) {
 				case 'regular':
-					return UIGlassEffectStyle?.Regular ?? 0;
+					return UIGlassEffectStyle.Regular;
 				case 'clear':
-					return UIGlassEffectStyle?.Clear ?? 1;
+					return UIGlassEffectStyle.Clear;
 			}
 		}
 		return 1;
@@ -1295,7 +1293,7 @@ export class CustomLayoutView extends ContainerView {
 	nativeViewProtected: UIView;
 
 	createNativeView() {
-		const window = getWindow<UIWindow>();
+		const window = getWindow<UIWindow>?.();
 		return UIView.alloc().initWithFrame(window ? window.screen.bounds : UIScreen.mainScreen.bounds);
 	}
 

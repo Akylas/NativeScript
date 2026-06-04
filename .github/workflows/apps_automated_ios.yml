@@ -20,7 +20,7 @@ jobs:
     runs-on: warp-macos-15-arm64-6x
 
     steps:
-      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       # - name: ActionDebugger By Warpbuild
       #   uses: Warpbuilds/action-debugger@v1.3
@@ -30,7 +30,7 @@ jobs:
           node-version: 23.5.0
 
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@826660b82addbef3abff5fa871492ebad618c9e1 # v4.3.3
+        uses: nrwl/nx-set-shas@afb73a62d26e41464e9254689e1fd6122ee683c1 # v5.0.1
         with:
           main-branch-name: 'main'
 
@@ -48,10 +48,9 @@ jobs:
         run: npx nx run-many --target=test --configuration=ci --projects=core
 
       - name: Start iOS Simulator
-        uses: futureware-tech/simulator-action@dab10d813144ef59b48d401cd95da151222ef8cd # v4
+        uses: futureware-tech/simulator-action@e89aa8f93d3aec35083ff49d2854d07f7186f7f5 # v5
         with:
           model: 'iPhone 16 Pro'
-          os_version: '18.4'
 
       - name: Run tests on iOS Simulator
         run: npx nx test apps-automated -c=ios

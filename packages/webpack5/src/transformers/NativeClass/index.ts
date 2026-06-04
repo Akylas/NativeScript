@@ -228,7 +228,9 @@ export default function (context: ts.TransformationContext, ...args) {
 			}
 			const result: ts.Statement[] = [];
 			for (const statement of statements) {
-				if (((statement as MutableNode).flags ?? 0) & ts.NodeFlags.Synthesized) {
+				if (
+					((statement as MutableNode).flags ?? 0) & ts.NodeFlags.Synthesized
+				) {
 					result.push(statement);
 					continue;
 				}
@@ -282,27 +284,18 @@ export default function (context: ts.TransformationContext, ...args) {
 					result.push(updated);
 					continue;
 				}
-				// No deep traversal for unrelated nodes
-				result.push(statement);
+				// iterate over children as there might be a NativeClass inside of functions, blocks, etc
+				const visited = ts.visitEachChild(statement, visitNode, context);
+				if (visited !== statement) {
+					mutated = true;
+					changed = true;
+				}
+				if (visited) {
+					result.push(visited);
+				}
 			}
 			return [changed ? factory.createNodeArray(result) : statements, changed];
 		}
-
-
-		// we detect ts-patch
-		if (args.length) {
-			const statements= ts.visitNodes(sourceFile.statements, visitNode) as unknown as ts.Statement[];
-				if (!mutated) {
-					return sourceFile;
-				}
-			const updatedSource = factory.updateSourceFile(sourceFile, statements as unknown as ts.Statement[]);
-			// Do NOT clear or rebind the entire SourceFile here. Doing so can break TS's
-			// import usage analysis and lead to import elision. The factory/update API
-			// preserves parents/bindings for original nodes (like imports). We only
-			// synthesize/bind the newly inserted class replacement statements.
-			return updatedSource;
-		}
-		
 		const updated = ts.visitNode(sourceFile, visitNode) as ts.SourceFile;
 		if (!mutated) return sourceFile;
 		return updated;
