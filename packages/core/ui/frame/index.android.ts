@@ -13,7 +13,7 @@ import type { ExpandedEntry } from './fragment.transitions.android';
 import { ContentView } from '../content-view';
 import { Transition } from '../transition';
 import { ensureFragmentClass, fragmentClass } from './fragment';
-import { getAppMainEntry } from '../../application/helpers-common';
+import { getAppMainEntry, setRootView, setSubRootView } from '../../application/helpers-common';
 
 import { AndroidActivityBackPressedEventData, AndroidActivityNewIntentEventData, AndroidActivityRequestPermissionsEventData, AndroidActivityResultEventData } from '../../application/application-interfaces';
 import { Application } from '../../application/application';
@@ -910,7 +910,9 @@ export class ActivityCallbacksImplementation implements AndroidActivityCallbacks
 			const rootViewId = savedInstanceState.getInt(ROOT_VIEW_ID_EXTRA, -1);
 			if (rootViewId !== -1 && activityRootViewsMap.has(rootViewId)) {
 				this._rootView = activityRootViewsMap.get(rootViewId)?.get();
+				setRootView(this._rootView);
 				this._subRootView = this._rootView.content;
+				setSubRootView(this._subRootView);
 			}
 		}
 
@@ -1022,6 +1024,7 @@ export class ActivityCallbacksImplementation implements AndroidActivityCallbacks
 				rootView._tearDownUI(true);
 			}
 			this._rootView = null;
+			setRootView(null);
 
 			// this may happen when the user changes the system theme
 			// In such case, isFinishing() is false (and isChangingConfigurations is true), and the app will start again (onCreate) with a savedInstanceState
@@ -1129,6 +1132,8 @@ export class ActivityCallbacksImplementation implements AndroidActivityCallbacks
 		// Delete previously cached root view in order to recreate it.
 		this._rootView = null;
 		this._subRootView = null;
+		setRootView(null);
+		setSubRootView(null);
 		this.setActivityContent(activity, null, false);
 		this._rootView.callLoaded();
 	}
@@ -1144,6 +1149,7 @@ export class ActivityCallbacksImplementation implements AndroidActivityCallbacks
 		// setup view as styleScopeHost
 		rootView._setupAsRootView(activity);
 		this._rootView = rootView;
+		setRootView(rootView);
 		// sets root classes once rootView is ready...
 		let subRootView = this._subRootView;
 		// in case we recreate the activity, subRootView is already created.
@@ -1181,6 +1187,7 @@ export class ActivityCallbacksImplementation implements AndroidActivityCallbacks
 			return;
 		}
 		this._subRootView = subRootView;
+		setSubRootView(this._subRootView);
 		if (subRootView.parent && subRootView.parent !== rootView) {
 			subRootView.parent._removeView(subRootView);
 		}

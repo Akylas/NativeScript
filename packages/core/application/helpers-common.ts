@@ -90,6 +90,15 @@ export function getRootView() {
 export function setRootView(view: any) {
 	rootView = view;
 }
+let subrootView: any;
+
+export function getSubRootView() {
+	return subrootView;
+}
+
+export function setSubRootView(view: any) {
+	subrootView = view;
+}
 
 let _appInBackground: boolean = false;
 export function isAppInBackground() {

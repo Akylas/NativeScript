@@ -2,12 +2,11 @@ import { ViewBase } from '../view-base';
 import { PropertyChangeData, WrappedValue } from '../../../data/observable';
 import { Trace } from '../../../trace';
 
-import { Application } from '../../../application';
-
 import { Style } from '../../styling/style';
 
 import { profile } from '../../../profiling';
 import { unsetValue, PropertyOptions, CoerciblePropertyOptions, CssPropertyOptions, ShorthandPropertyOptions, CssAnimationPropertyOptions, isCssWideKeyword, isCssUnsetValue, isResetValue } from './property-shared';
+import { getRootView } from 'application/helpers-common';
 
 export { makeValidator, makeParser } from '../../../core-types/validators';
 
@@ -105,7 +104,7 @@ export function _evaluateCssVariableExpression(view: ViewBase, cssName: string, 
 			.filter((v) => !!v);
 		const cssVariableName = matched.shift();
 		let cssVariableValue;
-		const rootView = Application.getRootView();
+		const rootView = getRootView();
 		if (typeof __ONLY_ALLOW_ROOT_VARIABLES__ !== 'undefined' && __ONLY_ALLOW_ROOT_VARIABLES__ === true && rootView) {
 			cssVariableValue = rootView.style.getCssVariable(cssVariableName);
 		} else {
