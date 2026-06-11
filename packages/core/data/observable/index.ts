@@ -40,6 +40,7 @@ interface ListenerEntry<T = Observable> {
 	callback: (data: EventData<T>) => void;
 	thisArg: any;
 	once?: boolean;
+	_isRemoved?: true;
 }
 
 interface ListEntryMap {
@@ -283,7 +284,7 @@ export class Observable {
 
 			// If we have neither `thisArg` nor `callback`, just remove all events
 			// of this type regardless.
-
+			entry._isRemoved = true;
 			entries.splice(i, 1);
 			i--;
 		}
@@ -415,7 +416,7 @@ export class Observable {
 	}
 
 	private static _handleListenerEntry<T extends EventData>(entry: ListenerEntry, index: number, observers: Array<ListenerEntry>, data: T): void {
-		if (!entry) {
+		if (!entry || entry._isRemoved) {
 			return;
 		}
 
