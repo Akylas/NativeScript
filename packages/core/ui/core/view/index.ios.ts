@@ -43,7 +43,6 @@ export class View extends ViewCommon {
 	 */
 	private _modalAnimatedOptions: Array<boolean>;
 	private _isLaidOut = false;
-	private _isTransformed = false;
 	private _privateFlags: number = PFLAG_LAYOUT_REQUIRED | PFLAG_FORCE_LAYOUT;
 	private _cachedFrame: CGRect;
 	private _suspendCATransaction = false;
@@ -100,7 +99,6 @@ export class View extends ViewCommon {
 
 		this._cachedFrame = null;
 		this._isLaidOut = false;
-		this._isTransformed = false;
 	}
 
 	public requestLayout(): void {
@@ -240,7 +238,9 @@ export class View extends ViewCommon {
 	public _modifyNativeViewFrame(nativeView: UIView, frame: CGRect): void {
 		let transform: CATransform3D;
 
-		if (this._isTransformed) {
+		// the layer's own transform: an animation sets it before the view's properties, which then
+		// match and skip updateNativeTransform, so a flag kept there would still read untransformed
+		if (!CATransform3DEqualToTransform(nativeView.layer.transform, CATransform3DIdentity)) {
 			// Always set identity transform before setting frame
 			transform = nativeView.layer.transform;
 			nativeView.layer.transform = CATransform3DIdentity;
@@ -487,7 +487,6 @@ export class View extends ViewCommon {
 			if (nativeView.outerShadowContainerLayer) {
 				nativeView.outerShadowContainerLayer.transform = transform;
 			}
-			this._isTransformed = this.nativeViewProtected && !CATransform3DEqualToTransform(this.nativeViewProtected.transform3D, CATransform3DIdentity);
 
 			if (!isInTheMiddleOfAnimation) {
 				CATransaction.setDisableActions(false);
