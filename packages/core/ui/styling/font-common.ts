@@ -20,9 +20,10 @@ export abstract class FontBase implements Font {
 			Object.assign(clone, this);
 		} else {
 			clone.isDirty = true;
-			// clear android cached typeface. need to find a better way
-			clone['_typeface'] = null;
 		}
+		// clear android cached typeface (Object.assign copies it to clones too)
+		// so it is recreated from the updated font properties
+		clone['_typeface'] = null;
 		return clone;
 	}
 
