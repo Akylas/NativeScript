@@ -1283,13 +1283,14 @@ export class View extends ViewCommon {
 		const nativeView = this.nativeViewProtected as NativeScriptAndroidView;
 		const canUseOutlineProvider = !background.hasBorderWidth() && !background.hasBoxShadows() && !background.clipPath && !background.image && SDK_VERSION >= 21 && (SDK_VERSION >= 33 || background.hasUniformBorderRadius());
 		if (onlyColor || canUseOutlineProvider) {
-			const backgroundColor = background.color?.android;
 			if (isBorderDrawable) {
 				// We need to duplicate the drawable or we lose the "default" cached drawable
 				backgroundDrawable = nativeView._cachedDrawable != null ? AndroidHelper.getCopyOrDrawable(nativeView._cachedDrawable, nativeView.getResources()) : null;
 				nativeView.setBackground(backgroundDrawable);
 			}
-			if (backgroundColor) {
+			// do not test the native color for truthiness: `transparent` is 0
+			if (background.color) {
+				const backgroundColor = background.color.android;
 				if (this.needsNativeDrawableFill && backgroundDrawable) {
 					backgroundDrawable.mutate();
 
@@ -1297,6 +1298,19 @@ export class View extends ViewCommon {
 					backgroundDrawable.invalidateSelf();
 				} else {
 					nativeView.setBackgroundColor(backgroundColor);
+				}
+			} else if (!isBorderDrawable && background.clearFlags & BackgroundClearFlags.CLEAR_BACKGROUND_COLOR) {
+				// background color was removed: restore the default background
+				if (this.needsNativeDrawableFill && backgroundDrawable) {
+					backgroundDrawable.mutate();
+
+					AndroidHelper.clearDrawableColor(backgroundDrawable);
+					backgroundDrawable.invalidateSelf();
+				} else {
+					const defaultDrawable = nativeView._cachedDrawable ?? null;
+					if (backgroundDrawable !== defaultDrawable) {
+						nativeView.setBackground(defaultDrawable);
+					}
 				}
 			}
 			// borderDrawable is slow

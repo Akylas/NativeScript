@@ -324,6 +324,66 @@ export function testSetAndRemoveBackgroundColor() {
 	});
 }
 
+function getNativeBackgroundColor(v: View): number {
+	const drawable = (<android.view.View>v.android).getBackground();
+	if (drawable instanceof org.nativescript.widgets.BorderDrawable) {
+		return drawable.getBackgroundColor();
+	} else if (drawable instanceof android.graphics.drawable.ColorDrawable) {
+		return drawable.getColor();
+	}
+
+	return drawable ? undefined : 0;
+}
+
+export function testSetTransparentAndRemoveBackgroundColorWithBorderRadius() {
+	const lbl = new Label();
+	lbl.text = 'segment';
+	lbl.borderRadius = 8;
+	lbl.backgroundColor = new Color('red');
+	helper.buildUIAndRunTest(lbl, function (views: Array<View>) {
+		helper.waitUntilLayoutReady(lbl);
+		TKUnit.assertEqual(getNativeBackgroundColor(lbl), new Color('red').android, 'BackgroundColor not applied correctly!');
+
+		lbl.backgroundColor = new Color('transparent');
+		TKUnit.assertEqual(getNativeBackgroundColor(lbl), 0, 'transparent BackgroundColor not applied!');
+
+		lbl.backgroundColor = new Color('red');
+		TKUnit.assertEqual(getNativeBackgroundColor(lbl), new Color('red').android, 'BackgroundColor not applied correctly!');
+
+		lbl.backgroundColor = unsetValue;
+		TKUnit.assertEqual(getNativeBackgroundColor(lbl), 0, 'BackgroundColor not removed!');
+	});
+}
+
+export function testToggleClassBackgroundColorFromCssVariableWithBorderRadius() {
+	const stack = new StackLayout();
+	stack.className = 'segments';
+	stack.css = `
+	.segments { --tile-color: red; }
+	.segment { border-radius: 8; background-color: transparent; }
+	.segment-selected { background-color: var(--tile-color); }
+	.no-transparent-segment { border-radius: 8; }
+	`;
+	const lbl = new Label();
+	lbl.text = 'segment';
+	lbl.className = 'segment segment-selected';
+	stack.addChild(lbl);
+	helper.buildUIAndRunTest(stack, function (views: Array<View>) {
+		helper.waitUntilLayoutReady(lbl);
+		const red = new Color('red').android;
+		TKUnit.assertEqual(getNativeBackgroundColor(lbl), red, 'selected BackgroundColor not applied!');
+
+		lbl.className = 'segment';
+		TKUnit.assertEqual(getNativeBackgroundColor(lbl), 0, 'BackgroundColor should be transparent after deselection!');
+
+		lbl.className = 'no-transparent-segment segment-selected';
+		TKUnit.assertEqual(getNativeBackgroundColor(lbl), red, 'selected BackgroundColor not applied!');
+
+		lbl.className = 'no-transparent-segment';
+		TKUnit.assertEqual(getNativeBackgroundColor(lbl), 0, 'BackgroundColor should be reset after deselection!');
+	});
+}
+
 export function testBackgroundImage() {
 	const lbl = _createLabelWithBorder();
 	lbl.className = 'myClass';
