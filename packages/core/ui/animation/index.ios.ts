@@ -516,7 +516,9 @@ export class Animation extends AnimationBase {
 		if (delay !== undefined) {
 			basicAnimation.beginTime = CACurrentMediaTime() + delay;
 		}
-		if (curve !== undefined) {
+		// 'spring' selected CASpringAnimation above, it is not a timing function: assigning the
+		// string here aborts at the next CA commit with `-[NSTaggedPointerString _getPoints:]`.
+		if (curve !== undefined && curve !== 'spring') {
 			basicAnimation.timingFunction = curve;
 		}
 
