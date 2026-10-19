@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.25](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@9.0.22...@akylas/nativescript@9.0.25) (2026-10-19)
+
+
+### Bug Fixes
+
+* **android:** don't copy cached typeface when cloning a Font ([8db5b6e](https://github.com/Akylas/NativeScript/commit/8db5b6e07f3fa95139155806a1f6da8ba91ec424))
+* **android:** reset background color when it becomes transparent or is removed ([c15a176](https://github.com/Akylas/NativeScript/commit/c15a1765e514a477d073527595882f1412127314))
+* **core:** replay layout requests suppressed while resuming native updates ([4e03c54](https://github.com/Akylas/NativeScript/commit/4e03c545f473432ad6082bbfb75226181adbea15))
+* **ios:** do not assign the 'spring' curve as a timing function ([948de96](https://github.com/Akylas/NativeScript/commit/948de96d64c79272f3205d97a4a4cdb727c6588c))
+* **ios:** request layout when a css property without native setter changes ([06777ea](https://github.com/Akylas/NativeScript/commit/06777ea5a9a111909eb9c5c1a5a6e1cf8faf1e85))
+* **ios:** reset the layer transform before setting a frame under an animation ([5ec4fee](https://github.com/Akylas/NativeScript/commit/5ec4feed3a2de8403dcc632230611cd741376b21))
+
 ### [9.0.24](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@9.0.22...@akylas/nativescript@9.0.24) (2026-10-19)
 
 
