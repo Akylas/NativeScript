@@ -834,9 +834,10 @@ export class CssAnimationProperty<T extends Style, U> implements CssAnimationPro
 								}
 							}
 						}
-						if (property.affectsLayout) {
-							view.requestLayout();
-						}
+					}
+					// properties without a native setter (height, width, margins on iOS) still need the layout
+					if (property.affectsLayout && (computedValueChanged || isSet !== wasSet)) {
+						view.requestLayout();
 					}
 					const eventName = property.eventName;
 					if (computedValueChanged && (!__UI_USE_EXTERNAL_RENDERER__ || !view._suspendNativeUpdatesCount) && this.hasListeners(eventName)) {
