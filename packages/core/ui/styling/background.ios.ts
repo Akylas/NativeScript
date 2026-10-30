@@ -1137,8 +1137,9 @@ function drawBoxShadow(view: View): void {
 			shadowLayer.allowsEdgeAntialiasing = true;
 			shadowLayer.contentsScale = Screen.mainScreen.scale;
 
-			// Shadow opacity is handled on the shadow's color instance
-			shadowLayer.shadowOpacity = boxShadow.color?.a ? boxShadow.color.a / 255 : 1;
+			// Shadow alpha is already carried by the CGColor set below, and CALayer multiplies
+			// shadowOpacity with it, so keep opacity at 1 to apply the alpha only once.
+			shadowLayer.shadowOpacity = 1;
 			// Use this multiplier to imitate CSS shadow blur
 			shadowLayer.shadowRadius = shadowRadius * 0.5;
 			shadowLayer.shadowColor = boxShadow.color?.ios?.CGColor;
