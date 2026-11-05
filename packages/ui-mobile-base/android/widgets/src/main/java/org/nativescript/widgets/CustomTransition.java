@@ -57,9 +57,11 @@ public class CustomTransition extends Visibility {
 		return this.transitionName;
 	}
 
-	private Animator setAnimatorsTarget(AnimatorSet animatorSet, final View view) {
+	private Animator setAnimatorsTarget(AnimatorSet source, final View view) {
+		// A fresh animator per run: the shared one kept, run after run, the listeners holding the animated view
+		// and the transition clones, so every page that ever animated stayed alive.
+		AnimatorSet animatorSet = source.clone();
 		ArrayList<Animator> animatorsList = animatorSet.getChildAnimations();
-		boolean resetOnTransitionEnd = this.resetOnTransitionEnd;
 
 		for (int i = 0; i < animatorsList.size(); i++) {
 			animatorsList.get(i).setTarget(view);
@@ -67,7 +69,7 @@ public class CustomTransition extends Visibility {
 
 		// Reset animation to its initial state to prevent mirrorered effect
 		if (this.resetOnTransitionEnd) {
-			this.immediateAnimatorSet = this.animatorSet.clone();
+			this.immediateAnimatorSet = animatorSet.clone();
 		}
 
 		// Switching to hardware layer during transition to improve animation performance
@@ -75,7 +77,7 @@ public class CustomTransition extends Visibility {
 		animatorSet.addListener(listener);
 		this.addListener(new CustomTransitionListenerAdapter(this));
 
-		return this.animatorSet;
+		return animatorSet;
 	}
 
 	private class ReverseInterpolator implements Interpolator {
