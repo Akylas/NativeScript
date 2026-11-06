@@ -738,6 +738,11 @@ function drawNonUniformBorders(nativeView: NativeScriptUIView, background: Backg
 		layer.mask.path = generateNonUniformBorderOuterClipPath(layerBounds, cappedOuterRadii);
 	}
 
+	// all widths went back to 0 while the radii stay non-uniform: the previous border layer must go
+	if (!background.hasBorderWidth() && nativeView.hasNonUniformBorder) {
+		clearNonUniformBorders(nativeView);
+	}
+
 	if (background.hasBorderWidth()) {
 		if (!nativeView.hasNonUniformBorder) {
 			nativeView.borderLayer = CAShapeLayer.new();
