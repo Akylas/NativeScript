@@ -10,6 +10,7 @@
 		"experimentalDecorators": true,
 		"diagnostics": true,
 		"sourceMap": true,
+		"inlineSources": true,
 		"inlineSourceMap": false,
 		"baseUrl": ".",
 		"outDir": "../../dist",

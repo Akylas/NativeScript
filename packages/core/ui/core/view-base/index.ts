@@ -844,6 +844,11 @@ export abstract class ViewBase extends Observable {
 		if (!this._suspendNativeUpdatesCount) {
 			this.onResumeNativeUpdates();
 		}
+		if (shouldResumeRequestLayout) {
+			// layout requests received while suspended were only recorded: replay them now,
+			// otherwise the next measure reuses the cached size and ignores the changes
+			this.requestlayoutIfNeeded();
+		}
 	}
 
 	/**
