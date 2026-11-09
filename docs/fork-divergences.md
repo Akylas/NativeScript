@@ -65,6 +65,19 @@ Widgets are **packaged as source** and compiled by the consuming app; only a pre
   upstream copy is removed from the working tree too.
 * Consequence: upstream's Java/Swift changes still matter (they are compiled from source), only the binaries don't.
 
+### yarn, not npm/nx, in CI
+The fork has no `nx` dependency and no `nx.json`, and installs with **yarn** (`packageManager: yarn@4.3.1`;
+`corepack enable` then `yarn install --immutable`). npm-only `overrides` are dead config under yarn.
+
+* Deleted workflows, keep deleted when upstream touches them: `native_artifacts_check.yml` (`nx verify-native`),
+  `preview-release.yml` (`nx run-many` + pkg.pr.new). `secure_nx_release.yml` is upstream's nx release flow and
+  is unused; the fork releases with `npm_release_core.yml`.
+* `apps_automated_{android,ios}.yml` are adapted: yarn install, `yarn core:build`, then
+  `node tools/scripts/run-automated.js <platform>` instead of `npx nx test apps-automated`. Re-apply that after
+  each merge that modifies them, and drop any `nrwl/nx-set-shas` / `NX_CLOUD_*` lines upstream re-adds.
+* Do not re-add upstream's `"vite": "^8.0.0"` entry to `overrides`; it conflicts with the pinned devDependency
+  under npm (`EOVERRIDE`).
+
 ### Apps use napi runtimes via `runtimePackageName`
 The fork's CLI (`nativescript-cli`) resolves the platform runtime from `nativescript.config.ts`
 `android.runtimePackageName` / `ios.runtimePackageName` (upstream only added the type, `8f7d55c08`).

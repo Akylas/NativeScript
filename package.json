@@ -129,8 +129,7 @@
 		"zx": "^8.3.0"
 	},
 	"overrides": {
-		"form-data": ">=4.0.4",
-		"vite": "^8.0.0"
+		"form-data": ">=4.0.4"
 	},
 	"packageManager": "yarn@4.3.1",
 	"lint-staged": {

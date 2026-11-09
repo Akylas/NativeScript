@@ -7,8 +7,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
   
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -25,14 +23,13 @@ jobs:
       # - name: ActionDebugger By Warpbuild
       #   uses: Warpbuilds/action-debugger@v1.3
 
+      - name: Enable Corepack (yarn)
+        run: corepack enable
+
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 23.5.0
-
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@afb73a62d26e41464e9254689e1fd6122ee683c1 # v5.0.1
-        with:
-          main-branch-name: 'main'
+          cache: yarn
 
       - name: Install NativeScript
         run: |
@@ -41,11 +38,11 @@ jobs:
           ns error-reporting disable
           # ns doctor
 
-      - name: Setup
-        run: npm run setup
+      - name: Install dependencies
+        run: yarn install --immutable
 
-      - name: Unit Tests
-        run: npx nx run-many --target=test --configuration=ci --projects=core
+      - name: Build core
+        run: yarn core:build
 
       - name: Start iOS Simulator
         uses: futureware-tech/simulator-action@c768f52966d5f70335ec77881f9806b24a52f80e # v6
@@ -53,4 +50,4 @@ jobs:
           model: 'iPhone 16 Pro'
 
       - name: Run tests on iOS Simulator
-        run: npx nx test apps-automated -c=ios
+        run: node tools/scripts/run-automated.js ios
