@@ -51,7 +51,7 @@ jobs:
         run: mkdir -p dist/packages/core && cp packages/core/package.json dist/packages/core/package.json
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: yarn install --immutable --mode=skip-build
 
       - name: Build core
         run: yarn core:build

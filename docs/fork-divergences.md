@@ -78,6 +78,8 @@ The fork has no `nx` dependency and no `nx.json`, and installs with **yarn** (`p
 * `dist/packages/core` is a yarn workspace but `dist` is not committed. On a clean checkout copy
   `packages/core/package.json` to `dist/packages/core/package.json` **before** `yarn install --immutable`, or yarn
   resolves `@akylas/nativescript` from npm and the immutable check fails (`YN0028`).
+* CI installs with `--mode=skip-build`: the `dist/packages/core` workspace has a `postinstall`
+  (`node cli-hooks/postinstall.mjs`) that can't run before core is built. `yarn core:build` runs `ts-patch install` itself.
 * Do not re-add upstream's `"vite": "^8.0.0"` entry to `overrides`; it conflicts with the pinned devDependency
   under npm (`EOVERRIDE`).
 
