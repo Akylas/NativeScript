@@ -75,6 +75,9 @@ The fork has no `nx` dependency and no `nx.json`, and installs with **yarn** (`p
 * `apps_automated_{android,ios}.yml` are adapted: yarn install, `yarn core:build`, then
   `node tools/scripts/run-automated.js <platform>` instead of `npx nx test apps-automated`. Re-apply that after
   each merge that modifies them, and drop any `nrwl/nx-set-shas` / `NX_CLOUD_*` lines upstream re-adds.
+* `dist/packages/core` is a yarn workspace but `dist` is not committed. On a clean checkout copy
+  `packages/core/package.json` to `dist/packages/core/package.json` **before** `yarn install --immutable`, or yarn
+  resolves `@akylas/nativescript` from npm and the immutable check fails (`YN0028`).
 * Do not re-add upstream's `"vite": "^8.0.0"` entry to `overrides`; it conflicts with the pinned devDependency
   under npm (`EOVERRIDE`).
 

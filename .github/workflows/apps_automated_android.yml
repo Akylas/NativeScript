@@ -45,6 +45,11 @@ jobs:
           ns usage-reporting disable
           ns error-reporting disable
 
+      # dist/packages/core is a yarn workspace (the built @akylas/nativescript) but dist is not committed:
+      # seed its package.json so the lockfile resolves to the workspace instead of the npm package.
+      - name: Seed core workspace
+        run: mkdir -p dist/packages/core && cp packages/core/package.json dist/packages/core/package.json
+
       - name: Install dependencies
         run: yarn install --immutable
 
