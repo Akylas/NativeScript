@@ -19,6 +19,10 @@ jest.mock('../src/helpers/config.ts', () => ({
 	getValue: getValueMock,
 }));
 
+jest.mock('sass', () => ({
+	info: 'mock-sass',
+}));
+
 jest.mock('os', () => {
 	const os = jest.requireActual('os');
 

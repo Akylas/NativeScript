@@ -1,0 +1,19 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo" class="page">
+  <Page.actionBar>
+    <ActionBar title="Shared photo" class="action-bar" />
+  </Page.actionBar>
+
+  <GridLayout rows="auto,auto,auto,auto,auto,*" class="p-20">
+    <Label row="0" text="Tap a photo. Page B has a zoomable image (pinch, double tap to reset), swipe left/right to change photo, and a back button using the current photo tag. Also try the edge swipe back." textWrap="true" />
+    <GridLayout row="1" columns="*,*" marginTop="10">
+      <Button col="0" text="{{ barLabel }}" tap="{{ toggleBar }}" class="btn btn-primary" />
+      <Button col="1" text="{{ edgeLabel }}" tap="{{ toggleInteractive }}" class="btn btn-primary" />
+    </GridLayout>
+    <ScrollView row="2" id="strip" orientation="horizontal" marginTop="20" height="220">
+      <StackLayout id="photos" orientation="horizontal" />
+    </ScrollView>
+    <Button row="3" text="auto test (open 2, go to 3, zoom, back)" tap="{{ autoTest }}" class="btn btn-primary" />
+    <Button row="4" text="auto test without zoom" tap="{{ autoTestNoZoom }}" class="btn btn-primary" />
+    <Label row="5" text="{{ info }}" textWrap="true" marginTop="10" />
+  </GridLayout>
+</Page>

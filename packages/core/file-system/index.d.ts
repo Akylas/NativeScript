@@ -299,7 +299,7 @@ export class Folder extends FileSystemEntity {
 /**
  * Provides access to the top-level Folders instances that are accessible from the application. Use these as entry points to access the FileSystem.
  */
-export module knownFolders {
+export namespace knownFolders {
 	/**
 	 * Gets the Documents folder available for the current application. This Folder is private for the application and not accessible from Users/External apps.
 	 */
@@ -326,7 +326,7 @@ export module knownFolders {
 	/**
 	 * Contains iOS-specific known folders.
 	 */
-	module ios {
+	namespace ios {
 		/**
 		 * Gets the NSLibraryDirectory. Note that the folder will not be created if it did not exist.
 		 */
@@ -372,7 +372,7 @@ export module knownFolders {
 /**
  * Enables path-specific operations like join, extension, etc.
  */
-export module path {
+export namespace path {
 	/**
 	 * Normalizes a path, taking care of occurrances like ".." and "//".
 	 * @param path The path to be normalized.

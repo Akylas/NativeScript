@@ -1,6 +1,7 @@
 
 /**
  * @since 7.0
+ * @deprecated 27.0
  */
 declare class MCAdvertiserAssistant extends NSObject {
 
@@ -8,23 +9,27 @@ declare class MCAdvertiserAssistant extends NSObject {
 
 	static new(): MCAdvertiserAssistant; // inherited from NSObject
 
-	delegate: MCAdvertiserAssistantDelegate;
+	delegate: MCAdvertiserAssistantDelegate | null;
 
-	readonly discoveryInfo: NSDictionary<string, string>;
+	readonly discoveryInfo: NSDictionary<string, string> | null;
 
 	readonly serviceType: string;
 
 	readonly session: MCSession;
 
-	constructor(o: { serviceType: string; discoveryInfo: NSDictionary<string, string>; session: MCSession; });
+	constructor(o: { serviceType: string; discoveryInfo: NSDictionary<string, string> | null; session: MCSession; });
 
-	initWithServiceTypeDiscoveryInfoSession(serviceType: string, info: NSDictionary<string, string>, session: MCSession): this;
+	initWithServiceTypeDiscoveryInfoSession(serviceType: string, info: NSDictionary<string, string> | null, session: MCSession): this;
 
 	start(): void;
 
 	stop(): void;
 }
 
+/**
+ * @since 7.0
+ * @deprecated 27.0
+ */
 interface MCAdvertiserAssistantDelegate extends NSObjectProtocol {
 
 	advertiserAssistantDidDismissInvitation?(advertiserAssistant: MCAdvertiserAssistant): void;
@@ -38,6 +43,7 @@ declare var MCAdvertiserAssistantDelegate: {
 
 /**
  * @since 7.0
+ * @deprecated 27.0
  */
 declare class MCBrowserViewController extends UIViewController implements MCNearbyServiceBrowserDelegate {
 
@@ -45,9 +51,9 @@ declare class MCBrowserViewController extends UIViewController implements MCNear
 
 	static new(): MCBrowserViewController; // inherited from NSObject
 
-	readonly browser: MCNearbyServiceBrowser;
+	readonly browser: MCNearbyServiceBrowser | null;
 
-	delegate: MCBrowserViewControllerDelegate;
+	delegate: MCBrowserViewControllerDelegate | null;
 
 	maximumNumberOfPeers: number;
 
@@ -73,7 +79,7 @@ declare class MCBrowserViewController extends UIViewController implements MCNear
 
 	browserDidNotStartBrowsingForPeers(browser: MCNearbyServiceBrowser, error: NSError): void;
 
-	browserFoundPeerWithDiscoveryInfo(browser: MCNearbyServiceBrowser, peerID: MCPeerID, info: NSDictionary<string, string>): void;
+	browserFoundPeerWithDiscoveryInfo(browser: MCNearbyServiceBrowser, peerID: MCPeerID, info: NSDictionary<string, string> | null): void;
 
 	browserLostPeer(browser: MCNearbyServiceBrowser, peerID: MCPeerID): void;
 
@@ -104,11 +110,15 @@ declare class MCBrowserViewController extends UIViewController implements MCNear
 	self(): this;
 }
 
+/**
+ * @since 7.0
+ * @deprecated 27.0
+ */
 interface MCBrowserViewControllerDelegate extends NSObjectProtocol {
 
 	browserViewControllerDidFinish(browserViewController: MCBrowserViewController): void;
 
-	browserViewControllerShouldPresentNearbyPeerWithDiscoveryInfo?(browserViewController: MCBrowserViewController, peerID: MCPeerID, info: NSDictionary<string, string>): boolean;
+	browserViewControllerShouldPresentNearbyPeerWithDiscoveryInfo?(browserViewController: MCBrowserViewController, peerID: MCPeerID, info: NSDictionary<string, string> | null): boolean;
 
 	browserViewControllerWasCancelled(browserViewController: MCBrowserViewController): void;
 }
@@ -119,6 +129,7 @@ declare var MCBrowserViewControllerDelegate: {
 
 /**
  * @since 7.0
+ * @deprecated 27.0
  */
 declare const enum MCEncryptionPreference {
 
@@ -131,6 +142,7 @@ declare const enum MCEncryptionPreference {
 
 /**
  * @since 7.0
+ * @deprecated 27.0
  */
 declare const enum MCErrorCode {
 
@@ -149,10 +161,15 @@ declare const enum MCErrorCode {
 	Unavailable = 6
 }
 
+/**
+ * @since 7.0
+ * @deprecated 27.0
+ */
 declare var MCErrorDomain: string;
 
 /**
  * @since 7.0
+ * @deprecated 27.0
  */
 declare class MCNearbyServiceAdvertiser extends NSObject {
 
@@ -160,28 +177,32 @@ declare class MCNearbyServiceAdvertiser extends NSObject {
 
 	static new(): MCNearbyServiceAdvertiser; // inherited from NSObject
 
-	delegate: MCNearbyServiceAdvertiserDelegate;
+	delegate: MCNearbyServiceAdvertiserDelegate | null;
 
-	readonly discoveryInfo: NSDictionary<string, string>;
+	readonly discoveryInfo: NSDictionary<string, string> | null;
 
 	readonly myPeerID: MCPeerID;
 
 	readonly serviceType: string;
 
-	constructor(o: { peer: MCPeerID; discoveryInfo: NSDictionary<string, string>; serviceType: string; });
+	constructor(o: { peer: MCPeerID; discoveryInfo: NSDictionary<string, string> | null; serviceType: string; });
 
-	initWithPeerDiscoveryInfoServiceType(myPeerID: MCPeerID, info: NSDictionary<string, string>, serviceType: string): this;
+	initWithPeerDiscoveryInfoServiceType(myPeerID: MCPeerID, info: NSDictionary<string, string> | null, serviceType: string): this;
 
 	startAdvertisingPeer(): void;
 
 	stopAdvertisingPeer(): void;
 }
 
+/**
+ * @since 7.0
+ * @deprecated 27.0
+ */
 interface MCNearbyServiceAdvertiserDelegate extends NSObjectProtocol {
 
 	advertiserDidNotStartAdvertisingPeer?(advertiser: MCNearbyServiceAdvertiser, error: NSError): void;
 
-	advertiserDidReceiveInvitationFromPeerWithContextInvitationHandler(advertiser: MCNearbyServiceAdvertiser, peerID: MCPeerID, context: NSData, invitationHandler: (p1: boolean, p2: MCSession) => void): void;
+	advertiserDidReceiveInvitationFromPeerWithContextInvitationHandler(advertiser: MCNearbyServiceAdvertiser, peerID: MCPeerID, context: NSData | null, invitationHandler: (p1: boolean, p2: MCSession | null) => void): void;
 }
 declare var MCNearbyServiceAdvertiserDelegate: {
 
@@ -190,6 +211,7 @@ declare var MCNearbyServiceAdvertiserDelegate: {
 
 /**
  * @since 7.0
+ * @deprecated 27.0
  */
 declare class MCNearbyServiceBrowser extends NSObject {
 
@@ -197,7 +219,7 @@ declare class MCNearbyServiceBrowser extends NSObject {
 
 	static new(): MCNearbyServiceBrowser; // inherited from NSObject
 
-	delegate: MCNearbyServiceBrowserDelegate;
+	delegate: MCNearbyServiceBrowserDelegate | null;
 
 	readonly myPeerID: MCPeerID;
 
@@ -207,18 +229,22 @@ declare class MCNearbyServiceBrowser extends NSObject {
 
 	initWithPeerServiceType(myPeerID: MCPeerID, serviceType: string): this;
 
-	invitePeerToSessionWithContextTimeout(peerID: MCPeerID, session: MCSession, context: NSData, timeout: number): void;
+	invitePeerToSessionWithContextTimeout(peerID: MCPeerID, session: MCSession, context: NSData | null, timeout: number): void;
 
 	startBrowsingForPeers(): void;
 
 	stopBrowsingForPeers(): void;
 }
 
+/**
+ * @since 7.0
+ * @deprecated 27.0
+ */
 interface MCNearbyServiceBrowserDelegate extends NSObjectProtocol {
 
 	browserDidNotStartBrowsingForPeers?(browser: MCNearbyServiceBrowser, error: NSError): void;
 
-	browserFoundPeerWithDiscoveryInfo(browser: MCNearbyServiceBrowser, peerID: MCPeerID, info: NSDictionary<string, string>): void;
+	browserFoundPeerWithDiscoveryInfo(browser: MCNearbyServiceBrowser, peerID: MCPeerID, info: NSDictionary<string, string> | null): void;
 
 	browserLostPeer(browser: MCNearbyServiceBrowser, peerID: MCPeerID): void;
 }
@@ -229,6 +255,7 @@ declare var MCNearbyServiceBrowserDelegate: {
 
 /**
  * @since 7.0
+ * @deprecated 27.0
  */
 declare class MCPeerID extends NSObject implements NSCopying, NSSecureCoding {
 
@@ -244,7 +271,7 @@ declare class MCPeerID extends NSObject implements NSCopying, NSSecureCoding {
 
 	constructor(o: { displayName: string; });
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -255,6 +282,7 @@ declare class MCPeerID extends NSObject implements NSCopying, NSSecureCoding {
 
 /**
  * @since 7.0
+ * @deprecated 27.0
  */
 declare class MCSession extends NSObject {
 
@@ -264,17 +292,17 @@ declare class MCSession extends NSObject {
 
 	readonly connectedPeers: NSArray<MCPeerID>;
 
-	delegate: MCSessionDelegate;
+	delegate: MCSessionDelegate | null;
 
 	readonly encryptionPreference: MCEncryptionPreference;
 
 	readonly myPeerID: MCPeerID;
 
-	readonly securityIdentity: NSArray<any>;
+	readonly securityIdentity: NSArray<any> | null;
 
 	constructor(o: { peer: MCPeerID; });
 
-	constructor(o: { peer: MCPeerID; securityIdentity: NSArray<any> | any[]; encryptionPreference: MCEncryptionPreference; });
+	constructor(o: { peer: MCPeerID; securityIdentity: NSArray<any> | any[] | null; encryptionPreference: MCEncryptionPreference; });
 
 	cancelConnectPeer(peerID: MCPeerID): void;
 
@@ -284,22 +312,26 @@ declare class MCSession extends NSObject {
 
 	initWithPeer(myPeerID: MCPeerID): this;
 
-	initWithPeerSecurityIdentityEncryptionPreference(myPeerID: MCPeerID, identity: NSArray<any> | any[], encryptionPreference: MCEncryptionPreference): this;
+	initWithPeerSecurityIdentityEncryptionPreference(myPeerID: MCPeerID, identity: NSArray<any> | any[] | null, encryptionPreference: MCEncryptionPreference): this;
 
-	nearbyConnectionDataForPeerWithCompletionHandler(peerID: MCPeerID, completionHandler: (p1: NSData, p2: NSError) => void): void;
+	nearbyConnectionDataForPeerWithCompletionHandler(peerID: MCPeerID, completionHandler: (p1: NSData | null, p2: NSError | null) => void): void;
 
 	sendDataToPeersWithModeError(data: NSData, peerIDs: NSArray<MCPeerID> | MCPeerID[], mode: MCSessionSendDataMode, error?: interop.Reference<NSError>): boolean;
 
-	sendResourceAtURLWithNameToPeerWithCompletionHandler(resourceURL: NSURL, resourceName: string, peerID: MCPeerID, completionHandler: (p1: NSError) => void): NSProgress;
+	sendResourceAtURLWithNameToPeerWithCompletionHandler(resourceURL: NSURL, resourceName: string, peerID: MCPeerID, completionHandler: (p1: NSError | null) => void | null): NSProgress | null;
 
-	startStreamWithNameToPeerError(streamName: string, peerID: MCPeerID, error?: interop.Reference<NSError>): NSOutputStream;
+	startStreamWithNameToPeerError(streamName: string, peerID: MCPeerID, error?: interop.Reference<NSError>): NSOutputStream | null;
 }
 
+/**
+ * @since 7.0
+ * @deprecated 27.0
+ */
 interface MCSessionDelegate extends NSObjectProtocol {
 
-	sessionDidFinishReceivingResourceWithNameFromPeerAtURLWithError(session: MCSession, resourceName: string, peerID: MCPeerID, localURL: NSURL, error: NSError): void;
+	sessionDidFinishReceivingResourceWithNameFromPeerAtURLWithError(session: MCSession, resourceName: string, peerID: MCPeerID, localURL: NSURL | null, error: NSError | null): void;
 
-	sessionDidReceiveCertificateFromPeerCertificateHandler?(session: MCSession, certificate: NSArray<any> | any[], peerID: MCPeerID, certificateHandler: (p1: boolean) => void): void;
+	sessionDidReceiveCertificateFromPeerCertificateHandler?(session: MCSession, certificate: NSArray<any> | any[] | null, peerID: MCPeerID, certificateHandler: (p1: boolean) => void): void;
 
 	sessionDidReceiveDataFromPeer(session: MCSession, data: NSData, peerID: MCPeerID): void;
 
@@ -316,6 +348,7 @@ declare var MCSessionDelegate: {
 
 /**
  * @since 7.0
+ * @deprecated 27.0
  */
 declare const enum MCSessionSendDataMode {
 
@@ -326,6 +359,7 @@ declare const enum MCSessionSendDataMode {
 
 /**
  * @since 7.0
+ * @deprecated 27.0
  */
 declare const enum MCSessionState {
 
@@ -338,10 +372,12 @@ declare const enum MCSessionState {
 
 /**
  * @since 7.0
+ * @deprecated 27.0
  */
 declare var kMCSessionMaximumNumberOfPeers: number;
 
 /**
  * @since 7.0
+ * @deprecated 27.0
  */
 declare var kMCSessionMinimumNumberOfPeers: number;

@@ -1,6 +1,6 @@
 {
 	"name": "@akylas/nativescript",
-	"version": "9.0.23",
+	"version": "9.0.24",
 	"description": "A JavaScript library providing an easy to use api for interacting with iOS and Android platform APIs.",
 	"type": "module",
 	"main": "index",
@@ -68,6 +68,7 @@
 		"css-tree": "^3.1.0",
 		"css-what": "^6.1.0",
 		"emoji-regex": "^10.2.1",
+		"semver": "^7.0.0",
 		"source-map": "0.7.6",
 		"source-map-js": "^1.2.1",
 		"tslib": "^2.0.0"

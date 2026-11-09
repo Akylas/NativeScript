@@ -1,8 +1,9 @@
-import { ScrollEventData } from '.';
-import { ScrollViewBase, scrollBarIndicatorVisibleProperty, isScrollEnabledProperty } from './scroll-view-common';
+import type { ScrollEventData } from './scroll-view-common';
+import { ScrollViewBase, scrollBarIndicatorVisibleProperty, isScrollEnabledProperty, iosContentInsetAdjustmentBehaviorProperty, iosScrollEdgeEffectProperty } from './scroll-view-common';
 import { layout } from '../../utils';
 import { SDK_VERSION } from '../../utils/constants';
 import { View } from '../core/view';
+import { IOSHelper, ScrollEdgeContainers } from '../core/view/view-helper';
 import { CoreTypes } from '../enums';
 
 export * from './scroll-view-common';
@@ -40,6 +41,7 @@ export class ScrollView extends ScrollViewBase {
 	private _contentMeasuredHeight = 0;
 	private _isFirstLayout: boolean = true;
 	private _delegate: UIScrollViewDelegateImpl;
+	private _scrollEdgeContainers: ScrollEdgeContainers;
 
 	public createNativeView() {
 		return UIScrollView.new();
@@ -49,12 +51,28 @@ export class ScrollView extends ScrollViewBase {
 		super.initNativeView();
 		this.updateScrollBarVisibility(this.scrollBarIndicatorVisible);
 		this._setNativeClipToBounds();
+		// UIKit defaults to `automatic` while the property defaults to `never`, and
+		// setNative only runs for non-default values — so apply it up front.
+		this.updateContentInsetAdjustmentBehavior(this.iosContentInsetAdjustmentBehavior);
+		this._scrollEdgeContainers?.attach();
 	}
 
 	public disposeNativeView() {
+		this._scrollEdgeContainers?.detach();
 		super.disposeNativeView();
 
 		this._isFirstLayout = true;
+	}
+
+	public addScrollEdgeContainer(view: View, edge: CoreTypes.ScrollEdgeType): void {
+		if (!this._scrollEdgeContainers) {
+			this._scrollEdgeContainers = new ScrollEdgeContainers(this);
+		}
+		this._scrollEdgeContainers.add(view, edge);
+	}
+
+	public removeScrollEdgeContainer(view: View): void {
+		this._scrollEdgeContainers?.remove(view);
 	}
 
 	_setNativeClipToBounds() {
@@ -92,6 +110,22 @@ export class ScrollView extends ScrollViewBase {
 		}
 	}
 
+	protected updateContentInsetAdjustmentBehavior(value: 'never' | 'automatic' | 'scrollableAxes' | 'always') {
+		if (!this.nativeViewProtected || SDK_VERSION <= 10) {
+			return;
+		}
+		// https://developer.apple.com/documentation/uikit/uiscrollview/contentinsetadjustmentbehavior
+		let behavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
+		if (value === 'automatic') {
+			behavior = UIScrollViewContentInsetAdjustmentBehavior.Automatic;
+		} else if (value === 'scrollableAxes') {
+			behavior = UIScrollViewContentInsetAdjustmentBehavior.ScrollableAxes;
+		} else if (value === 'always') {
+			behavior = UIScrollViewContentInsetAdjustmentBehavior.Always;
+		}
+		this.nativeViewProtected.contentInsetAdjustmentBehavior = behavior;
+	}
+
 	get horizontalOffset(): number {
 		return this.nativeViewProtected ? this.nativeViewProtected.contentOffset.x : 0;
 	}
@@ -100,12 +134,15 @@ export class ScrollView extends ScrollViewBase {
 		return this.nativeViewProtected ? this.nativeViewProtected.contentOffset.y : 0;
 	}
 
+	// Each is the largest offset a scroll reaches, end inset included, so scrolling to it shows the end of the
+	// content above a keyboard or docked bar that sets contentInset.bottom.
 	get scrollableWidth(): number {
 		if (!this.nativeViewProtected || this.orientation !== 'horizontal') {
 			return 0;
 		}
 
-		return Math.max(0, this.nativeViewProtected.contentSize.width - this.nativeViewProtected.bounds.size.width);
+		const nativeView = this.nativeViewProtected;
+		return Math.max(0, nativeView.contentSize.width + nativeView.adjustedContentInset.right - nativeView.bounds.size.width);
 	}
 
 	get scrollableHeight(): number {
@@ -113,7 +150,8 @@ export class ScrollView extends ScrollViewBase {
 			return 0;
 		}
 
-		return Math.max(0, this.nativeViewProtected.contentSize.height - this.nativeViewProtected.bounds.size.height);
+		const nativeView = this.nativeViewProtected;
+		return Math.max(0, nativeView.contentSize.height + nativeView.adjustedContentInset.bottom - nativeView.bounds.size.height);
 	}
 
 	[isScrollEnabledProperty.getDefault](): boolean {
@@ -130,17 +168,35 @@ export class ScrollView extends ScrollViewBase {
 		this.updateScrollBarVisibility(value);
 	}
 
+	[iosContentInsetAdjustmentBehaviorProperty.setNative](value: 'never' | 'automatic' | 'scrollableAxes' | 'always') {
+		this.updateContentInsetAdjustmentBehavior(value);
+	}
+
+	[iosScrollEdgeEffectProperty.setNative](value: CoreTypes.ScrollEdgeEffectType) {
+		IOSHelper.setScrollEdgeEffect(this.nativeViewProtected, value);
+	}
+
+	// The offset is set directly rather than through scrollRectToVisible with a
+	// viewport-sized rect: that rect cannot fit inside a content inset, so UIKit
+	// would land contentInset.bottom (or .right) past the requested offset. The
+	// value is clamped to the range a user scroll can reach.
 	public scrollToVerticalOffset(value: number, animated: boolean) {
-		if (this.nativeViewProtected && this.orientation === 'vertical' && this.isScrollEnabled) {
-			const bounds = this.nativeViewProtected.bounds.size;
-			this.nativeViewProtected.scrollRectToVisibleAnimated(CGRectMake(0, value, bounds.width, bounds.height), animated);
+		const nativeView = this.nativeViewProtected;
+		if (nativeView && this.orientation === 'vertical' && this.isScrollEnabled) {
+			const inset = nativeView.adjustedContentInset;
+			const min = -inset.top;
+			const max = Math.max(min, nativeView.contentSize.height + inset.bottom - nativeView.bounds.size.height);
+			nativeView.setContentOffsetAnimated(CGPointMake(nativeView.contentOffset.x, Math.min(Math.max(value, min), max)), animated);
 		}
 	}
 
 	public scrollToHorizontalOffset(value: number, animated: boolean) {
-		if (this.nativeViewProtected && this.orientation === 'horizontal' && this.isScrollEnabled) {
-			const bounds = this.nativeViewProtected.bounds.size;
-			this.nativeViewProtected.scrollRectToVisibleAnimated(CGRectMake(value, 0, bounds.width, bounds.height), animated);
+		const nativeView = this.nativeViewProtected;
+		if (nativeView && this.orientation === 'horizontal' && this.isScrollEnabled) {
+			const inset = nativeView.adjustedContentInset;
+			const min = -inset.left;
+			const max = Math.max(min, nativeView.contentSize.width + inset.right - nativeView.bounds.size.width);
+			nativeView.setContentOffsetAnimated(CGPointMake(Math.min(Math.max(value, min), max), nativeView.contentOffset.y), animated);
 		}
 	}
 
@@ -180,17 +236,13 @@ export class ScrollView extends ScrollViewBase {
 			return;
 		}
 
-		const insets = this.getSafeAreaInsets();
+		// When iOS adjusts content insets itself, don't also subtract safe-area insets here —
+		// doing both makes contentSize track the dynamic navbar height and causes scroll drift with large titles.
+		const useIOSInsetAdjustment = SDK_VERSION > 10 && this.iosContentInsetAdjustmentBehavior !== 'never';
+		const insets = useIOSInsetAdjustment ? { left: 0, top: 0, right: 0, bottom: 0 } : this.getSafeAreaInsets();
 
 		let scrollWidth = right - left - insets.right - insets.left;
 		let scrollHeight = bottom - top - insets.bottom - insets.top;
-
-		if (SDK_VERSION > 10) {
-			// Disable automatic adjustment of scroll view insets
-			// Consider exposing this as property with all 4 modes
-			// https://developer.apple.com/documentation/uikit/uiscrollview/contentinsetadjustmentbehavior
-			view.contentInsetAdjustmentBehavior = 2;
-		}
 
 		let scrollInsetWidth = scrollWidth + insets.left + insets.right;
 		let scrollInsetHeight = scrollHeight + insets.top + insets.bottom;

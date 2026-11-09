@@ -1,7 +1,7 @@
 import type { Frame } from '../frame';
 import { BackstackEntry, NavigationType } from '../frame/frame-interfaces';
 import { View, IOSHelper } from '../core/view';
-import { PageBase, actionBarHiddenProperty } from './page-common';
+import { PageBase, actionBarHiddenProperty, enableSwipeBackNavigationProperty } from './page-common';
 
 import { profile } from '../../profiling';
 import { layout } from '../../utils/layout-helper';
@@ -204,17 +204,22 @@ class UIViewControllerImpl extends UIViewController {
 					// Workaround for disabled backswipe on second custom native transition
 					if (frame.canGoBack()) {
 						const transitionState = SharedTransition.getState(owner.transitionId);
-						if (!transitionState?.interactive) {
+						if (transitionState?.interactive) {
+							// A custom interactive dismiss is wired up (shared transition with
+							// pan gesture). Disable iOS' built-in edge pan so it can't race the
+							// custom recognizer and run the standard non-interactive pop.
+							navigationController.interactivePopGestureRecognizer.enabled = false;
+						} else {
 							// only consider when interactive transitions are not enabled
 							navigationController.interactivePopGestureRecognizer.delegate = navigationController;
 							navigationController.interactivePopGestureRecognizer.enabled = owner.enableSwipeBackNavigation;
-							if (SDK_VERSION >= 26) {
+							if (SDK_VERSION >= 26 && navigationController.interactiveContentPopGestureRecognizer) {
 								navigationController.interactiveContentPopGestureRecognizer.enabled = owner.enableSwipeBackNavigation;
 							}
 						}
 					} else {
 						navigationController.interactivePopGestureRecognizer.enabled = false;
-						if (SDK_VERSION >= 26) {
+						if (SDK_VERSION >= 26 && navigationController.interactiveContentPopGestureRecognizer) {
 							navigationController.interactiveContentPopGestureRecognizer.enabled = false;
 						}
 					}
@@ -367,20 +372,15 @@ class UIViewControllerImpl extends UIViewController {
 		}
 	}
 
-	// TODO: a11y
-	// public accessibilityPerformEscape() {
-	// 	const owner = this._owner.get();
-	// 	if (!owner) {
-	// 		return false;
-	// 	}
-	// 	console.log('page accessibilityPerformEscape');
-	// 	if (owner.onAccessibilityPerformEscape) {
-	// 		const result = owner.onAccessibilityPerformEscape();
-	// 		return result;
-	// 	} else {
-	// 		return false;
-	// 	}
-	// }
+	public accessibilityPerformEscape() {
+		const owner = this._owner?.deref();
+		if (owner?.onAccessibilityPerformEscape) {
+			const result = owner.onAccessibilityPerformEscape();
+			return result;
+		} else {
+			return false;
+		}
+	}
 
 	// @ts-ignore
 	public get preferredStatusBarStyle(): UIStatusBarStyle {
@@ -568,11 +568,7 @@ export class Page extends PageBase {
 		}
 
 		if (nativeParent && nativeChild) {
-			if (typeof atIndex !== 'number' || atIndex >= nativeParent.subviews.count) {
-				nativeParent.addSubview(nativeChild);
-			} else {
-				nativeParent.insertSubviewAtIndex(nativeChild, atIndex);
-			}
+			IOSHelper.insertNativeSubview(nativeParent, nativeChild, atIndex);
 
 			return true;
 		}
@@ -595,8 +591,6 @@ export class Page extends PageBase {
 	}
 
 	[actionBarHiddenProperty.setNative](value: boolean) {
-		this._updateEnableSwipeBackNavigation(value);
-
 		// Invalidate all inner controller.
 		invalidateTopmostController(this.viewController);
 
@@ -605,6 +599,10 @@ export class Page extends PageBase {
 			// Update nav-bar visibility with disabled animations
 			frame._updateActionBar(this, true);
 		}
+	}
+
+	[enableSwipeBackNavigationProperty.setNative](value: boolean) {
+		this._updateEnableSwipeBackNavigation(value);
 	}
 
 	public accessibilityScreenChanged(refocus = false): void {

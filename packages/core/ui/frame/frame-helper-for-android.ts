@@ -5,8 +5,8 @@ import { profile } from '../../profiling';
 import type { Page } from '../page';
 import type { Frame } from '.';
 import type { ExpandedEntry } from './fragment.transitions.android';
-export const FRAMEID = '_frameId';
-export const CALLBACKS = '_callbacks';
+import { CALLBACKS, FRAMEID } from './frame-constants';
+export { CALLBACKS, FRAMEID };
 export const framesCache = new Array<WeakRef<AndroidFrame>>();
 
 export interface AndroidFragmentCallbacks {
@@ -128,21 +128,30 @@ export class FragmentCallbacksImplementation implements AndroidFragmentCallbacks
 
 		const entry = this.entry;
 		if (!entry) {
-			Trace.error(`${fragment}.onCreateView: entry is null or undefined`);
+			// Recoverable race: a stale fragment is being driven to onCreateView by the
+			// FragmentManager after its entry was cleared.
+			// Using Trace.error (routes to an error handler, which throws) would be fatal as the error handler rethrows across the JNI boundary.
+			// Trace.write(..., Trace.messageType.error) logs without routing through that throwing path.
+			Trace.write(`${fragment}.onCreateView: entry is null or undefined`, Trace.categories.NativeLifecycle, Trace.messageType.error);
 
 			return null;
 		}
 
 		const page = entry.resolvedPage;
 		if (!page) {
-			Trace.error(`${fragment}.onCreateView: entry has no resolvedPage`);
+			// Logging via Trace.error (routes to an error handler, which throws) here is fatal because the registered error handler rethrows across the JNI boundary.
+			// Trace.write(..., Trace.messageType.error) keeps this recoverable path non-fatal.
+			Trace.write(`${fragment}.onCreateView: entry has no resolvedPage`, Trace.categories.NativeLifecycle, Trace.messageType.error);
 
 			return null;
 		}
 
 		const frame = this.frame;
 		if (!frame) {
-			Trace.error(`${fragment}.onCreateView: this.frame is null or undefined`);
+			// Recoverable race: the owning frame was already torn down. Returning null discards
+			// this fragment; using Trace.error (routes to an error handler, which throws) would be fatal as the error handler rethrows across the JNI boundary.
+			// Trace.write(..., Trace.messageType.error) logs without invoking the throwing error handler.
+			Trace.write(`${fragment}.onCreateView: this.frame is null or undefined`, Trace.categories.NativeLifecycle, Trace.messageType.error);
 
 			return null;
 		}

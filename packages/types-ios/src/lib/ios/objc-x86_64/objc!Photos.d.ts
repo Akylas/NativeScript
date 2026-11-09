@@ -54,55 +54,65 @@ declare class PHAsset extends PHObject {
 	/**
 	 * @since 8
 	 */
-	static fetchAssetsInAssetCollectionOptions(assetCollection: PHAssetCollection, options: PHFetchOptions): PHFetchResult<PHAsset>;
+	static fetchAssetsInAssetCollectionOptions(assetCollection: PHAssetCollection, options: PHFetchOptions | null): PHFetchResult<PHAsset>;
 
 	/**
 	 * @since 8
 	 * @deprecated 11
 	 */
-	static fetchAssetsWithALAssetURLsOptions(assetURLs: NSArray<NSURL> | NSURL[], options: PHFetchOptions): PHFetchResult<PHAsset>;
+	static fetchAssetsWithALAssetURLsOptions(assetURLs: NSArray<NSURL> | NSURL[], options: PHFetchOptions | null): PHFetchResult<PHAsset>;
 
 	/**
 	 * @since 8
 	 */
-	static fetchAssetsWithBurstIdentifierOptions(burstIdentifier: string, options: PHFetchOptions): PHFetchResult<PHAsset>;
+	static fetchAssetsWithBurstIdentifierOptions(burstIdentifier: string, options: PHFetchOptions | null): PHFetchResult<PHAsset>;
 
 	/**
 	 * @since 8
 	 */
-	static fetchAssetsWithLocalIdentifiersOptions(identifiers: NSArray<string> | string[], options: PHFetchOptions): PHFetchResult<PHAsset>;
+	static fetchAssetsWithLocalIdentifiersOptions(identifiers: NSArray<string> | string[], options: PHFetchOptions | null): PHFetchResult<PHAsset>;
 
 	/**
 	 * @since 8
 	 */
-	static fetchAssetsWithMediaTypeOptions(mediaType: PHAssetMediaType, options: PHFetchOptions): PHFetchResult<PHAsset>;
+	static fetchAssetsWithMediaTypeOptions(mediaType: PHAssetMediaType, options: PHFetchOptions | null): PHFetchResult<PHAsset>;
 
 	/**
 	 * @since 8
 	 */
-	static fetchAssetsWithOptions(options: PHFetchOptions): PHFetchResult<PHAsset>;
+	static fetchAssetsWithOptions(options: PHFetchOptions | null): PHFetchResult<PHAsset>;
 
 	/**
 	 * @since 8
 	 */
-	static fetchKeyAssetsInAssetCollectionOptions(assetCollection: PHAssetCollection, options: PHFetchOptions): PHFetchResult<PHAsset>;
+	static fetchKeyAssetsInAssetCollectionOptions(assetCollection: PHAssetCollection, options: PHFetchOptions | null): PHFetchResult<PHAsset> | null;
 
 	static new(): PHAsset; // inherited from NSObject
 
 	/**
 	 * @since 26.0
 	 */
-	readonly addedDate: Date;
+	readonly addedDate: Date | null;
 
 	/**
 	 * @since 15
 	 */
-	readonly adjustmentFormatIdentifier: string;
+	readonly adjustmentFormatIdentifier: string | null;
+
+	/**
+	 * @since 18
+	 */
+	readonly adjustmentTimestamp: Date | null;
+
+	/**
+	 * @since 18
+	 */
+	readonly adjustmentsState: PHAssetAdjustmentsState;
 
 	/**
 	 * @since 8
 	 */
-	readonly burstIdentifier: string;
+	readonly burstIdentifier: string | null;
 
 	/**
 	 * @since 8
@@ -117,12 +127,17 @@ declare class PHAsset extends PHObject {
 	/**
 	 * @since 8
 	 */
-	readonly creationDate: Date;
+	readonly creationDate: Date | null;
 
 	/**
 	 * @since 8
 	 */
 	readonly duration: number;
+
+	/**
+	 * @since 27
+	 */
+	readonly extendedMetadata: PHAssetExtendedMetadata;
 
 	/**
 	 * @since 8
@@ -142,7 +157,7 @@ declare class PHAsset extends PHObject {
 	/**
 	 * @since 8
 	 */
-	readonly location: CLLocation;
+	readonly location: CLLocation | null;
 
 	/**
 	 * @since 8
@@ -157,7 +172,12 @@ declare class PHAsset extends PHObject {
 	/**
 	 * @since 8
 	 */
-	readonly modificationDate: Date;
+	readonly modificationDate: Date | null;
+
+	/**
+	 * @since 27
+	 */
+	readonly originalResourceChoice: PHOriginalResourceChoice;
 
 	/**
 	 * @since 8
@@ -173,6 +193,16 @@ declare class PHAsset extends PHObject {
 	 * @since 11
 	 */
 	readonly playbackStyle: PHAssetPlaybackStyle;
+
+	/**
+	 * @since 11
+	 */
+	readonly playbackVariation: PHAssetPlaybackVariation;
+
+	/**
+	 * @since 27
+	 */
+	readonly rating: PHAssetRating;
 
 	/**
 	 * @since 8
@@ -197,7 +227,19 @@ declare class PHAsset extends PHObject {
 	/**
 	 * @since 8
 	 */
-	requestContentEditingInputWithOptionsCompletionHandler(options: PHContentEditingInputRequestOptions, completionHandler: (p1: PHContentEditingInput, p2: NSDictionary<any, any>) => void): number;
+	requestContentEditingInputWithOptionsCompletionHandler(options: PHContentEditingInputRequestOptions | null, completionHandler: (p1: PHContentEditingInput | null, p2: NSDictionary<any, any>) => void): number;
+}
+
+/**
+ * @since 18
+ */
+declare const enum PHAssetAdjustmentsState {
+
+	None = 0,
+
+	UserAdjusted = 2,
+
+	CameraAutoAdjusted = 3
 }
 
 /**
@@ -247,14 +289,19 @@ declare class PHAssetChangeRequest extends PHChangeRequest {
 	static new(): PHAssetChangeRequest; // inherited from NSObject
 
 	/**
-	 * @since 8
+	 * @since 27
 	 */
-	contentEditingOutput: PHContentEditingOutput;
+	caption: string | null;
 
 	/**
 	 * @since 8
 	 */
-	creationDate: Date;
+	contentEditingOutput: PHContentEditingOutput | null;
+
+	/**
+	 * @since 8
+	 */
+	creationDate: Date | null;
 
 	/**
 	 * @since 8
@@ -269,17 +316,42 @@ declare class PHAssetChangeRequest extends PHChangeRequest {
 	/**
 	 * @since 8
 	 */
-	location: CLLocation;
+	location: CLLocation | null;
 
 	/**
 	 * @since 8
 	 */
-	readonly placeholderForCreatedAsset: PHObjectPlaceholder;
+	readonly placeholderForCreatedAsset: PHObjectPlaceholder | null;
+
+	/**
+	 * @since 27
+	 */
+	rating: PHAssetRating;
+
+	/**
+	 * @since 27
+	 */
+	addKeyword(keyword: string): void;
+
+	/**
+	 * @since 27
+	 */
+	removeKeyword(keyword: string): void;
 
 	/**
 	 * @since 8
 	 */
 	revertAssetContentToOriginal(): void;
+
+	/**
+	 * @since 27
+	 */
+	revertAssetContentToOriginalResourceChoice(choice: PHOriginalResourceChoice): void;
+
+	/**
+	 * @since 27
+	 */
+	setLivePhotoVideoPlaybackEnabled(enabled: boolean): void;
 }
 
 /**
@@ -292,52 +364,52 @@ declare class PHAssetCollection extends PHCollection {
 	/**
 	 * @since 8
 	 */
-	static fetchAssetCollectionsContainingAssetWithTypeOptions(asset: PHAsset, type: PHAssetCollectionType, options: PHFetchOptions): PHFetchResult<PHAssetCollection>;
+	static fetchAssetCollectionsContainingAssetWithTypeOptions(asset: PHAsset, type: PHAssetCollectionType, options: PHFetchOptions | null): PHFetchResult<PHAssetCollection>;
 
 	/**
 	 * @since 8
 	 * @deprecated 16
 	 */
-	static fetchAssetCollectionsWithALAssetGroupURLsOptions(assetGroupURLs: NSArray<NSURL> | NSURL[], options: PHFetchOptions): PHFetchResult<PHAssetCollection>;
+	static fetchAssetCollectionsWithALAssetGroupURLsOptions(assetGroupURLs: NSArray<NSURL> | NSURL[], options: PHFetchOptions | null): PHFetchResult<PHAssetCollection>;
 
 	/**
 	 * @since 8
 	 */
-	static fetchAssetCollectionsWithLocalIdentifiersOptions(identifiers: NSArray<string> | string[], options: PHFetchOptions): PHFetchResult<PHAssetCollection>;
+	static fetchAssetCollectionsWithLocalIdentifiersOptions(identifiers: NSArray<string> | string[], options: PHFetchOptions | null): PHFetchResult<PHAssetCollection>;
 
 	/**
 	 * @since 8
 	 */
-	static fetchAssetCollectionsWithTypeSubtypeOptions(type: PHAssetCollectionType, subtype: PHAssetCollectionSubtype, options: PHFetchOptions): PHFetchResult<PHAssetCollection>;
-
-	/**
-	 * @since 8
-	 * @deprecated 13
-	 */
-	static fetchMomentsInMomentListOptions(momentList: PHCollectionList, options: PHFetchOptions): PHFetchResult<PHAssetCollection>;
+	static fetchAssetCollectionsWithTypeSubtypeOptions(type: PHAssetCollectionType, subtype: PHAssetCollectionSubtype, options: PHFetchOptions | null): PHFetchResult<PHAssetCollection>;
 
 	/**
 	 * @since 8
 	 * @deprecated 13
 	 */
-	static fetchMomentsWithOptions(options: PHFetchOptions): PHFetchResult<PHAssetCollection>;
+	static fetchMomentsInMomentListOptions(momentList: PHCollectionList, options: PHFetchOptions | null): PHFetchResult<PHAssetCollection>;
+
+	/**
+	 * @since 8
+	 * @deprecated 13
+	 */
+	static fetchMomentsWithOptions(options: PHFetchOptions | null): PHFetchResult<PHAssetCollection>;
 
 	static new(): PHAssetCollection; // inherited from NSObject
 
 	/**
 	 * @since 8
 	 */
-	static transientAssetCollectionWithAssetFetchResultTitle(fetchResult: PHFetchResult<PHAsset>, title: string): PHAssetCollection;
+	static transientAssetCollectionWithAssetFetchResultTitle(fetchResult: PHFetchResult<PHAsset>, title: string | null): PHAssetCollection;
 
 	/**
 	 * @since 8
 	 */
-	static transientAssetCollectionWithAssetsTitle(assets: NSArray<PHAsset> | PHAsset[], title: string): PHAssetCollection;
+	static transientAssetCollectionWithAssetsTitle(assets: NSArray<PHAsset> | PHAsset[], title: string | null): PHAssetCollection;
 
 	/**
 	 * @since 8
 	 */
-	readonly approximateLocation: CLLocation;
+	readonly approximateLocation: CLLocation | null;
 
 	/**
 	 * @since 8
@@ -352,7 +424,7 @@ declare class PHAssetCollection extends PHCollection {
 	/**
 	 * @since 8
 	 */
-	readonly endDate: Date;
+	readonly endDate: Date | null;
 
 	/**
 	 * @since 8
@@ -367,7 +439,7 @@ declare class PHAssetCollection extends PHCollection {
 	/**
 	 * @since 8
 	 */
-	readonly startDate: Date;
+	readonly startDate: Date | null;
 }
 
 /**
@@ -385,7 +457,7 @@ declare class PHAssetCollectionChangeRequest extends PHChangeRequest {
 	/**
 	 * @since 8
 	 */
-	static changeRequestForAssetCollectionAssets(assetCollection: PHAssetCollection, assets: PHFetchResult<PHAsset>): PHAssetCollectionChangeRequest;
+	static changeRequestForAssetCollectionAssets(assetCollection: PHAssetCollection, assets: PHFetchResult<PHAsset> | null): PHAssetCollectionChangeRequest;
 
 	/**
 	 * @since 8
@@ -556,14 +628,19 @@ declare class PHAssetCreationRequest extends PHAssetChangeRequest {
 	static supportsAssetResourceTypes(types: NSArray<number> | number[]): boolean;
 
 	/**
-	 * @since 9
+	 * @since 27
 	 */
-	addResourceWithTypeDataOptions(type: PHAssetResourceType, data: NSData, options: PHAssetResourceCreationOptions): void;
+	originalResourceChoice: PHOriginalResourceChoice;
 
 	/**
 	 * @since 9
 	 */
-	addResourceWithTypeFileURLOptions(type: PHAssetResourceType, fileURL: NSURL, options: PHAssetResourceCreationOptions): void;
+	addResourceWithTypeDataOptions(type: PHAssetResourceType, data: NSData, options: PHAssetResourceCreationOptions | null): void;
+
+	/**
+	 * @since 9
+	 */
+	addResourceWithTypeFileURLOptions(type: PHAssetResourceType, fileURL: NSURL, options: PHAssetResourceCreationOptions | null): void;
 }
 
 /**
@@ -576,6 +653,22 @@ declare const enum PHAssetEditOperation {
 	Content = 2,
 
 	Properties = 3
+}
+
+/**
+ * @since 27
+ */
+declare class PHAssetExtendedMetadata extends NSObject {
+
+	static alloc(): PHAssetExtendedMetadata; // inherited from NSObject
+
+	static new(): PHAssetExtendedMetadata; // inherited from NSObject
+
+	readonly caption: string | null;
+
+	readonly keywords: NSArray<string>;
+
+	readonly originalFilename: string | null;
 }
 
 /**
@@ -594,6 +687,8 @@ declare const enum PHAssetMediaSubtype {
 	PhotoLive = 8,
 
 	PhotoDepthEffect = 16,
+
+	PhotoAnimation = 64,
 
 	SpatialMedia = 1024,
 
@@ -641,11 +736,48 @@ declare const enum PHAssetPlaybackStyle {
 }
 
 /**
+ * @since 11
+ */
+declare const enum PHAssetPlaybackVariation {
+
+	None = 0,
+
+	Autoloop = 1,
+
+	Mirror = 2,
+
+	LongExposure = 3
+}
+
+/**
+ * @since 27
+ */
+declare const enum PHAssetRating {
+
+	Unset = 0,
+
+	One = 1,
+
+	Two = 2,
+
+	Three = 3,
+
+	Four = 4,
+
+	Five = 5
+}
+
+/**
  * @since 9
  */
 declare class PHAssetResource extends NSObject {
 
 	static alloc(): PHAssetResource; // inherited from NSObject
+
+	/**
+	 * @since 27
+	 */
+	static assetResourceForUploadJob(job: PHAssetResourceUploadJob): PHAssetResource | null;
 
 	/**
 	 * @since 9
@@ -670,7 +802,18 @@ declare class PHAssetResource extends NSObject {
 	readonly contentType: UTType;
 
 	/**
+	 * @since 27
+	 */
+	readonly dataSize: number | null;
+
+	/**
+	 * @since 27
+	 */
+	readonly filename: string | null;
+
+	/**
 	 * @since 9
+	 * @deprecated 27
 	 */
 	readonly originalFilename: string;
 
@@ -708,12 +851,12 @@ declare class PHAssetResourceCreationOptions extends NSObject implements NSCopyi
 	/**
 	 * @since 26.0
 	 */
-	contentType: UTType;
+	contentType: UTType | null;
 
 	/**
 	 * @since 9
 	 */
-	originalFilename: string;
+	originalFilename: string | null;
 
 	/**
 	 * @since 9
@@ -724,9 +867,9 @@ declare class PHAssetResourceCreationOptions extends NSObject implements NSCopyi
 	 * @since 9
 	 * @deprecated 100000
 	 */
-	uniformTypeIdentifier: string;
+	uniformTypeIdentifier: string | null;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -751,12 +894,12 @@ declare class PHAssetResourceManager extends NSObject {
 	/**
 	 * @since 9
 	 */
-	requestDataForAssetResourceOptionsDataReceivedHandlerCompletionHandler(resource: PHAssetResource, options: PHAssetResourceRequestOptions, handler: (p1: NSData) => void, completionHandler: (p1: NSError) => void): number;
+	requestDataForAssetResourceOptionsDataReceivedHandlerCompletionHandler(resource: PHAssetResource, options: PHAssetResourceRequestOptions | null, handler: (p1: NSData) => void, completionHandler: (p1: NSError | null) => void): number;
 
 	/**
 	 * @since 9
 	 */
-	writeDataForAssetResourceToFileOptionsCompletionHandler(resource: PHAssetResource, fileURL: NSURL, options: PHAssetResourceRequestOptions, completionHandler: (p1: NSError) => void): void;
+	writeDataForAssetResourceToFileOptionsCompletionHandler(resource: PHAssetResource, fileURL: NSURL, options: PHAssetResourceRequestOptions | null, completionHandler: (p1: NSError | null) => void): void;
 }
 
 /**
@@ -776,9 +919,9 @@ declare class PHAssetResourceRequestOptions extends NSObject implements NSCopyin
 	/**
 	 * @since 9
 	 */
-	progressHandler: (p1: number) => void;
+	progressHandler: (p1: number) => void | null;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -811,6 +954,133 @@ declare const enum PHAssetResourceType {
 	AdjustmentBaseVideo = 12,
 
 	PhotoProxy = 19
+}
+
+/**
+ * @since 26.1
+ */
+declare class PHAssetResourceUploadJob extends PHObject {
+
+	static alloc(): PHAssetResourceUploadJob; // inherited from NSObject
+
+	static fetchJobsWithActionOptions(action: PHAssetResourceUploadJobAction, options: PHFetchOptions | null): PHFetchResult<PHAssetResourceUploadJob>;
+
+	static new(): PHAssetResourceUploadJob; // inherited from NSObject
+
+	readonly destination: NSURLRequest;
+
+	/**
+	 * @since 26.4
+	 */
+	readonly error: NSError | null;
+
+	/**
+	 * @since 26.1
+	 * @deprecated 100000
+	 */
+	readonly resource: PHAssetResource;
+
+	/**
+	 * @since 26.4
+	 */
+	readonly responseHeaderFields: NSDictionary<string, string> | null;
+
+	readonly state: PHAssetResourceUploadJobState;
+
+	readonly type: PHAssetResourceUploadJobType;
+
+	static readonly jobLimit: number;
+}
+
+/**
+ * @since 26.1
+ */
+declare const enum PHAssetResourceUploadJobAction {
+
+	Acknowledge = 1,
+
+	Retry = 2,
+
+	Process = 3
+}
+
+/**
+ * @since 26.1
+ */
+declare class PHAssetResourceUploadJobChangeRequest extends PHChangeRequest {
+
+	static alloc(): PHAssetResourceUploadJobChangeRequest; // inherited from NSObject
+
+	static changeRequestForUploadJob(job: PHAssetResourceUploadJob): PHAssetResourceUploadJobChangeRequest;
+
+	/**
+	 * @since 26.1
+	 * @deprecated 26.4
+	 */
+	static createJobWithDestinationResource(destination: NSURLRequest, resource: PHAssetResource): void;
+
+	/**
+	 * @since 26.4
+	 */
+	static creationRequestForDownloadJobWithResource(resource: PHAssetResource): PHAssetResourceUploadJobChangeRequest;
+
+	/**
+	 * @since 26.4
+	 */
+	static creationRequestForJobWithDestinationResource(destination: NSURLRequest, resource: PHAssetResource): PHAssetResourceUploadJobChangeRequest;
+
+	static new(): PHAssetResourceUploadJobChangeRequest; // inherited from NSObject
+
+	readonly placeholderForCreatedAssetResourceUploadJob: PHObjectPlaceholder | null;
+
+	acknowledge(): void;
+
+	/**
+	 * @since 26.4
+	 */
+	cancel(): void;
+
+	retryWithDestination(destination: NSURLRequest | null): void;
+}
+
+/**
+ * @since 27.0
+ */
+declare class PHAssetResourceUploadJobOptions extends NSObject implements NSCopying {
+
+	static alloc(): PHAssetResourceUploadJobOptions; // inherited from NSObject
+
+	static new(): PHAssetResourceUploadJobOptions; // inherited from NSObject
+
+	preventsExpensiveNetworkAccess: boolean;
+
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+}
+
+/**
+ * @since 26.1
+ */
+declare const enum PHAssetResourceUploadJobState {
+
+	Registered = 1,
+
+	Pending = 2,
+
+	Failed = 3,
+
+	Succeeded = 4,
+
+	Cancelled = 5
+}
+
+/**
+ * @since 26.4
+ */
+declare const enum PHAssetResourceUploadJobType {
+
+	Upload = 0,
+
+	DownloadOnly = 1
 }
 
 /**
@@ -861,7 +1131,7 @@ declare class PHCachingImageManager extends PHImageManager {
 	/**
 	 * @since 8
 	 */
-	startCachingImagesForAssetsTargetSizeContentModeOptions(assets: NSArray<PHAsset> | PHAsset[], targetSize: CGSize, contentMode: PHImageContentMode, options: PHImageRequestOptions): void;
+	startCachingImagesForAssetsTargetSizeContentModeOptions(assets: NSArray<PHAsset> | PHAsset[], targetSize: CGSize, contentMode: PHImageContentMode, options: PHImageRequestOptions | null): void;
 
 	/**
 	 * @since 8
@@ -871,7 +1141,7 @@ declare class PHCachingImageManager extends PHImageManager {
 	/**
 	 * @since 8
 	 */
-	stopCachingImagesForAssetsTargetSizeContentModeOptions(assets: NSArray<PHAsset> | PHAsset[], targetSize: CGSize, contentMode: PHImageContentMode, options: PHImageRequestOptions): void;
+	stopCachingImagesForAssetsTargetSizeContentModeOptions(assets: NSArray<PHAsset> | PHAsset[], targetSize: CGSize, contentMode: PHImageContentMode, options: PHImageRequestOptions | null): void;
 }
 
 /**
@@ -886,12 +1156,12 @@ declare class PHChange extends NSObject {
 	/**
 	 * @since 8
 	 */
-	changeDetailsForFetchResult(object: PHFetchResult<any>): PHFetchResultChangeDetails<any>;
+	changeDetailsForFetchResult(object: PHFetchResult<any>): PHFetchResultChangeDetails<any> | null;
 
 	/**
 	 * @since 8
 	 */
-	changeDetailsForObject(object: PHObject): PHObjectChangeDetails<any>;
+	changeDetailsForObject(object: PHObject): PHObjectChangeDetails<any> | null;
 }
 
 /**
@@ -914,27 +1184,45 @@ declare class PHCloudIdentifier extends NSObject implements NSCopying, NSSecureC
 	static new(): PHCloudIdentifier; // inherited from NSObject
 
 	/**
-	 * @since 15
+	 * @since 18.2
+	 */
+	readonly archivalStringValue: string;
+
+	/**
+	 * @since 13
+	 * @deprecated 27
 	 */
 	readonly stringValue: string;
 
 	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
 
+	/**
+	 * @since 18.2
+	 */
+	constructor(o: { archivalStringValue: string; });
+
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
 	/**
-	 * @since 15
+	 * @since 13
+	 * @deprecated 27
 	 */
 	constructor(o: { stringValue: string; });
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
+
+	/**
+	 * @since 18.2
+	 */
+	initWithArchivalStringValue(archivalString: string): this;
 
 	initWithCoder(coder: NSCoder): this;
 
 	/**
-	 * @since 15
+	 * @since 13
+	 * @deprecated 27
 	 */
 	initWithStringValue(stringValue: string): this;
 }
@@ -951,12 +1239,12 @@ declare class PHCloudIdentifierMapping extends NSObject {
 	/**
 	 * @since 15
 	 */
-	readonly cloudIdentifier: PHCloudIdentifier;
+	readonly cloudIdentifier: PHCloudIdentifier | null;
 
 	/**
 	 * @since 15
 	 */
-	readonly error: NSError;
+	readonly error: NSError | null;
 }
 
 /**
@@ -969,12 +1257,12 @@ declare class PHCollection extends PHObject {
 	/**
 	 * @since 8
 	 */
-	static fetchCollectionsInCollectionListOptions(collectionList: PHCollectionList, options: PHFetchOptions): PHFetchResult<PHCollection>;
+	static fetchCollectionsInCollectionListOptions(collectionList: PHCollectionList, options: PHFetchOptions | null): PHFetchResult<PHCollection>;
 
 	/**
 	 * @since 8
 	 */
-	static fetchTopLevelUserCollectionsWithOptions(options: PHFetchOptions): PHFetchResult<PHCollection>;
+	static fetchTopLevelUserCollectionsWithOptions(options: PHFetchOptions | null): PHFetchResult<PHCollection>;
 
 	static new(): PHCollection; // inherited from NSObject
 
@@ -991,7 +1279,12 @@ declare class PHCollection extends PHObject {
 	/**
 	 * @since 8
 	 */
-	readonly localizedTitle: string;
+	readonly localizedTitle: string | null;
+
+	/**
+	 * @since 26
+	 */
+	readonly modificationDate: Date | null;
 
 	/**
 	 * @since 8
@@ -1029,41 +1322,41 @@ declare class PHCollectionList extends PHCollection {
 	/**
 	 * @since 8
 	 */
-	static fetchCollectionListsContainingCollectionOptions(collection: PHCollection, options: PHFetchOptions): PHFetchResult<PHCollectionList>;
+	static fetchCollectionListsContainingCollectionOptions(collection: PHCollection, options: PHFetchOptions | null): PHFetchResult<PHCollectionList>;
 
 	/**
 	 * @since 8
 	 */
-	static fetchCollectionListsWithLocalIdentifiersOptions(identifiers: NSArray<string> | string[], options: PHFetchOptions): PHFetchResult<PHCollectionList>;
+	static fetchCollectionListsWithLocalIdentifiersOptions(identifiers: NSArray<string> | string[], options: PHFetchOptions | null): PHFetchResult<PHCollectionList>;
 
 	/**
 	 * @since 8
 	 */
-	static fetchCollectionListsWithTypeSubtypeOptions(collectionListType: PHCollectionListType, subtype: PHCollectionListSubtype, options: PHFetchOptions): PHFetchResult<PHCollectionList>;
-
-	/**
-	 * @since 8
-	 * @deprecated 13
-	 */
-	static fetchMomentListsWithSubtypeContainingMomentOptions(momentListSubtype: PHCollectionListSubtype, moment: PHAssetCollection, options: PHFetchOptions): PHFetchResult<PHCollectionList>;
+	static fetchCollectionListsWithTypeSubtypeOptions(collectionListType: PHCollectionListType, subtype: PHCollectionListSubtype, options: PHFetchOptions | null): PHFetchResult<PHCollectionList>;
 
 	/**
 	 * @since 8
 	 * @deprecated 13
 	 */
-	static fetchMomentListsWithSubtypeOptions(momentListSubtype: PHCollectionListSubtype, options: PHFetchOptions): PHFetchResult<PHCollectionList>;
+	static fetchMomentListsWithSubtypeContainingMomentOptions(momentListSubtype: PHCollectionListSubtype, moment: PHAssetCollection, options: PHFetchOptions | null): PHFetchResult<PHCollectionList>;
+
+	/**
+	 * @since 8
+	 * @deprecated 13
+	 */
+	static fetchMomentListsWithSubtypeOptions(momentListSubtype: PHCollectionListSubtype, options: PHFetchOptions | null): PHFetchResult<PHCollectionList>;
 
 	static new(): PHCollectionList; // inherited from NSObject
 
 	/**
 	 * @since 8
 	 */
-	static transientCollectionListWithCollectionsFetchResultTitle(fetchResult: PHFetchResult<PHCollection>, title: string): PHCollectionList;
+	static transientCollectionListWithCollectionsFetchResultTitle(fetchResult: PHFetchResult<PHCollection>, title: string | null): PHCollectionList;
 
 	/**
 	 * @since 8
 	 */
-	static transientCollectionListWithCollectionsTitle(collections: NSArray<PHCollection> | PHCollection[], title: string): PHCollectionList;
+	static transientCollectionListWithCollectionsTitle(collections: NSArray<PHCollection> | PHCollection[], title: string | null): PHCollectionList;
 
 	/**
 	 * @since 8
@@ -1078,7 +1371,7 @@ declare class PHCollectionList extends PHCollection {
 	/**
 	 * @since 8
 	 */
-	readonly endDate: Date;
+	readonly endDate: Date | null;
 
 	/**
 	 * @since 8
@@ -1088,7 +1381,7 @@ declare class PHCollectionList extends PHCollection {
 	/**
 	 * @since 8
 	 */
-	readonly startDate: Date;
+	readonly startDate: Date | null;
 }
 
 /**
@@ -1177,6 +1470,8 @@ declare const enum PHCollectionListSubtype {
 
 	RegularFolder = 100,
 
+	RootFolder = 101,
+
 	SmartFolderEvents = 200,
 
 	SmartFolderFaces = 201,
@@ -1208,33 +1503,33 @@ declare class PHContentEditingInput extends NSObject {
 	/**
 	 * @since 8
 	 */
-	readonly adjustmentData: PHAdjustmentData;
+	readonly adjustmentData: PHAdjustmentData | null;
 
 	/**
 	 * @since 9
 	 */
-	readonly audiovisualAsset: AVAsset;
+	readonly audiovisualAsset: AVAsset | null;
 
 	/**
 	 * @since 8
 	 * @deprecated 9
 	 */
-	readonly avAsset: AVAsset;
+	readonly avAsset: AVAsset | null;
 
 	/**
 	 * @since 26.0
 	 */
-	readonly contentType: UTType;
+	readonly contentType: UTType | null;
 
 	/**
 	 * @since 8
 	 */
-	readonly creationDate: Date;
+	readonly creationDate: Date | null;
 
 	/**
 	 * @since 8
 	 */
-	readonly displaySizeImage: UIImage;
+	readonly displaySizeImage: UIImage | null;
 
 	/**
 	 * @since 8
@@ -1244,17 +1539,17 @@ declare class PHContentEditingInput extends NSObject {
 	/**
 	 * @since 8
 	 */
-	readonly fullSizeImageURL: NSURL;
+	readonly fullSizeImageURL: NSURL | null;
 
 	/**
 	 * @since 10
 	 */
-	readonly livePhoto: PHLivePhoto;
+	readonly livePhoto: PHLivePhoto | null;
 
 	/**
 	 * @since 8
 	 */
-	readonly location: CLLocation;
+	readonly location: CLLocation | null;
 
 	/**
 	 * @since 8
@@ -1275,7 +1570,7 @@ declare class PHContentEditingInput extends NSObject {
 	 * @since 8
 	 * @deprecated 100000
 	 */
-	readonly uniformTypeIdentifier: string;
+	readonly uniformTypeIdentifier: string | null;
 }
 
 /**
@@ -1308,9 +1603,19 @@ declare class PHContentEditingInputRequestOptions extends NSObject {
 	networkAccessAllowed: boolean;
 
 	/**
+	 * @since 27
+	 */
+	originalResourceChoice: PHOriginalResourceChoice;
+
+	/**
 	 * @since 8
 	 */
-	progressHandler: (p1: number, p2: interop.Pointer | interop.Reference<boolean>) => void;
+	progressHandler: (p1: number, p2: interop.Pointer | interop.Reference<boolean> | null) => void | null;
+
+	/**
+	 * @since 27
+	 */
+	skipsDisplaySizeImage: boolean;
 }
 
 /**
@@ -1330,12 +1635,12 @@ declare class PHContentEditingOutput extends NSObject {
 	/**
 	 * @since 8
 	 */
-	adjustmentData: PHAdjustmentData;
+	adjustmentData: PHAdjustmentData | null;
 
 	/**
 	 * @since 17
 	 */
-	readonly defaultRenderedContentType: UTType;
+	readonly defaultRenderedContentType: UTType | null;
 
 	/**
 	 * @since 8
@@ -1370,7 +1675,7 @@ declare class PHContentEditingOutput extends NSObject {
 	/**
 	 * @since 17
 	 */
-	renderedContentURLForTypeError(type: UTType, error?: interop.Reference<NSError>): NSURL;
+	renderedContentURLForTypeError(type: UTType, error?: interop.Reference<NSError>): NSURL | null;
 }
 
 /**
@@ -1405,19 +1710,24 @@ declare class PHFetchOptions extends NSObject implements NSCopying {
 	/**
 	 * @since 8
 	 */
-	predicate: NSPredicate;
+	predicate: NSPredicate | null;
+
+	/**
+	 * @since 27
+	 */
+	prefetchAssetExtendedMetadata: boolean;
 
 	/**
 	 * @since 8
 	 */
-	sortDescriptors: NSArray<NSSortDescriptor>;
+	sortDescriptors: NSArray<NSSortDescriptor> | null;
 
 	/**
 	 * @since 8
 	 */
 	wantsIncrementalChangeDetails: boolean;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -1437,12 +1747,12 @@ declare class PHFetchResult<ObjectType> extends NSObject implements NSCopying, N
 	/**
 	 * @since 8
 	 */
-	readonly firstObject: any;
+	readonly firstObject: any | null;
 
 	/**
 	 * @since 8
 	 */
-	readonly lastObject: any;
+	readonly lastObject: any | null;
 	[index: number]: any;
 	[Symbol.iterator](): Iterator<any>;
 
@@ -1451,7 +1761,7 @@ declare class PHFetchResult<ObjectType> extends NSObject implements NSCopying, N
 	 */
 	containsObject(anObject: any): boolean;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	/**
 	 * @since 8
@@ -1461,17 +1771,17 @@ declare class PHFetchResult<ObjectType> extends NSObject implements NSCopying, N
 	/**
 	 * @since 8
 	 */
-	enumerateObjectsAtIndexesOptionsUsingBlock(s: NSIndexSet, opts: NSEnumerationOptions, block: (p1: any, p2: number, p3: interop.Pointer | interop.Reference<boolean>) => void): void;
+	enumerateObjectsAtIndexesOptionsUsingBlock(s: NSIndexSet, opts: NSEnumerationOptions, block: (p1: any, p2: number, p3: interop.Pointer | interop.Reference<boolean> | null) => void): void;
 
 	/**
 	 * @since 8
 	 */
-	enumerateObjectsUsingBlock(block: (p1: any, p2: number, p3: interop.Pointer | interop.Reference<boolean>) => void): void;
+	enumerateObjectsUsingBlock(block: (p1: any, p2: number, p3: interop.Pointer | interop.Reference<boolean> | null) => void): void;
 
 	/**
 	 * @since 8
 	 */
-	enumerateObjectsWithOptionsUsingBlock(opts: NSEnumerationOptions, block: (p1: any, p2: number, p3: interop.Pointer | interop.Reference<boolean>) => void): void;
+	enumerateObjectsWithOptionsUsingBlock(opts: NSEnumerationOptions, block: (p1: any, p2: number, p3: interop.Pointer | interop.Reference<boolean> | null) => void): void;
 
 	/**
 	 * @since 8
@@ -1516,7 +1826,7 @@ declare class PHFetchResultChangeDetails<ObjectType> extends NSObject {
 	/**
 	 * @since 8
 	 */
-	readonly changedIndexes: NSIndexSet;
+	readonly changedIndexes: NSIndexSet | null;
 
 	/**
 	 * @since 8
@@ -1546,7 +1856,7 @@ declare class PHFetchResultChangeDetails<ObjectType> extends NSObject {
 	/**
 	 * @since 8
 	 */
-	readonly insertedIndexes: NSIndexSet;
+	readonly insertedIndexes: NSIndexSet | null;
 
 	/**
 	 * @since 8
@@ -1556,7 +1866,7 @@ declare class PHFetchResultChangeDetails<ObjectType> extends NSObject {
 	/**
 	 * @since 8
 	 */
-	readonly removedIndexes: NSIndexSet;
+	readonly removedIndexes: NSIndexSet | null;
 
 	/**
 	 * @since 8
@@ -1613,38 +1923,38 @@ declare class PHImageManager extends NSObject {
 	/**
 	 * @since 8
 	 */
-	requestAVAssetForVideoOptionsResultHandler(asset: PHAsset, options: PHVideoRequestOptions, resultHandler: (p1: AVAsset, p2: AVAudioMix, p3: NSDictionary<any, any>) => void): number;
+	requestAVAssetForVideoOptionsResultHandler(asset: PHAsset, options: PHVideoRequestOptions | null, resultHandler: (p1: AVAsset | null, p2: AVAudioMix | null, p3: NSDictionary<any, any> | null) => void): number;
 
 	/**
 	 * @since 8
 	 */
-	requestExportSessionForVideoOptionsExportPresetResultHandler(asset: PHAsset, options: PHVideoRequestOptions, exportPreset: string, resultHandler: (p1: AVAssetExportSession, p2: NSDictionary<any, any>) => void): number;
+	requestExportSessionForVideoOptionsExportPresetResultHandler(asset: PHAsset, options: PHVideoRequestOptions | null, exportPreset: string, resultHandler: (p1: AVAssetExportSession | null, p2: NSDictionary<any, any> | null) => void): number;
 
 	/**
 	 * @since 13
 	 */
-	requestImageDataAndOrientationForAssetOptionsResultHandler(asset: PHAsset, options: PHImageRequestOptions, resultHandler: (p1: NSData, p2: string, p3: CGImagePropertyOrientation, p4: NSDictionary<any, any>) => void): number;
+	requestImageDataAndOrientationForAssetOptionsResultHandler(asset: PHAsset, options: PHImageRequestOptions | null, resultHandler: (p1: NSData | null, p2: string | null, p3: CGImagePropertyOrientation, p4: NSDictionary<any, any> | null) => void): number;
 
 	/**
 	 * @since 8
 	 * @deprecated 13
 	 */
-	requestImageDataForAssetOptionsResultHandler(asset: PHAsset, options: PHImageRequestOptions, resultHandler: (p1: NSData, p2: string, p3: UIImageOrientation, p4: NSDictionary<any, any>) => void): number;
+	requestImageDataForAssetOptionsResultHandler(asset: PHAsset, options: PHImageRequestOptions | null, resultHandler: (p1: NSData | null, p2: string | null, p3: UIImageOrientation, p4: NSDictionary<any, any> | null) => void): number;
 
 	/**
 	 * @since 8
 	 */
-	requestImageForAssetTargetSizeContentModeOptionsResultHandler(asset: PHAsset, targetSize: CGSize, contentMode: PHImageContentMode, options: PHImageRequestOptions, resultHandler: (p1: UIImage, p2: NSDictionary<any, any>) => void): number;
+	requestImageForAssetTargetSizeContentModeOptionsResultHandler(asset: PHAsset, targetSize: CGSize, contentMode: PHImageContentMode, options: PHImageRequestOptions | null, resultHandler: (p1: UIImage | null, p2: NSDictionary<any, any> | null) => void): number;
 
 	/**
 	 * @since 9.1
 	 */
-	requestLivePhotoForAssetTargetSizeContentModeOptionsResultHandler(asset: PHAsset, targetSize: CGSize, contentMode: PHImageContentMode, options: PHLivePhotoRequestOptions, resultHandler: (p1: PHLivePhoto, p2: NSDictionary<any, any>) => void): number;
+	requestLivePhotoForAssetTargetSizeContentModeOptionsResultHandler(asset: PHAsset, targetSize: CGSize, contentMode: PHImageContentMode, options: PHLivePhotoRequestOptions | null, resultHandler: (p1: PHLivePhoto | null, p2: NSDictionary<any, any> | null) => void): number;
 
 	/**
 	 * @since 8
 	 */
-	requestPlayerItemForVideoOptionsResultHandler(asset: PHAsset, options: PHVideoRequestOptions, resultHandler: (p1: AVPlayerItem, p2: NSDictionary<any, any>) => void): number;
+	requestPlayerItemForVideoOptionsResultHandler(asset: PHAsset, options: PHVideoRequestOptions | null, resultHandler: (p1: AVPlayerItem | null, p2: NSDictionary<any, any> | null) => void): number;
 }
 
 /**
@@ -1682,9 +1992,14 @@ declare class PHImageRequestOptions extends NSObject implements NSCopying {
 	normalizedCropRect: CGRect;
 
 	/**
+	 * @since 17
+	 */
+	preferHDR: boolean;
+
+	/**
 	 * @since 8
 	 */
-	progressHandler: (p1: number, p2: NSError, p3: interop.Pointer | interop.Reference<boolean>, p4: NSDictionary<any, any>) => void;
+	progressHandler: (p1: number, p2: NSError | null, p3: interop.Pointer | interop.Reference<boolean> | null, p4: NSDictionary<any, any> | null) => void | null;
 
 	/**
 	 * @since 8
@@ -1697,11 +2012,16 @@ declare class PHImageRequestOptions extends NSObject implements NSCopying {
 	synchronous: boolean;
 
 	/**
+	 * @since 17
+	 */
+	targetHDRHeadroom: number;
+
+	/**
 	 * @since 8
 	 */
 	version: PHImageRequestOptionsVersion;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -1784,7 +2104,7 @@ declare class PHLivePhoto extends NSObject implements NSCopying, NSItemProviderR
 	/**
 	 * @since 9.1
 	 */
-	static requestLivePhotoWithResourceFileURLsPlaceholderImageTargetSizeContentModeResultHandler(fileURLs: NSArray<NSURL> | NSURL[], image: UIImage, targetSize: CGSize, contentMode: PHImageContentMode, resultHandler: (p1: PHLivePhoto, p2: NSDictionary<any, any>) => void): number;
+	static requestLivePhotoWithResourceFileURLsPlaceholderImageTargetSizeContentModeResultHandler(fileURLs: NSArray<NSURL> | NSURL[], image: UIImage | null, targetSize: CGSize, contentMode: PHImageContentMode, resultHandler: (p1: PHLivePhoto | null, p2: NSDictionary<any, any>) => void): number;
 
 	/**
 	 * @since 9.1
@@ -1813,7 +2133,7 @@ declare class PHLivePhoto extends NSObject implements NSCopying, NSItemProviderR
 
 	conformsToProtocol(aProtocol: any /* Protocol */): boolean;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -1860,7 +2180,7 @@ declare class PHLivePhotoEditingContext extends NSObject {
 	/**
 	 * @since 10
 	 */
-	frameProcessor: (p1: PHLivePhotoFrame, p2: interop.Pointer | interop.Reference<NSError>) => CIImage;
+	frameProcessor: (p1: PHLivePhotoFrame, p2: interop.Pointer | interop.Reference<NSError | null> | null) => CIImage | null | null;
 
 	/**
 	 * @since 10
@@ -1895,12 +2215,12 @@ declare class PHLivePhotoEditingContext extends NSObject {
 	/**
 	 * @since 10
 	 */
-	prepareLivePhotoForPlaybackWithTargetSizeOptionsCompletionHandler(targetSize: CGSize, options: NSDictionary<string, any>, handler: (p1: PHLivePhoto, p2: NSError) => void): void;
+	prepareLivePhotoForPlaybackWithTargetSizeOptionsCompletionHandler(targetSize: CGSize, options: NSDictionary<string, any> | null, handler: (p1: PHLivePhoto | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 10
 	 */
-	saveLivePhotoToOutputOptionsCompletionHandler(output: PHContentEditingOutput, options: NSDictionary<string, any>, handler: (p1: boolean, p2: NSError) => void): void;
+	saveLivePhotoToOutputOptionsCompletionHandler(output: PHContentEditingOutput, options: NSDictionary<string, any> | null, handler: (p1: boolean, p2: NSError | null) => void): void;
 }
 
 /**
@@ -1983,16 +2303,21 @@ declare class PHLivePhotoRequestOptions extends NSObject implements NSCopying {
 	networkAccessAllowed: boolean;
 
 	/**
+	 * @since 17
+	 */
+	preferHDR: boolean;
+
+	/**
 	 * @since 9.1
 	 */
-	progressHandler: (p1: number, p2: NSError, p3: interop.Pointer | interop.Reference<boolean>, p4: NSDictionary<any, any>) => void;
+	progressHandler: (p1: number, p2: NSError | null, p3: interop.Pointer | interop.Reference<boolean> | null, p4: NSDictionary<any, any> | null) => void | null;
 
 	/**
 	 * @since 9.1
 	 */
 	version: PHImageRequestOptionsVersion;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -2012,12 +2337,12 @@ declare class PHLocalIdentifierMapping extends NSObject {
 	/**
 	 * @since 15
 	 */
-	readonly error: NSError;
+	readonly error: NSError | null;
 
 	/**
 	 * @since 15
 	 */
-	readonly localIdentifier: string;
+	readonly localIdentifier: string | null;
 }
 
 /**
@@ -2039,7 +2364,7 @@ declare class PHObject extends NSObject implements NSCopying {
 	 */
 	readonly localIdentifier: string;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -2059,7 +2384,7 @@ declare class PHObjectChangeDetails<ObjectType> extends NSObject {
 	/**
 	 * @since 8
 	 */
-	readonly objectAfterChanges: PHObject;
+	readonly objectAfterChanges: PHObject | null;
 
 	/**
 	 * @since 8
@@ -2095,6 +2420,16 @@ declare const enum PHObjectType {
 }
 
 /**
+ * @since 27
+ */
+declare const enum PHOriginalResourceChoice {
+
+	Compressed = 0,
+
+	Raw = 1
+}
+
+/**
  * @since 16
  */
 declare class PHPersistentChange extends NSObject {
@@ -2105,7 +2440,7 @@ declare class PHPersistentChange extends NSObject {
 
 	readonly changeToken: PHPersistentChangeToken;
 
-	changeDetailsForObjectTypeError(objectType: PHObjectType, error?: interop.Reference<NSError>): PHPersistentObjectChangeDetails;
+	changeDetailsForObjectTypeError(objectType: PHObjectType, error?: interop.Reference<NSError>): PHPersistentObjectChangeDetails | null;
 }
 
 /**
@@ -2117,7 +2452,7 @@ declare class PHPersistentChangeFetchResult extends NSObject {
 
 	static new(): PHPersistentChangeFetchResult; // inherited from NSObject
 
-	enumerateChangesWithBlock(block: (p1: PHPersistentChange, p2: interop.Pointer | interop.Reference<boolean>) => void): void;
+	enumerateChangesWithBlock(block: (p1: PHPersistentChange, p2: interop.Pointer | interop.Reference<boolean> | null) => void): void;
 }
 
 /**
@@ -2133,7 +2468,7 @@ declare class PHPersistentChangeToken extends NSObject implements NSCopying, NSS
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -2202,7 +2537,17 @@ declare class PHPhotoLibrary extends NSObject {
 	/**
 	 * @since 13
 	 */
-	readonly unavailabilityReason: NSError;
+	readonly unavailabilityReason: NSError | null;
+
+	/**
+	 * @since 26.1
+	 */
+	readonly uploadJobExtensionEnabled: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly uploadJobExtensionOptions: PHAssetResourceUploadJobOptions | null;
 
 	/**
 	 * @since 15
@@ -2210,14 +2555,29 @@ declare class PHPhotoLibrary extends NSObject {
 	cloudIdentifierMappingsForLocalIdentifiers(localIdentifiers: NSArray<string> | string[]): NSDictionary<string, PHCloudIdentifierMapping>;
 
 	/**
+	 * @since 27.0
+	 */
+	disableUploadJobExtensionWithError(error?: interop.Reference<NSError>): boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	enableUploadJobExtensionWithOptionsError(options: PHAssetResourceUploadJobOptions | null, error?: interop.Reference<NSError>): boolean;
+
+	/**
 	 * @since 16
 	 */
-	fetchPersistentChangesSinceTokenError(token: PHPersistentChangeToken, error?: interop.Reference<NSError>): PHPersistentChangeFetchResult;
+	fetchPersistentChangesSinceTokenError(token: PHPersistentChangeToken, error?: interop.Reference<NSError>): PHPersistentChangeFetchResult | null;
 
 	/**
 	 * @since 15
 	 */
 	localIdentifierMappingsForCloudIdentifiers(cloudIdentifiers: NSArray<PHCloudIdentifier> | PHCloudIdentifier[]): NSDictionary<PHCloudIdentifier, PHLocalIdentifierMapping>;
+
+	/**
+	 * @since 27
+	 */
+	localIdentifierMappingsForSyncedCloudIdentifiers(cloudIdentifiers: NSArray<PHCloudIdentifier> | PHCloudIdentifier[]): NSDictionary<PHCloudIdentifier, PHLocalIdentifierMapping>;
 
 	/**
 	 * @since 8
@@ -2227,7 +2587,7 @@ declare class PHPhotoLibrary extends NSObject {
 	/**
 	 * @since 8
 	 */
-	performChangesCompletionHandler(changeBlock: () => void, completionHandler: (p1: boolean, p2: NSError) => void): void;
+	performChangesCompletionHandler(changeBlock: () => void, completionHandler: (p1: boolean, p2: NSError | null) => void | null): void;
 
 	/**
 	 * @since 14
@@ -2250,6 +2610,22 @@ declare class PHPhotoLibrary extends NSObject {
 	registerChangeObserver(observer: PHPhotoLibraryChangeObserver): void;
 
 	/**
+	 * @since 27
+	 */
+	registerPersistentChangesObserver(observer: PHPhotoLibraryPersistentChangesObserver): void;
+
+	/**
+	 * @since 26.1
+	 * @deprecated 27.0
+	 */
+	setUploadJobExtensionEnabledError(enable: boolean, error?: interop.Reference<NSError>): boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	setUploadJobExtensionOptionsError(options: PHAssetResourceUploadJobOptions, error?: interop.Reference<NSError>): boolean;
+
+	/**
 	 * @since 13
 	 */
 	unregisterAvailabilityObserver(observer: PHPhotoLibraryAvailabilityObserver): void;
@@ -2258,6 +2634,11 @@ declare class PHPhotoLibrary extends NSObject {
 	 * @since 8
 	 */
 	unregisterChangeObserver(observer: PHPhotoLibraryChangeObserver): void;
+
+	/**
+	 * @since 27
+	 */
+	unregisterPersistentChangesObserver(observer: PHPhotoLibraryPersistentChangesObserver): void;
 }
 
 /**
@@ -2288,6 +2669,21 @@ interface PHPhotoLibraryChangeObserver extends NSObjectProtocol {
 declare var PHPhotoLibraryChangeObserver: {
 
 	prototype: PHPhotoLibraryChangeObserver;
+};
+
+/**
+ * @since 27
+ */
+interface PHPhotoLibraryPersistentChangesObserver extends NSObjectProtocol {
+
+	/**
+	 * @since 8
+	 */
+	photoLibraryPersistentChangesDidUpdate(photoLibrary: PHPhotoLibrary): void;
+}
+declare var PHPhotoLibraryPersistentChangesObserver: {
+
+	prototype: PHPhotoLibraryPersistentChangesObserver;
 };
 
 /**
@@ -2324,6 +2720,8 @@ declare const enum PHPhotosError {
 	NotEnoughSpace = 3305,
 
 	RequestNotSupportedForAsset = 3306,
+
+	LimitExceeded = 3307,
 
 	AccessRestricted = 3310,
 
@@ -2365,14 +2763,14 @@ declare class PHVideoRequestOptions extends NSObject implements NSCopying {
 	/**
 	 * @since 8
 	 */
-	progressHandler: (p1: number, p2: NSError, p3: interop.Pointer | interop.Reference<boolean>, p4: NSDictionary<any, any>) => void;
+	progressHandler: (p1: number, p2: NSError | null, p3: interop.Pointer | interop.Reference<boolean> | null, p4: NSDictionary<any, any> | null) => void | null;
 
 	/**
 	 * @since 8
 	 */
 	version: PHVideoRequestOptionsVersion;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**

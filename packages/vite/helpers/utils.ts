@@ -9,7 +9,6 @@ const require = createRequire(import.meta.url);
 const packageJson = getPackageJson();
 
 export function nsConfigToJson() {
-	let configObject: Record<string, any>;
 	const tsPath = getProjectFilePath('nativescript.config.ts');
 	const tsCode = fs.readFileSync(tsPath, 'utf-8');
 
@@ -24,7 +23,7 @@ export function nsConfigToJson() {
 	const module = { exports: {} as any };
 	const requireFunc = (id: string) => require(id);
 	new Function('exports', 'require', 'module', '__filename', '__dirname', cjsCode)(module.exports, requireFunc, module, tsPath, path.dirname(tsPath));
-	configObject = module.exports.default ?? module.exports;
+	const configObject: Record<string, any> = module.exports.default ?? module.exports;
 	// ensure the config has a name
 	configObject.name = packageJson.name;
 	// ensure the main entry is set to "bundle"
@@ -40,21 +39,41 @@ export function nsConfigToJson() {
  */
 export function resolveNativeScriptPlatformFile(id: string, platform: string): string | undefined {
 	const ext = path.extname(id);
-	const base = id.slice(0, -ext.length);
+	return resolveNativeScriptPlatformModule(id.slice(0, -ext.length), [ext], platform);
+}
 
-	let platformFile = `${base}.${platform}${ext}`;
-	if (fs.existsSync(platformFile)) {
-		return platformFile;
+/**
+ * Resolves an extensionless module path the way Node and webpack do: every
+ * file candidate (`base.<platform>.ext`, then `base.ext`, per extension)
+ * before any directory barrel (`base/index.<platform>.ext`), so a package
+ * shipping both `platform.js` and a `platform/` directory gets the file.
+ */
+export function resolveNativeScriptPlatformModule(base: string, extensions: readonly string[], platform: string): string | undefined {
+	for (const ext of extensions) {
+		const platformFile = `${base}.${platform}${ext}`;
+		if (isFile(platformFile)) {
+			return platformFile;
+		}
+		if (isFile(base + ext)) {
+			return base + ext;
+		}
 	}
-
 	// core uses indices for many barrels
-	platformFile = `${base}/index.${platform}${ext}`;
-	if (fs.existsSync(platformFile)) {
-		return platformFile;
+	for (const ext of extensions) {
+		const platformIndex = `${base}/index.${platform}${ext}`;
+		if (isFile(platformIndex)) {
+			return platformIndex;
+		}
 	}
+	return undefined;
+}
 
-	// fallback to non-platform file
-	return fs.existsSync(id) ? id : undefined;
+function isFile(file: string): boolean {
+	try {
+		return fs.statSync(file).isFile();
+	} catch {
+		return false;
+	}
 }
 
 /**
@@ -154,4 +173,27 @@ export function getProjectAppAbsolutePath(subPath = ''): string {
 export function getProjectAppVirtualPath(subPath = ''): string {
 	const rel = getProjectAppRelativePath(subPath).replace(/^\/+/, '');
 	return `/${rel.replace(/\/+/g, '/')}`;
+}
+
+// Global stylesheet candidates under the app directory, in priority order.
+// `app.css` is the NativeScript convention; `styles.css` is common in web
+// projects that share a codebase with NativeScript (e.g. Vite / TanStack
+// Start), so it is used as a fallback when `app.css` is absent.
+export const GLOBAL_APP_CSS_CANDIDATES = ['app.css', 'styles.css'];
+
+/**
+ * Resolve the project's global stylesheet, preferring `app.css` and falling
+ * back to `styles.css`. Returns the absolute filesystem path of the first
+ * candidate that exists under the app directory, or `null` when none are
+ * present. All call sites share this single resolver so the entry generator,
+ * the virtual-module loader, and the HMR watcher always agree on the same file.
+ */
+export function resolveProjectGlobalCssPath(projectRoot: string = getProjectRootPath()): string | null {
+	for (const name of GLOBAL_APP_CSS_CANDIDATES) {
+		const abs = path.resolve(projectRoot, getProjectAppRelativePath(name));
+		if (fs.existsSync(abs)) {
+			return abs;
+		}
+	}
+	return null;
 }

@@ -31,9 +31,9 @@ export namespace CoreTypes {
 	export type LengthPxUnit = { readonly unit: 'px'; readonly value: px };
 	export type LengthPercentUnit = { readonly unit: '%'; readonly value: percent };
 
-	export type FixedLengthType = dip | LengthDipUnit | LengthPxUnit | CSSWideKeywords;
+	export type FixedLengthType = dip | LengthDipUnit | LengthPxUnit | `${number}dip` | `${number}px` | CSSWideKeywords;
 	export type LengthType = 'auto' | FixedLengthType;
-	export type PercentLengthType = 'auto' | FixedLengthType | LengthPercentUnit;
+	export type PercentLengthType = 'auto' | FixedLengthType | LengthPercentUnit | `${number}%`;
 
 	export const zeroLength: LengthType = {
 		value: 0,
@@ -272,6 +272,14 @@ export namespace CoreTypes {
 		export const parse = makeParser<BackgroundRepeatType>(isValid);
 	}
 
+	export type CornerShapeType = 'round' | 'squircle';
+	export namespace CornerShape {
+		export const round: CornerShapeType = 'round';
+		export const squircle: CornerShapeType = 'squircle';
+		export const isValid = makeValidator<CornerShapeType>(round, squircle);
+		export const parse = makeParser<CornerShapeType>(isValid);
+	}
+
 	export namespace AnimationCurve {
 		export const ease = 'ease';
 		export const easeIn = 'easeIn';
@@ -298,6 +306,22 @@ export namespace CoreTypes {
 	export namespace LayoutDirection {
 		export const ltr = 'ltr';
 		export const rtl = 'rtl';
+	}
+
+	export type ScrollEdgeEffectType = 'automatic' | 'soft' | 'hard' | 'none';
+	export namespace ScrollEdgeEffect {
+		export const automatic = 'automatic';
+		export const soft = 'soft';
+		export const hard = 'hard';
+		export const none = 'none';
+	}
+
+	export type ScrollEdgeType = 'top' | 'bottom' | 'left' | 'right';
+	export namespace ScrollEdge {
+		export const top = 'top';
+		export const bottom = 'bottom';
+		export const left = 'left';
+		export const right = 'right';
 	}
 }
 
@@ -380,6 +404,8 @@ export const Enums = {
 	NavigationBarVisibility: CoreTypes.NavigationBarVisibility,
 	Orientation: CoreTypes.Orientation,
 	ReturnKeyType: CoreTypes.ReturnKeyType,
+	ScrollEdge: CoreTypes.ScrollEdge,
+	ScrollEdgeEffect: CoreTypes.ScrollEdgeEffect,
 	StatusBarStyle: CoreTypes.StatusBarStyle,
 	Stretch: CoreTypes.ImageStretch,
 	SystemAppearance: CoreTypes.SystemAppearance,

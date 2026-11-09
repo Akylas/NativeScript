@@ -12,7 +12,7 @@
     "@nativescript/theme": "*"
   },
   "devDependencies": {
-    "@nativescript/android": "*",
+    "@nativescript/android-quickjs-ng": "9.0.0-alpha.5",
     "@nativescript/core": "*",
     "@nativescript/ios": "*",
     "@nativescript/vite": "*",

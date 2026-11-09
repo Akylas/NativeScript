@@ -190,6 +190,10 @@ export default function (context: ts.TransformationContext, ...args) {
 				const [stmts, changed] = transformStatements(node.statements, true);
 				return changed ? factory.updateSourceFile(node, stmts) : node;
 			}
+			// Do not traverse synthesized helper trees; leave them intact
+			if (((node as MutableNode).flags ?? 0) & ts.NodeFlags.Synthesized) {
+				return node;
+			}
 			if (ts.isBlock(node)) {
 				const [stmts, changed] = transformStatements(node.statements, false);
 				if (changed) {

@@ -322,6 +322,8 @@ export interface SwipeGestureEventData extends GestureEventData {
  * Provides gesture event data for pan gesture.
  */
 export interface PanGestureEventData extends GestureEventDataWithState {
+	startX: number;
+	startY: number;
 	deltaX: number;
 	deltaY: number;
 }

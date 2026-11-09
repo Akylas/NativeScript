@@ -35,6 +35,34 @@ class ScrollLayoutTest extends UITest<ScrollView> {
 		TKUnit.assertTrue(scrollView !== null, 'ScrollView should be created.');
 	}
 
+	public test_default_iosScrollEdgeEffect() {
+		const scroll = new ScrollView();
+		TKUnit.assertEqual(scroll.iosScrollEdgeEffect, 'automatic', 'Default iosScrollEdgeEffect');
+	}
+
+	public test_iosScrollEdgeEffect_maps_to_native_edge_effects() {
+		const nativeEffects = __APPLE__ && parseFloat(UIDevice.currentDevice.systemVersion) >= 26;
+		this.testView.iosScrollEdgeEffect = 'none';
+		if (nativeEffects) {
+			const native = this.testView.ios as UIScrollView;
+			TKUnit.assertTrue(native.topEdgeEffect.hidden, 'none hides the top edge effect');
+			TKUnit.assertTrue(native.bottomEdgeEffect.hidden, 'none hides the bottom edge effect');
+		}
+		this.testView.iosScrollEdgeEffect = 'soft';
+		if (nativeEffects) {
+			const native = this.testView.ios as UIScrollView;
+			TKUnit.assertFalse(native.topEdgeEffect.hidden, 'soft shows the top edge effect');
+			TKUnit.assertTrue(native.topEdgeEffect.style.isEqual(UIScrollEdgeEffectStyle.softStyle), 'soft maps to the soft style');
+		}
+	}
+
+	public test_addScrollEdgeContainer_accepts_unloaded_views() {
+		const scroll = new ScrollView();
+		const bar = new Button();
+		scroll.addScrollEdgeContainer(bar, 'top');
+		scroll.removeScrollEdgeContainer(bar);
+	}
+
 	public test_default_TNS_values() {
 		const scroll = new ScrollView();
 		TKUnit.assertEqual(scroll.orientation, 'vertical', 'Default this.testView.orientation');
@@ -96,6 +124,37 @@ class ScrollLayoutTest extends UITest<ScrollView> {
 
 		TKUnit.assertEqual(this.testView.scrollableHeight, 0, 'this.testView.scrollableHeight');
 		TKUnit.assertAreClose(layoutHelper.dip(this.testView.scrollableWidth), 300, 0.4, 'this.testView.scrollableWidth');
+	}
+
+	public test_scrollableHeight_includes_bottom_content_inset() {
+		if (!__APPLE__) {
+			return;
+		}
+		this.waitUntilTestElementLayoutIsValid();
+		const native = this.testView.ios as UIScrollView;
+		const before = this.testView.scrollableHeight;
+		native.contentInset = new UIEdgeInsets({ top: 0, left: 0, bottom: 50, right: 0 });
+
+		TKUnit.assertAreClose(this.testView.scrollableHeight, before + 50, 0.1, 'scrollableHeight with a bottom inset');
+		this.testView.scrollToVerticalOffset(this.testView.scrollableHeight, false);
+		const end = native.contentSize.height + native.adjustedContentInset.bottom - native.bounds.size.height;
+		TKUnit.assertAreClose(native.contentOffset.y, end, 0.1, 'scrollToVerticalOffset(scrollableHeight) reaches the end above the inset');
+	}
+
+	public test_scrollableWidth_includes_right_content_inset() {
+		if (!__APPLE__) {
+			return;
+		}
+		this.testView.orientation = 'horizontal';
+		this.waitUntilTestElementLayoutIsValid();
+		const native = this.testView.ios as UIScrollView;
+		const before = this.testView.scrollableWidth;
+		native.contentInset = new UIEdgeInsets({ top: 0, left: 0, bottom: 0, right: 40 });
+
+		TKUnit.assertAreClose(this.testView.scrollableWidth, before + 40, 0.1, 'scrollableWidth with a right inset');
+		this.testView.scrollToHorizontalOffset(this.testView.scrollableWidth, false);
+		const end = native.contentSize.width + native.adjustedContentInset.right - native.bounds.size.width;
+		TKUnit.assertAreClose(native.contentOffset.x, end, 0.1, 'scrollToHorizontalOffset(scrollableWidth) reaches the end beside the inset');
 	}
 
 	public test_scrollToVerticalOffset_no_animation() {
@@ -248,7 +307,7 @@ class ScrollLayoutTest extends UITest<ScrollView> {
 		this.waitUntilTestElementLayoutIsValid();
 
 		if (__APPLE__) {
-			TKUnit.assertEqual(this.testView.ios.showsHorizontalScrollIndicator, true);
+			TKUnit.assertEqual((this.testView.ios as UIScrollView).showsHorizontalScrollIndicator, true);
 		} else {
 			TKUnit.assertEqual(this.testView.android.isHorizontalScrollBarEnabled(), true);
 		}
@@ -257,7 +316,7 @@ class ScrollLayoutTest extends UITest<ScrollView> {
 		this.waitUntilTestElementLayoutIsValid();
 
 		if (__APPLE__) {
-			TKUnit.assertEqual(this.testView.ios.showsHorizontalScrollIndicator, false);
+			TKUnit.assertEqual((this.testView.ios as UIScrollView).showsHorizontalScrollIndicator, false);
 		} else {
 			TKUnit.assertEqual(this.testView.android.isHorizontalScrollBarEnabled(), false);
 		}
@@ -269,7 +328,7 @@ class ScrollLayoutTest extends UITest<ScrollView> {
 		this.waitUntilTestElementLayoutIsValid();
 
 		if (__APPLE__) {
-			TKUnit.assertEqual(this.testView.ios.showsVerticalScrollIndicator, true);
+			TKUnit.assertEqual((this.testView.ios as UIScrollView).showsVerticalScrollIndicator, true);
 		} else {
 			TKUnit.assertEqual(this.testView.android.isVerticalScrollBarEnabled(), true);
 		}
@@ -278,7 +337,7 @@ class ScrollLayoutTest extends UITest<ScrollView> {
 		this.waitUntilTestElementLayoutIsValid();
 
 		if (__APPLE__) {
-			TKUnit.assertEqual(this.testView.ios.showsVerticalScrollIndicator, false);
+			TKUnit.assertEqual((this.testView.ios as UIScrollView).showsVerticalScrollIndicator, false);
 		} else {
 			TKUnit.assertEqual(this.testView.android.isVerticalScrollBarEnabled(), false);
 		}

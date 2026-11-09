@@ -27,6 +27,13 @@ export type SharedRect = { x?: number; y?: number; width?: number; height?: numb
 export type SharedProperties = SharedRect & {
 	opacity?: number;
 	scale?: { x?: number; y?: number };
+	/**
+	 * (iOS only) Page-level corner radius to animate alongside the transition.
+	 * Useful for sheet-style modals where the top corners are rounded at the
+	 * starting offscreen position and flatten as the page reaches fullscreen
+	 * (and vice versa for dismiss). Top-left + top-right corners are masked.
+	 */
+	cornerRadius?: number;
 };
 /**
  * Properties which can be set on individual Shared Elements
@@ -77,6 +84,12 @@ type SharedTransitionPageWithDurationProperties = SharedTransitionPageProperties
 	 * Note: When this is defined, it will override spring options and use only linear animation.
 	 */
 	duration?: number | undefined | null;
+	/**
+	 * (Android only) Easing used for the transition: 'linear', 'ease', 'easeIn', 'easeOut', 'easeInOut',
+	 * a CubicBezierAnimationCurve or an android Interpolator.
+	 * Defaults to the curve of the PageTransition (FastOutSlowIn when none is given).
+	 */
+	curve?: any;
 };
 export interface SharedTransitionInteractiveOptions {
 	/**
@@ -92,6 +105,46 @@ export interface SharedTransitionInteractiveOptions {
 	 * @returns The percentage value to be used as the finish/cancel threshold
 	 */
 	percentFormula?: (eventData: PanGestureEventData) => number;
+	/**
+	 * (iOS only) Apple Music–style "morph" interactive dismiss.
+	 *
+	 * Instead of fading the destination and animating shared snapshots, the
+	 * entire destination view scales + translates with the user's finger.
+	 *  - If released past `finishThreshold`, the view morphs into the matching
+	 *    source element's frame and the transition completes.
+	 *  - If released before the threshold, the view springs back to its
+	 *    fullscreen position.
+	 *
+	 * Set to `true` for the default tuning. Pass an object to customize.
+	 */
+	morph?:
+		| boolean
+		| {
+				/** Smallest scale applied at maximum drag distance. Default 0.5. */
+				minScale?: number;
+		  };
+	/**
+	 * (iOS only) Drop shadow rendered behind the destination view during the
+	 * interactive dismiss — gives the view a sense of depth/elevation as it
+	 * morphs back toward the source (Apple Music–style).
+	 * Note: This feature will be brought to Android in a future release.
+	 *
+	 * - `true` applies sensible defaults
+	 *   (color black, opacity 0.3, radius 30, offset (0, 8)).
+	 * - Pass an object to customize any field.
+	 * - Omit / `false` to skip.
+	 */
+	shadow?: boolean | SharedTransitionInteractiveDismissShadow;
+}
+export interface SharedTransitionInteractiveDismissShadow {
+	/** Hex / named color string or `Color` instance. Default `'#000'`. */
+	color?: string | { ios?: any /* UIColor */ };
+	/** 0–1. Default `0.3`. */
+	opacity?: number;
+	/** Blur radius in points. Default `30`. */
+	radius?: number;
+	/** Offset in points. Default `{ x: 0, y: 8 }`. */
+	offset?: { x?: number; y?: number };
 }
 export interface SharedTransitionConfig {
 	/**
@@ -156,6 +209,59 @@ class SharedTransitionObservable extends Observable {
 }
 let sharedTransitionEvents: SharedTransitionObservable;
 let currentStack: Array<SharedTransitionState>;
+// Detached NS subtrees (e.g. a TabView's iosBottomAccessory) that aren't reachable
+// from a page via the NS view tree, but whose tagged views should still participate
+// in shared transitions. Registered by their owning component; queried alongside
+// the source page in getSharedElements. Held weakly so an unregistered-but-forgotten
+// root doesn't pin its subtree; dead refs are pruned on query.
+let externalRoots: Array<WeakRef<ViewBase>>;
+/**
+ * Passed to a {@link SharedElementHandler} when a shared element is about to be transitioned.
+ */
+export interface SharedElementTransitionContext {
+	/**
+	 * The view of the page we leave: where the shared element starts from.
+	 */
+	from: View;
+	/**
+	 * The view of the page we enter: the one the transition moves/resizes from the bounds of `from` to its own bounds.
+	 */
+	to: View;
+	/**
+	 * Whether the shared element goes back to the page we came from.
+	 */
+	isBack: boolean;
+	/**
+	 * Progress of the shared element: 0 at the bounds of `from`, 1 at the own bounds of `to`. It can go out of [0, 1] with springs.
+	 * It is deduced from the current native size of `to` (in native pixels), so whatever is driven by it stays in sync with the transition
+	 * (duration, interpolator, spring...) without any animator of its own.
+	 * Call it from native draw/layout callbacks with the current native width/height of the view.
+	 */
+	progress(width: number, height: number): number;
+	/**
+	 * Register something to run when the transition ends (or is replaced), to restore anything changed on the views.
+	 */
+	onEnd(restore: () => void): void;
+	/**
+	 * Android: stop the platform from animating the image matrix of `to` (androidx ChangeImageTransform). Needed when the view
+	 * draws its image itself (eg through its own scale type) and animates it from the handler: both would stack up otherwise.
+	 */
+	skipImageTransform(): void;
+}
+
+/**
+ * Lets a plugin teach the shared element transitions how to animate its custom views (eg an image view which keeps its scale type
+ * in its own native hierarchy, so that the platform image transforms don't apply).
+ * Currently used on Android only.
+ */
+export interface SharedElementHandler {
+	/**
+	 * Called for each shared element pair, before the transition starts, when the views are laid out.
+	 * @returns true when the pair was handled: the default animation of the scale type is then skipped.
+	 */
+	handle(context: SharedElementTransitionContext): boolean | void;
+}
+
 /**
  * Shared Element Transitions (preview)
  * Allows you to auto animate between shared elements on two different screesn to create smooth navigational experiences.
@@ -181,6 +287,34 @@ export class SharedTransition {
 			transition.setDuration(__APPLE__ ? pageEnd?.duration / 1000 : pageEnd?.duration);
 		}
 		return { instance: transition };
+	}
+	private static elementHandlers: SharedElementHandler[] = [];
+	/**
+	 * Register a handler which animates shared elements made of custom views.
+	 * Plugins supporting several versions of core should feature detect it:
+	 * `SharedTransition['registerElementHandler']?.(handler)`
+	 * @returns a function to unregister the handler
+	 */
+	static registerElementHandler(handler: SharedElementHandler): () => void {
+		if (SharedTransition.elementHandlers.indexOf(handler) === -1) {
+			SharedTransition.elementHandlers.push(handler);
+		}
+		return () => SharedTransition.unregisterElementHandler(handler);
+	}
+	/**
+	 * Unregister a handler previously registered with {@link registerElementHandler}.
+	 */
+	static unregisterElementHandler(handler: SharedElementHandler) {
+		const index = SharedTransition.elementHandlers.indexOf(handler);
+		if (index !== -1) {
+			SharedTransition.elementHandlers.splice(index, 1);
+		}
+	}
+	/**
+	 * The registered element handlers, in registration order.
+	 */
+	static getElementHandlers(): readonly SharedElementHandler[] {
+		return SharedTransition.elementHandlers;
 	}
 	/**
 	 * Whether a transition is in progress or not.
@@ -280,6 +414,37 @@ export class SharedTransition {
 		}
 	}
 	/**
+	 * Register an NS view subtree that should be searched for sharedTransitionTag
+	 * elements in addition to the source page. Use this for views that are attached
+	 * to the native UI but aren't reachable from the page via the NS view tree —
+	 * for example, a TabView's `iosBottomAccessory`. The root and any of its
+	 * descendants with a `sharedTransitionTag` will then participate in transitions
+	 * originating from any page.
+	 *
+	 * Registration is idempotent. Pair with `unregisterExternalRoot` on teardown
+	 * to avoid leaking detached views into future transitions.
+	 */
+	static registerExternalRoot(root: ViewBase): void {
+		if (!root) return;
+		if (!externalRoots) {
+			externalRoots = [];
+		}
+		if (!externalRoots.some((ref) => ref.deref() === root)) {
+			externalRoots.push(new WeakRef(root));
+		}
+	}
+	/**
+	 * Remove a previously registered external root. No-op if the root wasn't
+	 * registered.
+	 */
+	static unregisterExternalRoot(root: ViewBase): void {
+		if (!root || !externalRoots) return;
+		externalRoots = externalRoots.filter((ref) => {
+			const view = ref.deref();
+			return view && view !== root;
+		});
+	}
+	/**
 	 * Gather view collections based on sharedTransitionTag details.
 	 * @param fromPage Page moving away from
 	 * @param toPage Page moving to
@@ -303,18 +468,37 @@ export class SharedTransition {
 				presentedSharedElements = <Array<View>>querySelectorAll(toPage, 'sharedTransitionTag').filter((v) => !v.sharedTransitionIgnore && typeof v.sharedTransitionTag === 'string');
 			}
 		}
+		const presentedTags = presentedSharedElements.map((v) => v.sharedTransitionTag);
 
 		// console.log(
 		// 	'presented sharedTransitionTags:',
 		// 	presentedSharedElements.map((v) => v.sharedTransitionTag)
 		// );
 
-		// 2. Presenting view: gather all sharedTransitionTag views
+		// 2. Presenting view: gather all sharedTransitionTag views — and also any
+		// tagged views inside external roots (detached subtrees registered by
+		// components like TabView's iosBottomAccessory). External roots persist
+		// across page navigations, so their views only join the transition when
+		// their tag *also* exists on the destination — they participate as
+		// matched shared elements, never as orphans that would fade out.
 		if (fromPage) {
 			if (fromPage.hasListeners('sharedElementFrom')) {
 				fromPage.notify({ eventName: 'sharedElementFrom', views: presentingSharedElements });
 			} else {
 				presentingSharedElements = <Array<View>>querySelectorAll(fromPage, 'sharedTransitionTag').filter((v) => !v.sharedTransitionIgnore && typeof v.sharedTransitionTag === 'string');
+			}
+		}
+		if (externalRoots?.length) {
+			externalRoots = externalRoots.filter((ref) => ref.deref());
+			for (const ref of externalRoots) {
+				const root = ref.deref();
+				if (!root) continue;
+				const extra = <Array<View>>querySelectorAll(root, 'sharedTransitionTag').filter((v) => !v.sharedTransitionIgnore && typeof v.sharedTransitionTag === 'string');
+				for (const v of extra) {
+					if (!presentedTags.includes(v.sharedTransitionTag)) continue;
+					if (presentingSharedElements.includes(v)) continue;
+					presentingSharedElements.push(v);
+				}
 			}
 		}
 		// console.log(
@@ -323,7 +507,6 @@ export class SharedTransition {
 		// );
 
 		// 3. only handle sharedTransitionTag on presenting which match presented
-		const presentedTags = presentedSharedElements.map((v) => v.sharedTransitionTag);
 		return {
 			sharedElements: presentingSharedElements.filter((v) => presentedTags.includes(v.sharedTransitionTag)),
 			presented: presentedSharedElements,
