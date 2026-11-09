@@ -1,0 +1,347 @@
+## 8.0.21 (2026-10-22)
+
+### 🩹 Fixes
+
+- **vite:** recognize aliased default exports in link checks ([#11567](https://github.com/NativeScript/NativeScript/pull/11567))
+- **vite:** preserve package imports during vendor bundling ([#11565](https://github.com/NativeScript/NativeScript/pull/11565))
+
+### ❤️ Thank You
+
+- Alec Larson @aleclarson
+
+## 8.0.20 (2026-10-21)
+
+### 🩹 Fixes
+
+- **vite:** apply app.css before the app entry on HMR dev boots ([#11522](https://github.com/NativeScript/NativeScript/pull/11522))
+- **vite:** keep source-only dependencies out of the HMR vendor bundle regardless of spec ([#11560](https://github.com/NativeScript/NativeScript/pull/11560))
+- **vite:** resolve nested node_modules requests for install-linked dependencies ([#11559](https://github.com/NativeScript/NativeScript/pull/11559))
+- **vite:** preserve Vue plugin imports and canonical runtime bridge ([#11555](https://github.com/NativeScript/NativeScript/pull/11555))
+- **vite:** give HMR deps-bundle shims the named exports of CommonJS and minified ESM ([#11543](https://github.com/NativeScript/NativeScript/pull/11543))
+- **vite:** keep `value: undefined` in HMR-served Vue scripts ([#11542](https://github.com/NativeScript/NativeScript/pull/11542))
+- **vite:** keep the ?raw query on HMR imports ([#11541](https://github.com/NativeScript/NativeScript/pull/11541))
+- **vite:** serve a plugin module under one URL whether imported or re-exported ([#11540](https://github.com/NativeScript/NativeScript/pull/11540))
+- **vite:** emit the Android activity chunk under a stable name ([#11539](https://github.com/NativeScript/NativeScript/pull/11539))
+- **vite:** keep the rules after @layer, @container and other at-rules css can't parse ([#11538](https://github.com/NativeScript/NativeScript/pull/11538))
+
+### ❤️ Thank You
+
+- Alec Larson @aleclarson
+- Nathan Walker
+- Osei Fortune @triniwiz
+- Rafael Augusto @rafaelaugustos
+
+## 8.0.19 (2026-10-12)
+
+### 🩹 Fixes
+
+- **vite:** Android release bundles keep the class names the binding generator reads ([#11516](https://github.com/NativeScript/NativeScript/pull/11516))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.18 (2026-10-05)
+
+### 🩹 Fixes
+
+- **vite:** serve worker re-exports per module, not from the deps bundle ([#11504](https://github.com/NativeScript/NativeScript/pull/11504))
+
+### ❤️ Thank You
+
+- Osei Fortune @triniwiz
+
+## 8.0.17 (2026-09-30)
+
+### 🩹 Fixes
+
+- **vite:** decode percent-encoded /ns/m request paths ([#11483](https://github.com/NativeScript/NativeScript/pull/11483))
+
+### ❤️ Thank You
+
+- Alec Larson @aleclarson
+
+## 8.0.16 (2026-09-30)
+
+### 🩹 Fixes
+
+- **vite:** start HMR graph population after every plugin's configureServer ([#11479](https://github.com/NativeScript/NativeScript/pull/11479))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.15 (2026-09-29)
+
+### 🩹 Fixes
+
+- **vite:** hot-update vue screens on plain .ts edits ([#11478](https://github.com/NativeScript/NativeScript/pull/11478))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.14 (2026-09-29)
+
+### 🩹 Fixes
+
+- keep escaped commas inside CSS selectors ([#11463](https://github.com/NativeScript/NativeScript/pull/11463))
+- **vite:** resolve a file before a same-named directory ([#11464](https://github.com/NativeScript/NativeScript/pull/11464))
+- **vite:** evaluate transitively bundled deps on first use ([#11465](https://github.com/NativeScript/NativeScript/pull/11465))
+- **vite:** decode dots in prebundled subpath specifiers ([#11466](https://github.com/NativeScript/NativeScript/pull/11466))
+- **vite:** inline release bundle css with minified sentinel, in import order ([#11477](https://github.com/NativeScript/NativeScript/pull/11477))
+- **vite:** resolve workspace css specs to /@fs before ?inline transform ([#11474](https://github.com/NativeScript/NativeScript/pull/11474))
+- **vite:** mask comments before scanning module export names ([#11473](https://github.com/NativeScript/NativeScript/pull/11473))
+- **vite:** serve pnpm-isolated transitive deps over /ns/m ([#11475](https://github.com/NativeScript/NativeScript/pull/11475))
+- **vite:** route unvendored plugin-patterned deps through /ns/m HTTP ([#11459](https://github.com/NativeScript/NativeScript/pull/11459))
+
+### ❤️ Thank You
+
+- Alec Larson @aleclarson
+- Nathan Walker
+- Osei Fortune @triniwiz
+
+## 8.0.13 (2026-09-25)
+
+### 🩹 Fixes
+
+- **vite:** android dev overlay improvements ([345acfc51](https://github.com/NativeScript/NativeScript/commit/345acfc51))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.12 (2026-09-25)
+
+### 🩹 Fixes
+
+- **vite:** type check TSRX imports ([#11450](https://github.com/NativeScript/NativeScript/pull/11450))
+
+### ❤️ Thank You
+
+- Alec Larson @aleclarson
+
+## 8.0.11 (2026-09-22)
+
+### 🩹 Fixes
+
+- **vite:** let a framework flavor exclude packages from the dev deps bundle seed ([#11442](https://github.com/NativeScript/NativeScript/pull/11442), [#11440](https://github.com/NativeScript/NativeScript/issues/11440))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.10 (2026-09-16)
+
+### 🩹 Fixes
+
+- **vite:** declare @babel/traverse and @babel/types as dependencies ([ba45aefcd](https://github.com/NativeScript/NativeScript/commit/ba45aefcd))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.9 (2026-09-14)
+
+### 🩹 Fixes
+
+- **vite:** alias vue through resolve.alias so the Vue flavor builds under rolldown ([#11431](https://github.com/NativeScript/NativeScript/pull/11431))
+- **vite:** serve a symlinked nativescript-vue as library code in HMR ([#11430](https://github.com/NativeScript/NativeScript/pull/11430))
+
+### ❤️ Thank You
+
+- Igor Randjelovic
+
+## 8.0.8 (2026-09-10)
+
+### 🩹 Fixes
+
+- **vite:** accept @angular/build 22 as an optional peer ([4df777fa5](https://github.com/NativeScript/NativeScript/commit/4df777fa5))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.7 (2026-09-10)
+
+### 🩹 Fixes
+
+- **vite:** give HMR-navigated Vue pages the root app's registrations and fresh reloads ([29ef51474](https://github.com/NativeScript/NativeScript/commit/29ef51474))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.6 (2026-09-10)
+
+### 🩹 Fixes
+
+- **vite:** await the client strategy before /ns/rt $navigateTo reports the navigator missing ([#11424](https://github.com/NativeScript/NativeScript/pull/11424), [#11422](https://github.com/NativeScript/NativeScript/issues/11422))
+- **vite:** replace the browser preload helper before esbuild minifies it ([#11425](https://github.com/NativeScript/NativeScript/pull/11425), [#11423](https://github.com/NativeScript/NativeScript/issues/11423))
+- **vite:** serve deps-bundle shims for barrels that re-export a bare package ([#11427](https://github.com/NativeScript/NativeScript/pull/11427))
+
+### ❤️ Thank You
+
+- Nathan Walker
+- Steve McNiven-Scott
+
+## 8.0.5 (2026-09-07)
+
+### 🚀 Features
+
+- **vite:** support plain javascript ([d0f3e7654](https://github.com/NativeScript/NativeScript/commit/d0f3e7654))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.4 (2026-09-03)
+
+### 🩹 Fixes
+
+- **vite:** fold an exports-map plugin's root entry onto its bare package id ([#11411](https://github.com/NativeScript/NativeScript/pull/11411))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.3 (2026-09-02)
+
+### 🩹 Fixes
+
+- **vite:** rebuild the cached core bundle when a patch-package core patch changes ([#11408](https://github.com/NativeScript/NativeScript/pull/11408))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.2 (2026-09-01)
+
+### 🚀 Features
+
+- **vite:** framework registration API ([#11358](https://github.com/NativeScript/NativeScript/pull/11358))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.1 (2026-08-31)
+
+### 🩹 Fixes
+
+- **vite:** settings-only pnpm-workspace.yaml is not a monorepo root marker ([#11375](https://github.com/NativeScript/NativeScript/pull/11375))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.1-dev.0 (2026-08-31)
+
+### 🩹 Fixes
+
+- **vite:** settings-only pnpm-workspace.yaml is not a monorepo root marker ([25a16ea39](https://github.com/NativeScript/NativeScript/commit/25a16ea39))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+# 8.0.0 (2026-08-27)
+
+### 🚀 Features
+
+- **vite:** align the dev boot with 9.1 runtime contract ([#11355](https://github.com/NativeScript/NativeScript/pull/11355))
+- **vite:** allow auto port availability selection ([#11351](https://github.com/NativeScript/NativeScript/pull/11351))
+- ⚠️  **vite:** add Vite 8 HMR engine with ns:runtime ([d601d0d11](https://github.com/NativeScript/NativeScript/commit/d601d0d11))
+- vite improvements ([5360522b9](https://github.com/NativeScript/NativeScript/commit/5360522b9))
+- NativeClass transformer now supports ts-patch and ts-loader ([#10952](https://github.com/NativeScript/NativeScript/pull/10952))
+- @nativescript/vite ([#10948](https://github.com/NativeScript/NativeScript/pull/10948))
+
+### 🩹 Fixes
+
+- **vite:** hmr propagation improvements on css, modals, scripts ([86320ee62](https://github.com/NativeScript/NativeScript/commit/86320ee62))
+- **vite:** lazy-load Vue SFC compiler ([#11354](https://github.com/NativeScript/NativeScript/pull/11354))
+- **vite:** remove browser preload probe from native bundles ([#11311](https://github.com/NativeScript/NativeScript/pull/11311))
+- **vite:** fix windows path separator for static copy targets ([#11048](https://github.com/NativeScript/NativeScript/pull/11048))
+- **vite:** __dirname windows compat ([#11046](https://github.com/NativeScript/NativeScript/pull/11046))
+- **vite:** init handling ([1c6c38d19](https://github.com/NativeScript/NativeScript/commit/1c6c38d19))
+
+### ⚠️  Breaking Changes
+
+- **vite:** add Vite 8 HMR engine with ns:runtime  ([d601d0d11](https://github.com/NativeScript/NativeScript/commit/d601d0d11))
+
+### ❤️ Thank You
+
+- Adrien Foulon @Tofandel
+- farfromrefuge
+- Nathan Walker
+- Tanner Linsley
+
+## 8.0.0-rc.1 (2026-08-26)
+
+### 🩹 Fixes
+
+- **vite:** hmr propagation improvements on css, modals, scripts ([86320ee62](https://github.com/NativeScript/NativeScript/commit/86320ee62))
+
+### ❤️ Thank You
+
+- Nathan Walker
+
+## 8.0.0-rc.0 (2026-08-21)
+
+### 🚀 Features
+
+- **vite:** align the dev boot with 9.1 runtime contract ([#11355](https://github.com/NativeScript/NativeScript/pull/11355))
+- **vite:** allow auto port availability selection ([#11351](https://github.com/NativeScript/NativeScript/pull/11351))
+- ⚠️  **vite:** add Vite 8 HMR engine with ns:runtime ([d601d0d11](https://github.com/NativeScript/NativeScript/commit/d601d0d11))
+- vite improvements ([5360522b9](https://github.com/NativeScript/NativeScript/commit/5360522b9))
+- NativeClass transformer now supports ts-patch and ts-loader ([#10952](https://github.com/NativeScript/NativeScript/pull/10952))
+- @nativescript/vite ([#10948](https://github.com/NativeScript/NativeScript/pull/10948))
+
+### 🩹 Fixes
+
+- **vite:** lazy-load Vue SFC compiler ([#11354](https://github.com/NativeScript/NativeScript/pull/11354))
+- **vite:** remove browser preload probe from native bundles ([#11311](https://github.com/NativeScript/NativeScript/pull/11311))
+- **vite:** fix windows path separator for static copy targets ([#11048](https://github.com/NativeScript/NativeScript/pull/11048))
+- **vite:** __dirname windows compat ([#11046](https://github.com/NativeScript/NativeScript/pull/11046))
+- **vite:** init handling ([1c6c38d19](https://github.com/NativeScript/NativeScript/commit/1c6c38d19))
+
+### ⚠️  Breaking Changes
+
+- **vite:** add Vite 8 HMR engine with ns:runtime  ([d601d0d11](https://github.com/NativeScript/NativeScript/commit/d601d0d11))
+
+### ❤️ Thank You
+
+- Adrien Foulon @Tofandel
+- farfromrefuge
+- Nathan Walker
+- Tanner Linsley
+
+## 2.0.3 (2026-04-12)
+
+### Fixes
+
+- Cross platform path resolutions (mac, windows)
+
+## 2.0.1 (2026-04-12)
+
+### 🚀 Features
+
+- Vite HMR improvements with Vue
+
+## 2.0.0 (2026-03-13)
+
+### 🚀 Features
+
+- Vite 7 with framework-agnostic support 
+
+### ❤️ Thank You
+
+- Adrien Foulon @Tofandel
+- farfromrefuge
+- Nathan Walker
+
+## 1.0.0 (2025-11-18)
+
+### 🚀 Features
+
+- Initial release of Vite for NativeScript

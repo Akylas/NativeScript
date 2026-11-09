@@ -181,6 +181,11 @@
                 public widthPercent: number;
                 public heightPercent: number;
 
+                public maxWidth: number;
+                public maxHeight: number;
+                public maxWidthPercent: number;
+                public maxHeightPercent: number;
+
                 public topMarginPercent: number;
                 public leftMarginPercent: number;
                 public bottomMarginPercent: number;
@@ -335,6 +340,12 @@
 
                 public getAlignContent(): number;
                 public setAlignContent(value: number);
+
+                public getRowGap(): number;
+                public setRowGap(value: number);
+
+                public getColumnGap(): number;
+                public setColumnGap(value: number);
 
                 public static FLEX_DIRECTION_ROW: number;
                 public static FLEX_DIRECTION_ROW_REVERSE: number;
@@ -529,12 +540,16 @@
 
                 export namespace Worker {
                     interface IOnImageLoadedListener {
-                        onImageLoaded(success: boolean): void;
+                        handlesImageUpdate(): boolean;
+                        onImageLoaded(bitmapOrDrawable: globalAndroid.graphics.Bitmap | globalAndroid.graphics.drawable.Drawable): void;
+                        onImageLoadingError(e: java.lang.Exception): void;
                     }
 
                     export class OnImageLoadedListener implements IOnImageLoadedListener {
                         constructor(implementation: IOnImageLoadedListener);
-                        public onImageLoaded(success: boolean): void;
+                        public handlesImageUpdate(): boolean;
+                        public onImageLoaded(bitmapOrDrawable: globalAndroid.graphics.Bitmap | globalAndroid.graphics.drawable.Drawable): void;
+                        public onImageLoadingError(e: java.lang.Exception): void;
                     }
                 }
 
@@ -568,6 +583,14 @@
 
                 public static getMinHeight(view: android.view.View): number;
                 public static setMinHeight(view: android.view.View, value: number): void;
+
+                public static getMaxWidth(view: android.view.View): number;
+                public static setMaxWidth(view: android.view.View, value: number): void;
+                public static setMaxWidthPercent(view: android.view.View, value: number): void;
+
+                public static getMaxHeight(view: android.view.View): number;
+                public static setMaxHeight(view: android.view.View, value: number): void;
+                public static setMaxHeightPercent(view: android.view.View, value: number): void;
 
                 public static getWidth(view: android.view.View): number;
                 public static setWidth(view: android.view.View, value: number): void;
@@ -788,6 +811,9 @@ declare module org {
                 public static saveToFileAsync(param0: globalAndroid.graphics.Bitmap, param1: string, param2: string, param3: number, param4: org.nativescript.widgets.Utils.AsyncImageCallback): void;
                 public static toBase64StringAsync(param0: globalAndroid.graphics.Bitmap, param1: string, param2: number, param3: org.nativescript.widgets.Utils.AsyncImageCallback): void;
                 public static resizeAsync(param0: globalAndroid.graphics.Bitmap, param1: number, param2: string, param3: org.nativescript.widgets.Utils.AsyncImageCallback): void;
+                public static stringToUpperCase(value: string): string;
+                public static stringToLowerCase(value: string): string;
+                public static capitalizeString(value: string): string;
 				public constructor();
 			}
 			export module Utils {

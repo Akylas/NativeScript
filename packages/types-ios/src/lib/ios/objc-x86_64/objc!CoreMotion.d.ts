@@ -58,9 +58,9 @@ declare class CMAltimeter extends NSObject {
 	/**
 	 * @since 15.0
 	 */
-	startAbsoluteAltitudeUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMAbsoluteAltitudeData, p2: NSError) => void): void;
+	startAbsoluteAltitudeUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMAbsoluteAltitudeData | null, p2: NSError | null) => void): void;
 
-	startRelativeAltitudeUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMAltitudeData, p2: NSError) => void): void;
+	startRelativeAltitudeUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMAltitudeData | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 15.0
@@ -121,7 +121,7 @@ declare class CMAttitude extends NSObject implements NSCopying, NSSecureCoding {
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -163,13 +163,13 @@ declare class CMBatchedSensorManager extends NSObject {
 
 	readonly accelerometerActive: boolean;
 
-	readonly accelerometerBatch: NSArray<CMAccelerometerData>;
+	readonly accelerometerBatch: NSArray<CMAccelerometerData> | null;
 
 	readonly accelerometerDataFrequency: number;
 
 	readonly deviceMotionActive: boolean;
 
-	readonly deviceMotionBatch: NSArray<CMDeviceMotion>;
+	readonly deviceMotionBatch: NSArray<CMDeviceMotion> | null;
 
 	readonly deviceMotionDataFrequency: number;
 
@@ -181,16 +181,26 @@ declare class CMBatchedSensorManager extends NSObject {
 
 	startAccelerometerUpdates(): void;
 
-	startAccelerometerUpdatesWithHandler(handler: (p1: NSArray<CMAccelerometerData>, p2: NSError) => void): void;
+	startAccelerometerUpdatesWithHandler(handler: (p1: NSArray<CMAccelerometerData> | null, p2: NSError | null) => void): void;
 
 	startDeviceMotionUpdates(): void;
 
-	startDeviceMotionUpdatesWithHandler(handler: (p1: NSArray<CMDeviceMotion>, p2: NSError) => void): void;
+	startDeviceMotionUpdatesWithHandler(handler: (p1: NSArray<CMDeviceMotion> | null, p2: NSError | null) => void): void;
 
 	stopAccelerometerUpdates(): void;
 
 	stopDeviceMotionUpdates(): void;
 }
+
+/**
+ * @since 27.0
+ */
+interface CMBodyIdentifiable extends NSObjectProtocol {
+}
+declare var CMBodyIdentifiable: {
+
+	prototype: CMBodyIdentifiable;
+};
 
 interface CMCalibratedMagneticField {
 	field: CMMagneticField;
@@ -215,6 +225,11 @@ declare class CMDeviceMotion extends CMLogItem {
 	 * @since 11.0
 	 */
 	readonly heading: number;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly headingAccuracy: number;
 
 	/**
 	 * @since 5.0
@@ -261,7 +276,7 @@ declare class CMDyskineticSymptomResult extends NSObject implements NSCopying, N
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -346,9 +361,9 @@ declare class CMHeadphoneActivityManager extends NSObject {
 
 	readonly statusAvailable: boolean;
 
-	startActivityUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMMotionActivity, p2: NSError) => void): void;
+	startActivityUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMMotionActivity | null, p2: NSError | null) => void): void;
 
-	startStatusUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMHeadphoneActivityStatus, p2: NSError) => void): void;
+	startStatusUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMHeadphoneActivityStatus, p2: NSError | null) => void): void;
 
 	stopActivityUpdates(): void;
 
@@ -375,9 +390,9 @@ declare class CMHeadphoneMotionManager extends NSObject {
 
 	readonly connectionStatusActive: boolean;
 
-	delegate: CMHeadphoneMotionManagerDelegate;
+	delegate: CMHeadphoneMotionManagerDelegate | null;
 
-	readonly deviceMotion: CMDeviceMotion;
+	readonly deviceMotion: CMDeviceMotion | null;
 
 	readonly deviceMotionActive: boolean;
 
@@ -387,7 +402,7 @@ declare class CMHeadphoneMotionManager extends NSObject {
 
 	startDeviceMotionUpdates(): void;
 
-	startDeviceMotionUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMDeviceMotion, p2: NSError) => void): void;
+	startDeviceMotionUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMDeviceMotion | null, p2: NSError | null) => void): void;
 
 	stopConnectionStatusUpdates(): void;
 
@@ -419,7 +434,7 @@ declare class CMHighFrequencyHeartRateData extends CMLogItem {
 
 	readonly confidence: CMHighFrequencyHeartRateDataConfidence;
 
-	readonly date: Date;
+	readonly date: Date | null;
 
 	readonly heartRate: number;
 }
@@ -453,7 +468,7 @@ declare class CMLogItem extends NSObject implements NSCopying, NSSecureCoding {
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -544,9 +559,9 @@ declare class CMMotionActivityManager extends NSObject {
 
 	static new(): CMMotionActivityManager; // inherited from NSObject
 
-	queryActivityStartingFromDateToDateToQueueWithHandler(start: Date, end: Date, queue: NSOperationQueue, handler: (p1: NSArray<CMMotionActivity>, p2: NSError) => void): void;
+	queryActivityStartingFromDateToDateToQueueWithHandler(start: Date, end: Date, queue: NSOperationQueue, handler: (p1: NSArray<CMMotionActivity> | null, p2: NSError | null) => void): void;
 
-	startActivityUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMMotionActivity) => void): void;
+	startActivityUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMMotionActivity | null) => void): void;
 
 	stopActivityUpdates(): void;
 }
@@ -569,7 +584,7 @@ declare class CMMotionManager extends NSObject {
 
 	readonly accelerometerAvailable: boolean;
 
-	readonly accelerometerData: CMAccelerometerData;
+	readonly accelerometerData: CMAccelerometerData | null;
 
 	accelerometerUpdateInterval: number;
 
@@ -578,11 +593,16 @@ declare class CMMotionManager extends NSObject {
 	 */
 	readonly attitudeReferenceFrame: CMAttitudeReferenceFrame;
 
-	readonly deviceMotion: CMDeviceMotion;
+	readonly deviceMotion: CMDeviceMotion | null;
 
 	readonly deviceMotionActive: boolean;
 
 	readonly deviceMotionAvailable: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	deviceMotionBody: CMBodyIdentifiable | null;
 
 	deviceMotionUpdateInterval: number;
 
@@ -590,7 +610,7 @@ declare class CMMotionManager extends NSObject {
 
 	readonly gyroAvailable: boolean;
 
-	readonly gyroData: CMGyroData;
+	readonly gyroData: CMGyroData | null;
 
 	gyroUpdateInterval: number;
 
@@ -607,7 +627,7 @@ declare class CMMotionManager extends NSObject {
 	/**
 	 * @since 5.0
 	 */
-	readonly magnetometerData: CMMagnetometerData;
+	readonly magnetometerData: CMMagnetometerData | null;
 
 	/**
 	 * @since 5.0
@@ -621,11 +641,11 @@ declare class CMMotionManager extends NSObject {
 
 	startAccelerometerUpdates(): void;
 
-	startAccelerometerUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMAccelerometerData, p2: NSError) => void): void;
+	startAccelerometerUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMAccelerometerData | null, p2: NSError | null) => void): void;
 
 	startDeviceMotionUpdates(): void;
 
-	startDeviceMotionUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMDeviceMotion, p2: NSError) => void): void;
+	startDeviceMotionUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMDeviceMotion | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 5.0
@@ -635,11 +655,11 @@ declare class CMMotionManager extends NSObject {
 	/**
 	 * @since 5.0
 	 */
-	startDeviceMotionUpdatesUsingReferenceFrameToQueueWithHandler(referenceFrame: CMAttitudeReferenceFrame, queue: NSOperationQueue, handler: (p1: CMDeviceMotion, p2: NSError) => void): void;
+	startDeviceMotionUpdatesUsingReferenceFrameToQueueWithHandler(referenceFrame: CMAttitudeReferenceFrame, queue: NSOperationQueue, handler: (p1: CMDeviceMotion | null, p2: NSError | null) => void): void;
 
 	startGyroUpdates(): void;
 
-	startGyroUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMGyroData, p2: NSError) => void): void;
+	startGyroUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMGyroData | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 5.0
@@ -649,7 +669,7 @@ declare class CMMotionManager extends NSObject {
 	/**
 	 * @since 5.0
 	 */
-	startMagnetometerUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMMagnetometerData, p2: NSError) => void): void;
+	startMagnetometerUpdatesToQueueWithHandler(queue: NSOperationQueue, handler: (p1: CMMagnetometerData | null, p2: NSError | null) => void): void;
 
 	stopAccelerometerUpdates(): void;
 
@@ -697,7 +717,7 @@ declare class CMOdometerData extends NSObject implements NSCopying, NSSecureCodi
 	/**
 	 * @since 17.0
 	 */
-	readonly maxAbsSlope: number;
+	readonly maxAbsSlope: number | null;
 
 	/**
 	 * @since 15.4
@@ -707,7 +727,7 @@ declare class CMOdometerData extends NSObject implements NSCopying, NSSecureCodi
 	/**
 	 * @since 17.0
 	 */
-	readonly slope: number;
+	readonly slope: number | null;
 
 	/**
 	 * @since 17.0
@@ -730,7 +750,7 @@ declare class CMOdometerData extends NSObject implements NSCopying, NSSecureCodi
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -784,14 +804,14 @@ declare class CMPedometer extends NSObject {
 
 	static new(): CMPedometer; // inherited from NSObject
 
-	queryPedometerDataFromDateToDateWithHandler(start: Date, end: Date, handler: (p1: CMPedometerData, p2: NSError) => void): void;
+	queryPedometerDataFromDateToDateWithHandler(start: Date, end: Date, handler: (p1: CMPedometerData | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 10.0
 	 */
-	startPedometerEventUpdatesWithHandler(handler: (p1: CMPedometerEvent, p2: NSError) => void): void;
+	startPedometerEventUpdatesWithHandler(handler: (p1: CMPedometerEvent | null, p2: NSError | null) => void): void;
 
-	startPedometerUpdatesFromDateWithHandler(start: Date, handler: (p1: CMPedometerData, p2: NSError) => void): void;
+	startPedometerUpdatesFromDateWithHandler(start: Date, handler: (p1: CMPedometerData | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 10.0
@@ -813,25 +833,25 @@ declare class CMPedometerData extends NSObject implements NSCopying, NSSecureCod
 	/**
 	 * @since 10.0
 	 */
-	readonly averageActivePace: number;
+	readonly averageActivePace: number | null;
 
 	/**
 	 * @since 9.0
 	 */
-	readonly currentCadence: number;
+	readonly currentCadence: number | null;
 
 	/**
 	 * @since 9.0
 	 */
-	readonly currentPace: number;
+	readonly currentPace: number | null;
 
-	readonly distance: number;
+	readonly distance: number | null;
 
 	readonly endDate: Date;
 
-	readonly floorsAscended: number;
+	readonly floorsAscended: number | null;
 
-	readonly floorsDescended: number;
+	readonly floorsDescended: number | null;
 
 	readonly numberOfSteps: number;
 
@@ -841,7 +861,7 @@ declare class CMPedometerData extends NSObject implements NSCopying, NSSecureCod
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -865,7 +885,7 @@ declare class CMPedometerEvent extends NSObject implements NSCopying, NSSecureCo
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -898,6 +918,20 @@ declare class CMRecordedAccelerometerData extends CMAccelerometerData {
 	static alloc(): CMRecordedAccelerometerData; // inherited from NSObject
 
 	static new(): CMRecordedAccelerometerData; // inherited from NSObject
+
+	readonly identifier: number;
+
+	readonly startDate: Date;
+}
+
+/**
+ * @since 27
+ */
+declare class CMRecordedDeviceMotion extends CMDeviceMotion {
+
+	static alloc(): CMRecordedDeviceMotion; // inherited from NSObject
+
+	static new(): CMRecordedDeviceMotion; // inherited from NSObject
 
 	readonly identifier: number;
 
@@ -995,7 +1029,7 @@ declare class CMSensorRecorder extends NSObject {
 
 	static new(): CMSensorRecorder; // inherited from NSObject
 
-	accelerometerDataFromDateToDate(fromDate: Date, toDate: Date): CMSensorDataList;
+	accelerometerDataFromDateToDate(fromDate: Date, toDate: Date): CMSensorDataList | null;
 
 	recordAccelerometerForDuration(duration: number): void;
 }
@@ -1012,9 +1046,9 @@ declare class CMStepCounter extends NSObject {
 
 	static new(): CMStepCounter; // inherited from NSObject
 
-	queryStepCountStartingFromToToQueueWithHandler(start: Date, end: Date, queue: NSOperationQueue, handler: (p1: number, p2: NSError) => void): void;
+	queryStepCountStartingFromToToQueueWithHandler(start: Date, end: Date, queue: NSOperationQueue, handler: (p1: number, p2: NSError | null) => void): void;
 
-	startStepCountingUpdatesToQueueUpdateOnWithHandler(queue: NSOperationQueue, stepCounts: number, handler: (p1: number, p2: Date, p3: NSError) => void): void;
+	startStepCountingUpdatesToQueueUpdateOnWithHandler(queue: NSOperationQueue, stepCounts: number, handler: (p1: number, p2: Date, p3: NSError | null) => void): void;
 
 	stopStepCountingUpdates(): void;
 }
@@ -1048,7 +1082,7 @@ declare class CMTremorResult extends NSObject implements NSCopying, NSSecureCodi
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -1089,7 +1123,7 @@ declare class CMWaterSubmersionEvent extends NSObject implements NSCopying, NSSe
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -1105,9 +1139,9 @@ declare class CMWaterSubmersionManager extends NSObject {
 
 	static new(): CMWaterSubmersionManager; // inherited from NSObject
 
-	delegate: CMWaterSubmersionManagerDelegate;
+	delegate: CMWaterSubmersionManagerDelegate | null;
 
-	readonly maximumDepth: NSMeasurement<NSUnitLength>;
+	readonly maximumDepth: NSMeasurement<NSUnitLength> | null;
 
 	static readonly authorizationStatus: CMAuthorizationStatus;
 
@@ -1119,13 +1153,13 @@ declare class CMWaterSubmersionManager extends NSObject {
  */
 interface CMWaterSubmersionManagerDelegate extends NSObjectProtocol {
 
-	managerDidUpdateEvent(manager: CMWaterSubmersionManager, event: CMWaterSubmersionEvent): void;
+	managerDidUpdateEvent?(manager: CMWaterSubmersionManager, event: CMWaterSubmersionEvent): void;
 
-	managerDidUpdateMeasurement(manager: CMWaterSubmersionManager, measurement: CMWaterSubmersionMeasurement): void;
+	managerDidUpdateMeasurement?(manager: CMWaterSubmersionManager, measurement: CMWaterSubmersionMeasurement): void;
 
-	managerDidUpdateTemperature(manager: CMWaterSubmersionManager, measurement: CMWaterTemperature): void;
+	managerDidUpdateTemperature?(manager: CMWaterSubmersionManager, measurement: CMWaterTemperature): void;
 
-	managerErrorOccurred(manager: CMWaterSubmersionManager, error: NSError): void;
+	managerErrorOccurred?(manager: CMWaterSubmersionManager, error: NSError): void;
 }
 declare var CMWaterSubmersionManagerDelegate: {
 
@@ -1143,9 +1177,9 @@ declare class CMWaterSubmersionMeasurement extends NSObject implements NSCopying
 
 	readonly date: Date;
 
-	readonly depth: NSMeasurement<NSUnitLength>;
+	readonly depth: NSMeasurement<NSUnitLength> | null;
 
-	readonly pressure: NSMeasurement<NSUnitPressure>;
+	readonly pressure: NSMeasurement<NSUnitPressure> | null;
 
 	readonly submersionState: CMWaterSubmersionDepthState;
 
@@ -1155,7 +1189,7 @@ declare class CMWaterSubmersionMeasurement extends NSObject implements NSCopying
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -1190,7 +1224,7 @@ declare class CMWaterTemperature extends NSObject implements NSCopying, NSSecure
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 

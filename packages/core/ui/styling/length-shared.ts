@@ -5,6 +5,21 @@ import { CoreTypes } from '../../core-types';
 import { layout } from '../../utils/layout-helper';
 import { isCssWideKeyword } from '../core/properties/property-shared';
 
+let rootFontSize = 16;
+
+function parseRem(value: string): CoreTypes.dip | undefined {
+	if (!value.endsWith('rem')) {
+		return undefined;
+	}
+
+	const rem = parseFloat(value.substring(0, value.length - 3));
+	if (isNaN(rem) || !isFinite(rem)) {
+		throw new Error(`Invalid value: ${value}`);
+	}
+
+	return rem * rootFontSize;
+}
+
 function equalsCommon(a: CoreTypes.LengthType, b: CoreTypes.LengthType): boolean;
 function equalsCommon(a: CoreTypes.PercentLengthType, b: CoreTypes.PercentLengthType): boolean;
 function equalsCommon(a: CoreTypes.PercentLengthType, b: CoreTypes.PercentLengthType): boolean {
@@ -36,7 +51,7 @@ function equalsCommon(a: CoreTypes.PercentLengthType, b: CoreTypes.PercentLength
 }
 
 function convertToStringCommon(length: CoreTypes.LengthType | CoreTypes.PercentLengthType): string {
-	if (length == 'auto' || isCssWideKeyword(length)) {
+	if (length == 'auto' || length === null || length === undefined || isCssWideKeyword(length)) {
 		return 'auto';
 	}
 
@@ -101,8 +116,10 @@ export namespace PercentLength {
 				}
 
 				return { unit: '%', value };
+			} else if (stringValue.endsWith('rem')) {
+				return parseRem(stringValue);
 			} else if (stringValue.endsWith('px')) {
-				const value: CoreTypes.px = parseFloat(stringValue.slice(-2).trim());
+				const value: CoreTypes.px = parseFloat(stringValue.slice(0, -2).trim());
 				if (isNaN(value) || !isFinite(value)) {
 					throw new Error(`Invalid value: ${fromValue}`);
 				}
@@ -142,6 +159,9 @@ export namespace FixedLength {
 	export function parse(fromValue: string | CoreTypes.FixedLengthType): CoreTypes.FixedLengthType {
 		if (typeof fromValue === 'string') {
 			let stringValue = fromValue.trim();
+			if (stringValue.endsWith('rem')) {
+				return parseRem(stringValue);
+			}
 			if (stringValue.endsWith('px')) {
 				stringValue = stringValue.slice(0, -2).trim();
 				const value: CoreTypes.px = parseFloat(stringValue);
@@ -195,4 +215,12 @@ export namespace Length {
 	export const convertToString: {
 		(length: CoreTypes.LengthType): string;
 	} = convertToStringCommon;
+	export function getRootFontSize(): number {
+		return rootFontSize;
+	}
+	export function setRootFontSize(size: number): void {
+		if (size > 0 && isFinite(size)) {
+			rootFontSize = size;
+		}
+	}
 }

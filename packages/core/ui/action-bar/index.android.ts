@@ -1,6 +1,6 @@
 import { AndroidActionItemSettings, AndroidActionBarSettings as AndroidActionBarSettingsDefinition, ActionItem as ActionItemDefinition } from '.';
 import { ActionItemBase, ActionBarBase, isVisible, flatProperty, traceMissingIcon, androidContentInsetLeftProperty, androidContentInsetRightProperty } from './action-bar-common';
-import { View } from '../core/view';
+import { AndroidHelper, View } from '../core/view';
 import { VIEW_GONE, VIEW_VISIBLE } from '../core/view/index.android';
 import { Color } from '../../color';
 import { layout, RESOURCE_PREFIX, isFontIconURI } from '../../utils';
@@ -383,11 +383,7 @@ export class ActionBar extends ActionBarBase {
 		super._addViewToNativeVisualTree(child);
 
 		if (this.nativeViewProtected && child.nativeViewProtected) {
-			if (atIndex >= this.nativeViewProtected.getChildCount()) {
-				this.nativeViewProtected.addView(child.nativeViewProtected);
-			} else {
-				this.nativeViewProtected.addView(child.nativeViewProtected, atIndex);
-			}
+			AndroidHelper.insertNativeSubview(this.nativeViewProtected, child.nativeViewProtected, atIndex);
 
 			return true;
 		}

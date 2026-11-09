@@ -45,12 +45,17 @@ declare const enum ColorSyncDataDepth {
 /**
  * @since 16.0
  */
-declare function ColorSyncIterateInstalledProfiles(callBack: interop.FunctionReference<(p1: NSDictionary<any, any>, p2: interop.Pointer | interop.Reference<any>) => boolean>, seed: interop.Pointer | interop.Reference<number>, userInfo: interop.Pointer | interop.Reference<any>, error: interop.Pointer | interop.Reference<NSError>): void;
+declare function ColorSyncIterateInstalledProfiles(callBack: interop.FunctionReference<(p1: NSDictionary<any, any>, p2: interop.Pointer | interop.Reference<any> | null) => boolean> | null, seed: interop.Pointer | interop.Reference<number> | ArrayBufferLike | ArrayBufferView | null, userInfo: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null, error: interop.Pointer | interop.Reference<NSError | null> | ArrayBufferLike | ArrayBufferView | null): void;
 
 interface ColorSyncMD5 {
 	digest: interop.Reference<number>;
 }
 declare var ColorSyncMD5: interop.StructType<ColorSyncMD5>;
+
+/**
+ * @since 27.0
+ */
+declare function ColorSyncProfileContainsHeadroomAdaptiveGainCurve(profile: any): boolean;
 
 /**
  * @since 16.0
@@ -60,12 +65,12 @@ declare function ColorSyncProfileContainsTag(prof: any, signature: string): bool
 /**
  * @since 16.0
  */
-declare function ColorSyncProfileCopyData(prof: any, error: interop.Pointer | interop.Reference<NSError>): NSData;
+declare function ColorSyncProfileCopyData(prof: any, error: interop.Pointer | interop.Reference<NSError | null> | ArrayBufferLike | ArrayBufferView | null): NSData;
 
 /**
  * @since 16.0
  */
-declare function ColorSyncProfileCopyDescriptionString(prof: any): string;
+declare function ColorSyncProfileCopyDescriptionString(prof: any): string | null;
 
 /**
  * @since 16.0
@@ -73,44 +78,74 @@ declare function ColorSyncProfileCopyDescriptionString(prof: any): string;
 declare function ColorSyncProfileCopyHeader(prof: any): NSData;
 
 /**
- * @since 16.0
+ * @since 27.0
  */
-declare function ColorSyncProfileCopyTag(prof: any, signature: string): NSData;
+declare function ColorSyncProfileCopyHeadroomAdaptiveGainCurveInfoDictionary(profile: any): NSDictionary<any, any> | null;
+
+/**
+ * @since 27.0
+ */
+declare function ColorSyncProfileCopyHeadroomAdaptiveGainCurveMetadata(profile: any): NSData | null;
 
 /**
  * @since 16.0
  */
-declare function ColorSyncProfileCopyTagSignatures(prof: any): NSArray<any>;
+declare function ColorSyncProfileCopyTag(prof: any, signature: string): NSData | null;
 
 /**
  * @since 16.0
  */
-declare function ColorSyncProfileCreate(data: NSData, error: interop.Pointer | interop.Reference<NSError>): any;
+declare function ColorSyncProfileCopyTagSignatures(prof: any): NSArray<any> | null;
 
 /**
  * @since 16.0
  */
-declare function ColorSyncProfileCreateLink(profileInfo: NSArray<any> | any[], options: NSDictionary<any, any>): any;
+declare function ColorSyncProfileCreate(data: NSData, error: interop.Pointer | interop.Reference<NSError | null> | ArrayBufferLike | ArrayBufferView | null): any | null;
+
+/**
+ * @since 27.0
+ */
+declare function ColorSyncProfileCreateCopyWithHeadroomAdaptiveGainCurveInfoDictionary(profile: any, info: NSDictionary<any, any>): any | null;
+
+/**
+ * @since 27.0
+ */
+declare function ColorSyncProfileCreateCopyWithHeadroomAdaptiveGainCurveMetadata(profile: any, data: NSData, options: NSDictionary<any, any> | null): any | null;
 
 /**
  * @since 16.0
  */
-declare function ColorSyncProfileCreateMutable(): any;
+declare function ColorSyncProfileCreateLink(profileInfo: NSArray<any> | any[], options: NSDictionary<any, any> | null): any | null;
 
 /**
  * @since 16.0
  */
-declare function ColorSyncProfileCreateMutableCopy(prof: any): any;
+declare function ColorSyncProfileCreateMutable(): any | null;
 
 /**
  * @since 16.0
  */
-declare function ColorSyncProfileCreateWithName(name: string): any;
+declare function ColorSyncProfileCreateMutableCopy(prof: any): any | null;
 
 /**
  * @since 16.0
  */
-declare function ColorSyncProfileCreateWithURL(url: NSURL, error: interop.Pointer | interop.Reference<NSError>): any;
+declare function ColorSyncProfileCreateWithName(name: string): any | null;
+
+/**
+ * @since 16.0
+ */
+declare function ColorSyncProfileCreateWithURL(url: NSURL, error: interop.Pointer | interop.Reference<NSError | null> | ArrayBufferLike | ArrayBufferView | null): any | null;
+
+/**
+ * @since 26.1
+ */
+declare function ColorSyncProfileCreateWithURLAndOptions(url: NSURL, options: NSDictionary<any, any> | null, error: interop.Pointer | interop.Reference<NSError | null> | ArrayBufferLike | ArrayBufferView | null): any | null;
+
+/**
+ * @since 26.1
+ */
+declare function ColorSyncProfileEstimateGamma(prof: any, error: interop.Pointer | interop.Reference<NSError | null> | ArrayBufferLike | ArrayBufferView | null): number;
 
 /**
  * @since 16.0
@@ -125,7 +160,7 @@ declare function ColorSyncProfileGetTypeID(): number;
 /**
  * @since 16.0
  */
-declare function ColorSyncProfileGetURL(prof: any, error: interop.Pointer | interop.Reference<NSError>): NSURL;
+declare function ColorSyncProfileGetURL(prof: any, error: interop.Pointer | interop.Reference<NSError | null> | ArrayBufferLike | ArrayBufferView | null): NSURL;
 
 /**
  * @since 16.0
@@ -165,27 +200,27 @@ declare function ColorSyncProfileSetTag(prof: any, signature: string, data: NSDa
 /**
  * @since 16.0
  */
-declare function ColorSyncProfileVerify(prof: any, errors: interop.Pointer | interop.Reference<NSError>, warnings: interop.Pointer | interop.Reference<NSError>): boolean;
+declare function ColorSyncProfileVerify(prof: any, errors: interop.Pointer | interop.Reference<NSError | null> | ArrayBufferLike | ArrayBufferView | null, warnings: interop.Pointer | interop.Reference<NSError | null> | ArrayBufferLike | ArrayBufferView | null): boolean;
 
 /**
  * @since 16.0
  */
-declare function ColorSyncTransformConvert(transform: any, width: number, height: number, dst: interop.Pointer | interop.Reference<any>, dstDepth: ColorSyncDataDepth, dstLayout: number, dstBytesPerRow: number, src: interop.Pointer | interop.Reference<any>, srcDepth: ColorSyncDataDepth, srcLayout: number, srcBytesPerRow: number, options: NSDictionary<any, any>): boolean;
+declare function ColorSyncTransformConvert(transform: any, width: number, height: number, dst: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView, dstDepth: ColorSyncDataDepth, dstLayout: number, dstBytesPerRow: number, src: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView, srcDepth: ColorSyncDataDepth, srcLayout: number, srcBytesPerRow: number, options: NSDictionary<any, any> | null): boolean;
 
 /**
  * @since 16.0
  */
-declare function ColorSyncTransformCopyProperty(transform: any, key: any, options: NSDictionary<any, any>): any;
+declare function ColorSyncTransformCopyProperty(transform: any, key: any, options: NSDictionary<any, any> | null): any | null;
 
 /**
  * @since 16.0
  */
-declare function ColorSyncTransformCreate(profileSequence: NSArray<any> | any[], options: NSDictionary<any, any>): any;
+declare function ColorSyncTransformCreate(profileSequence: NSArray<any> | any[] | null, options: NSDictionary<any, any> | null): any | null;
 
 /**
  * @since 16.0
  */
-declare function ColorSyncTransformGetProfileSequence(transform: any): NSArray<any>;
+declare function ColorSyncTransformGetProfileSequence(transform: any): NSArray<any> | null;
 
 /**
  * @since 16.0
@@ -195,7 +230,7 @@ declare function ColorSyncTransformGetTypeID(): number;
 /**
  * @since 16.0
  */
-declare function ColorSyncTransformSetProperty(transform: any, key: any, property: any): void;
+declare function ColorSyncTransformSetProperty(transform: any, key: any, property: any | null): void;
 
 /**
  * @since 16.0
@@ -208,6 +243,26 @@ declare var kColorSyncACESCGLinearProfile: string;
 declare var kColorSyncAdobeRGB1998Profile: string;
 
 declare const kColorSyncAlphaInfoMask: number;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncAlternateCurveCount: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncAlternateCurveHeadroomStops: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncAlternateGainCurveInfo: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncBaselineHeadroomStops: string;
 
 /**
  * @since 16.0
@@ -230,6 +285,71 @@ declare const kColorSyncByteOrder32Little: number;
 declare const kColorSyncByteOrderDefault: number;
 
 declare const kColorSyncByteOrderMask: number;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncCoefficientBlue: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncCoefficientComponent: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncCoefficientGreen: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncCoefficientMaxRGB: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncCoefficientMinRGB: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncCoefficientRed: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncCommonComponentMixing: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncCommonCurveParameters: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncComponentCoefficients: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncComponentMix: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncControlPointSlopes: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncControlPointsX: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncControlPointsY: string;
 
 /**
  * @since 16.0
@@ -312,6 +432,11 @@ declare var kColorSyncConvertQuality: string;
 declare var kColorSyncConvertUseExtendedRange: string;
 
 /**
+ * @since 27.0
+ */
+declare var kColorSyncCustomHDRReferenceWhite: string;
+
+/**
  * @since 16.0
  */
 declare var kColorSyncDCIP3Profile: string;
@@ -320,6 +445,11 @@ declare var kColorSyncDCIP3Profile: string;
  * @since 16.0
  */
 declare var kColorSyncDisplayP3Profile: string;
+
+/**
+ * @since 26.1
+ */
+declare var kColorSyncDoNotSubstituteProfiles: string;
 
 /**
  * @since 16.0
@@ -335,6 +465,11 @@ declare var kColorSyncExtendedRange: string;
  * @since 16.0
  */
 declare var kColorSyncFixedPointRange: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncGainCurveChromaticities: string;
 
 /**
  * @since 16.0
@@ -377,6 +512,26 @@ declare var kColorSyncHDRDerivative: string;
 declare var kColorSyncHLGDerivative: string;
 
 /**
+ * @since 27.0
+ */
+declare var kColorSyncHeadroomAdaptiveGainCurveApplicationVersion: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncHeadroomAdaptiveGainCurveColorVolumeTransform: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncHeadroomAdaptiveGainCurveInfo: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncHeadroomAdaptiveToneMappingInfo: string;
+
+/**
  * @since 16.0
  */
 declare var kColorSyncITUR2020Profile: string;
@@ -385,6 +540,16 @@ declare var kColorSyncITUR2020Profile: string;
  * @since 16.0
  */
 declare var kColorSyncITUR709Profile: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncInterpolateSlopes: string;
+
+/**
+ * @since 27.0
+ */
+declare var kColorSyncMaxControlPointIndex: string;
 
 /**
  * @since 16.0

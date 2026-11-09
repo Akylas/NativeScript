@@ -4,9 +4,15 @@ import * as types from '../../utils/types';
 import * as domainDebugger from '../../debugger';
 import type { HttpRequestOptions, HttpResponse, Headers } from '../http-interfaces';
 import { HttpResponseEncoding } from '../http-interfaces';
-import { BaseHttpContent } from '.';
-import { addHeader } from './http-request-internal-common';
+import { addHeader, getDebugRequestMethodAndBody } from './http-request-internal-common';
 export { addHeader } from './http-request-internal-common';
+
+export interface BaseHttpContent {
+	raw: any;
+	requestURL: string;
+	toNativeImage: () => Promise<any>;
+	toNativeString: (encoding?: HttpResponseEncoding) => any;
+}
 
 const currentDevice = UIDevice.currentDevice;
 const device = currentDevice.userInterfaceIdiom === UIUserInterfaceIdiom.Phone ? 'Phone' : 'Pad';
@@ -166,7 +172,7 @@ export function requestInternal<T extends object>(options: HttpRequestOptions, c
 				timestamp = Date.now() / 1000;
 				const request = {
 					url: options.url,
-					method: 'GET',
+					...getDebugRequestMethodAndBody(options),
 					headers: options.headers,
 					timestamp,
 					headersSize: options?.headers?.length ?? -1,

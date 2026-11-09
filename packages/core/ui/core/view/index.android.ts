@@ -9,7 +9,7 @@ import { ShowModalOptions, hiddenProperty } from '../view-base';
 import { isCssWideKeyword } from '../properties/property-shared';
 import { EventData } from '../../../data/observable';
 
-import { perspectiveProperty, visibilityProperty, opacityProperty, horizontalAlignmentProperty, verticalAlignmentProperty, minWidthProperty, minHeightProperty, widthProperty, heightProperty, marginLeftProperty, marginTopProperty, marginRightProperty, marginBottomProperty, rotateProperty, rotateXProperty, rotateYProperty, scaleXProperty, scaleYProperty, translateXProperty, translateYProperty, zIndexProperty, backgroundInternalProperty, androidElevationProperty, androidDynamicElevationOffsetProperty } from '../../styling/style-properties';
+import { perspectiveProperty, visibilityProperty, opacityProperty, horizontalAlignmentProperty, verticalAlignmentProperty, minWidthProperty, minHeightProperty, maxWidthProperty, maxHeightProperty, widthProperty, heightProperty, marginLeftProperty, marginTopProperty, marginRightProperty, marginBottomProperty, rotateProperty, rotateXProperty, rotateYProperty, scaleXProperty, scaleYProperty, translateXProperty, translateYProperty, zIndexProperty, backgroundInternalProperty, androidElevationProperty, androidDynamicElevationOffsetProperty } from '../../styling/style-properties';
 import { CoreTypes } from '../../../core-types';
 
 import { Background, BackgroundClearFlags, refreshBorderDrawable } from '../../styling/background';
@@ -524,7 +524,9 @@ export class View extends ViewCommon {
 	}
 
 	public onBackPressed(): boolean {
-		const topmostFrame = topmost();
+		// Scoped to this view's own window rather than the active one: a back press can reach a
+		// window that is not the one the user last activated.
+		const topmostFrame = topmost(this.getNativeWindow());
 
 		// Delegate back navigation handling to the topmost Frame
 		// when it's a child of the current View.
@@ -1466,7 +1468,7 @@ export class CustomLayoutView extends ContainerView {
 			if (Trace.isEnabled()) {
 				Trace.write(`${this}.nativeView.addView(${child}.nativeView, ${atIndex})`, Trace.categories.VisualTreeEvents);
 			}
-			this.nativeViewProtected.addView(child.nativeViewProtected, atIndex);
+			AndroidHelper.insertNativeSubview(this.nativeViewProtected, child.nativeViewProtected, atIndex);
 			if (child instanceof View) {
 				this._updateNativeLayoutParams(child);
 			}
@@ -1648,5 +1650,27 @@ createNativePercentLengthProperty({
 	setter: '_setMinHeightNative',
 	get setPixels() {
 		return ViewHelper.setMinHeight;
+	},
+});
+
+createNativePercentLengthProperty({
+	setter: maxWidthProperty.setNative,
+	auto: -1, // -1 means unconstrained (no maximum).
+	get setPixels() {
+		return org.nativescript.widgets.ViewHelper.setMaxWidth;
+	},
+	get setPercent() {
+		return org.nativescript.widgets.ViewHelper.setMaxWidthPercent;
+	},
+});
+
+createNativePercentLengthProperty({
+	setter: maxHeightProperty.setNative,
+	auto: -1, // -1 means unconstrained (no maximum).
+	get setPixels() {
+		return org.nativescript.widgets.ViewHelper.setMaxHeight;
+	},
+	get setPercent() {
+		return org.nativescript.widgets.ViewHelper.setMaxHeightPercent;
 	},
 });

@@ -34,7 +34,7 @@ declare class SRAcousticSettings extends NSObject implements NSCopying, NSSecure
 
 	readonly environmentalSoundMeasurementsEnabled: boolean;
 
-	readonly headphoneSafetyAudioLevel: number;
+	readonly headphoneSafetyAudioLevel: number | null;
 
 	readonly musicEQSettings: SRAcousticSettingsMusicEQ;
 
@@ -42,7 +42,7 @@ declare class SRAcousticSettings extends NSObject implements NSCopying, NSSecure
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -70,7 +70,7 @@ declare class SRAcousticSettingsAccessibility extends NSObject implements NSCopy
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -102,7 +102,7 @@ declare class SRAcousticSettingsAccessibilityBackgroundSounds extends NSObject i
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -168,7 +168,7 @@ declare class SRAcousticSettingsAccessibilityHeadphoneAccommodations extends NSO
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -194,6 +194,8 @@ declare const enum SRAcousticSettingsAccessibilityHeadphoneAccommodationsMediaEn
  */
 declare const enum SRAcousticSettingsAccessibilityHeadphoneAccommodationsMediaEnhanceBoosting {
 
+	None = 0,
+
 	Slight = 1,
 
 	Moderate = 2,
@@ -205,6 +207,8 @@ declare const enum SRAcousticSettingsAccessibilityHeadphoneAccommodationsMediaEn
  * @since 26.0
  */
 declare const enum SRAcousticSettingsAccessibilityHeadphoneAccommodationsMediaEnhanceTuning {
+
+	None = 0,
 
 	BalancedTone = 1,
 
@@ -230,7 +234,7 @@ declare class SRAcousticSettingsMusicEQ extends NSObject implements NSCopying, N
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -302,7 +306,7 @@ declare class SRApplicationUsage extends NSObject {
 
 	static new(): SRApplicationUsage; // inherited from NSObject
 
-	readonly bundleIdentifier: string;
+	readonly bundleIdentifier: string | null;
 
 	/**
 	 * @since 16.4
@@ -344,7 +348,7 @@ declare class SRAudioLevel extends NSObject implements NSCopying, NSSecureCoding
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -441,7 +445,7 @@ declare class SRDevice extends NSObject implements NSCopying, NSSecureCoding {
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -639,7 +643,7 @@ declare class SRElectrocardiogramData extends NSObject implements NSCopying, NSS
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -691,7 +695,7 @@ declare class SRElectrocardiogramSample extends NSObject implements NSCopying, N
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -717,7 +721,7 @@ declare class SRElectrocardiogramSession extends NSObject implements NSCopying, 
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -790,7 +794,7 @@ declare class SRFaceMetrics extends NSObject implements NSCopying, NSSecureCodin
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -824,7 +828,7 @@ declare class SRFaceMetricsExpression extends NSObject implements NSCopying, NSS
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -858,9 +862,126 @@ declare class SRFetchResult<SampleType> extends NSObject implements NSCopying {
 
 	readonly sample: any;
 
+	/**
+	 * @since 27.0
+	 */
+	readonly sourceDevice: SRSourceDevice | null;
+
 	readonly timestamp: number;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+}
+
+/**
+ * @since 27.0
+ */
+declare class SRHeadphoneSettings extends NSObject implements NSCopying, NSSecureCoding {
+
+	static alloc(): SRHeadphoneSettings; // inherited from NSObject
+
+	static new(): SRHeadphoneSettings; // inherited from NSObject
+
+	readonly adaptiveAudioStrength: SRHeadphoneSettingsAdaptiveAudioStrength;
+
+	readonly conversationAwarenessEnabled: SRHeadphoneSettingsSettingEnablement;
+
+	readonly hearingAssistance: SRHeadphoneSettingsHearingAssistance | null;
+
+	readonly listeningMode: SRHeadphoneSettingsListeningMode;
+
+	readonly personalizedSpatialAudioEnabled: SRHeadphoneSettingsSettingEnablement;
+
+	readonly personalizedVolumeEnabled: SRHeadphoneSettingsSettingEnablement;
+
+	readonly spatialAudioEnabled: SRHeadphoneSettingsSettingEnablement;
+
+	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
+
+	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
+
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+
+	encodeWithCoder(coder: NSCoder): void;
+
+	initWithCoder(coder: NSCoder): this;
+}
+
+/**
+ * @since 27.0
+ */
+declare const enum SRHeadphoneSettingsAdaptiveAudioStrength {
+
+	Low = 1,
+
+	Medium = 2,
+
+	High = 3
+}
+
+/**
+ * @since 27.0
+ */
+declare class SRHeadphoneSettingsHearingAssistance extends NSObject implements NSCopying, NSSecureCoding {
+
+	static alloc(): SRHeadphoneSettingsHearingAssistance; // inherited from NSObject
+
+	static new(): SRHeadphoneSettingsHearingAssistance; // inherited from NSObject
+
+	readonly adjustMediaEnabled: SRHeadphoneSettingsSettingEnablement;
+
+	readonly adjustVoiceEnabled: SRHeadphoneSettingsSettingEnablement;
+
+	readonly ambientNoiseReduction: number;
+
+	readonly conversationBoostEnabled: SRHeadphoneSettingsSettingEnablement;
+
+	readonly hearingAidAmplification: number;
+
+	readonly hearingAidBalance: number;
+
+	readonly hearingAidEnabled: SRHeadphoneSettingsSettingEnablement;
+
+	readonly hearingAidTone: number;
+
+	readonly hearingProtectionEnabled: SRHeadphoneSettingsSettingEnablement;
+
+	readonly mediaAssistEnabled: SRHeadphoneSettingsSettingEnablement;
+
+	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
+
+	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
+
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+
+	encodeWithCoder(coder: NSCoder): void;
+
+	initWithCoder(coder: NSCoder): this;
+}
+
+/**
+ * @since 27.0
+ */
+declare const enum SRHeadphoneSettingsListeningMode {
+
+	Normal = 1,
+
+	ActiveNoiseCancelling = 2,
+
+	Transparency = 3,
+
+	AutoActiveNoiseCancelling = 4
+}
+
+/**
+ * @since 27.0
+ */
+declare const enum SRHeadphoneSettingsSettingEnablement {
+
+	Unsupported = 0,
+
+	Enabled = 1,
+
+	Disabled = 2
 }
 
 /**
@@ -1116,7 +1237,7 @@ declare class SRMediaEvent extends NSObject implements NSCopying, NSSecureCoding
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -1200,7 +1321,7 @@ declare class SRNotificationUsage extends NSObject {
 
 	static new(): SRNotificationUsage; // inherited from NSObject
 
-	readonly bundleIdentifier: string;
+	readonly bundleIdentifier: string | null;
 
 	readonly event: SRNotificationEvent;
 }
@@ -1248,7 +1369,7 @@ declare class SRPhotoplethysmogramAccelerometerSample extends NSObject implement
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -1266,9 +1387,9 @@ declare class SRPhotoplethysmogramOpticalSample extends NSObject implements NSCo
 
 	readonly activePhotodiodeIndexes: NSIndexSet;
 
-	readonly backgroundNoise: number;
+	readonly backgroundNoise: number | null;
 
-	readonly backgroundNoiseOffset: number;
+	readonly backgroundNoiseOffset: number | null;
 
 	readonly conditions: NSArray<string>;
 
@@ -1280,21 +1401,21 @@ declare class SRPhotoplethysmogramOpticalSample extends NSObject implements NSCo
 
 	readonly nominalWavelength: NSMeasurement<NSUnitLength>;
 
-	readonly normalizedReflectance: number;
+	readonly normalizedReflectance: number | null;
 
-	readonly pinkNoise: number;
+	readonly pinkNoise: number | null;
 
 	readonly samplingFrequency: NSMeasurement<NSUnitFrequency>;
 
 	readonly signalIdentifier: number;
 
-	readonly whiteNoise: number;
+	readonly whiteNoise: number | null;
 
 	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -1328,7 +1449,7 @@ declare class SRPhotoplethysmogramSample extends NSObject implements NSCopying, 
 
 	readonly startDate: Date;
 
-	readonly temperature: NSMeasurement<NSUnitTemperature>;
+	readonly temperature: NSMeasurement<NSUnitTemperature> | null;
 
 	readonly usage: NSArray<string>;
 
@@ -1336,7 +1457,7 @@ declare class SRPhotoplethysmogramSample extends NSObject implements NSCopying, 
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -1399,6 +1520,16 @@ declare var SRSensorElectrocardiogram: string;
 declare var SRSensorFaceMetrics: string;
 
 /**
+ * @since 27.0
+ */
+declare var SRSensorHeadphoneMotion: string;
+
+/**
+ * @since 27.0
+ */
+declare var SRSensorHeadphoneSettings: string;
+
+/**
  * @since 17.0
  */
 declare var SRSensorHeartRate: string;
@@ -1444,7 +1575,7 @@ declare var SRSensorPhoneUsageReport: string;
 declare var SRSensorPhotoplethysmogram: string;
 
 /**
- * @since 14.0
+ * @since 13.0
  */
 declare class SRSensorReader extends NSObject {
 
@@ -1452,11 +1583,11 @@ declare class SRSensorReader extends NSObject {
 
 	static new(): SRSensorReader; // inherited from NSObject
 
-	static requestAuthorizationForSensorsCompletion(sensors: NSSet<string>, completion: (p1: NSError) => void): void;
+	static requestAuthorizationForSensorsCompletion(sensors: NSSet<string>, completion: (p1: NSError | null) => void): void;
 
 	readonly authorizationStatus: SRAuthorizationStatus;
 
-	delegate: SRSensorReaderDelegate;
+	delegate: SRSensorReaderDelegate | null;
 
 	readonly sensor: string;
 
@@ -1474,7 +1605,7 @@ declare class SRSensorReader extends NSObject {
 }
 
 /**
- * @since 14.0
+ * @since 13.0
  */
 interface SRSensorReaderDelegate extends NSObjectProtocol {
 
@@ -1552,7 +1683,37 @@ declare class SRSleepSession extends NSObject implements NSCopying, NSSecureCodi
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+
+	encodeWithCoder(coder: NSCoder): void;
+
+	initWithCoder(coder: NSCoder): this;
+}
+
+/**
+ * @since 27.0
+ */
+declare class SRSourceDevice extends NSObject implements NSCopying, NSSecureCoding {
+
+	static alloc(): SRSourceDevice; // inherited from NSObject
+
+	static new(): SRSourceDevice; // inherited from NSObject
+
+	readonly firmwareVersion: string | null;
+
+	readonly hardwareVersion: string | null;
+
+	readonly localIdentifier: string;
+
+	readonly manufacturer: string | null;
+
+	readonly model: string | null;
+
+	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
+
+	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
+
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -1586,7 +1747,7 @@ declare class SRSpeechExpression extends NSObject implements NSCopying, NSSecure
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -1602,17 +1763,17 @@ declare class SRSpeechMetrics extends NSObject implements NSCopying, NSSecureCod
 
 	static new(): SRSpeechMetrics; // inherited from NSObject
 
-	readonly audioLevel: SRAudioLevel;
+	readonly audioLevel: SRAudioLevel | null;
 
 	readonly sessionFlags: SRSpeechMetricsSessionFlags;
 
 	readonly sessionIdentifier: string;
 
-	readonly soundClassification: SNClassificationResult;
+	readonly soundClassification: SNClassificationResult | null;
 
-	readonly speechExpression: SRSpeechExpression;
+	readonly speechExpression: SRSpeechExpression | null;
 
-	readonly speechRecognition: SFSpeechRecognitionResult;
+	readonly speechRecognition: SFSpeechRecognitionResult | null;
 
 	/**
 	 * @since 17.2
@@ -1625,7 +1786,7 @@ declare class SRSpeechMetrics extends NSObject implements NSCopying, NSSecureCod
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -1657,7 +1818,7 @@ declare class SRSupplementalCategory extends NSObject implements NSCopying, NSSe
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -1743,14 +1904,14 @@ declare class SRWristDetection extends NSObject {
 	/**
 	 * @since 16.4
 	 */
-	readonly offWristDate: Date;
+	readonly offWristDate: Date | null;
 
 	readonly onWrist: boolean;
 
 	/**
 	 * @since 16.4
 	 */
-	readonly onWristDate: Date;
+	readonly onWristDate: Date | null;
 
 	readonly wristLocation: SRWristLocation;
 }
@@ -1786,7 +1947,7 @@ declare class SRWristTemperature extends NSObject implements NSCopying, NSSecure
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -1828,7 +1989,7 @@ declare class SRWristTemperatureSession extends NSObject implements NSCopying, N
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 

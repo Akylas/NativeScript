@@ -29,6 +29,18 @@ const PFLAG_FORCE_LAYOUT = 1;
 const PFLAG_MEASURED_DIMENSION_SET = 1 << 1;
 const PFLAG_LAYOUT_REQUIRED = 1 << 2;
 
+// Views whose requestLayout already climbed this turn; cleared by a microtask.
+let requestedThisTurn: Set<View> | null = null;
+
+function isAncestorChainLayoutRequested(view: View): boolean {
+	for (let parent = view.parent as View; parent; parent = parent.parent as View) {
+		if (!parent.isLayoutRequested) {
+			return false;
+		}
+	}
+	return true;
+}
+
 export class View extends ViewCommon {
 	// @ts-ignore
 	nativeViewProtected: UIView;
@@ -107,6 +119,11 @@ export class View extends ViewCommon {
 			return;
 		}
 		this._requetLayoutNeeded = false;
+		// A layout pass in the same turn (e.g. layoutIfNeeded) can clear an ancestor that
+		// skipped this view, so only a fully flagged chain lets the native climb be skipped.
+		if (requestedThisTurn?.has(this) && this.isLayoutRequested && isAncestorChainLayoutRequested(this)) {
+			return;
+		}
 		this._privateFlags |= PFLAG_FORCE_LAYOUT;
 		super.requestLayout();
 
@@ -119,6 +136,12 @@ export class View extends ViewCommon {
 		if (controller && controller.view !== nativeView) {
 			controller.view.setNeedsLayout();
 		}
+
+		if (!requestedThisTurn) {
+			requestedThisTurn = new Set();
+			queueMicrotask(() => (requestedThisTurn = null));
+		}
+		requestedThisTurn.add(this);
 	}
 
 	public measure(widthMeasureSpec: number, heightMeasureSpec: number): void {
@@ -222,8 +245,13 @@ export class View extends ViewCommon {
 			nativeHeight = nativeSize.height;
 		}
 
-		const measureWidth = Math.max(nativeWidth, this.effectiveMinWidth);
-		const measureHeight = Math.max(nativeHeight, this.effectiveMinHeight);
+		let measureWidth = Math.max(nativeWidth, this.effectiveMinWidth);
+		let measureHeight = Math.max(nativeHeight, this.effectiveMinHeight);
+
+		// Clamp to max-width/max-height (effectiveMax* is Infinity when unconstrained).
+		// Applied after min so that max wins when min > max, matching CSS.
+		measureWidth = Math.min(measureWidth, this.effectiveMaxWidth);
+		measureHeight = Math.min(measureHeight, this.effectiveMaxHeight);
 
 		const widthAndState = View.resolveSizeAndState(measureWidth, width, widthMode, 0);
 		const heightAndState = View.resolveSizeAndState(measureHeight, height, heightMode, 0);
@@ -370,6 +398,11 @@ export class View extends ViewCommon {
 		const safeAreaInsets = this.nativeViewProtected && this.nativeViewProtected.safeAreaInsets;
 		const insets = { left: 0, top: 0, right: 0, bottom: 0 };
 		if (this.iosIgnoreSafeArea) {
+			return insets;
+		}
+		// An iOS-managed ScrollView ancestor already applies safe-area insets via
+		// adjustedContentInset; subtracting them here too would double-count them.
+		if (IOSHelper.hasIOSManagedInsetAncestor(this)) {
 			return insets;
 		}
 		if (safeAreaInsets) {
@@ -1052,6 +1085,19 @@ export class View extends ViewCommon {
 		IOSHelper.invalidateStatusBarAppearance(ownerController, `View.updateStatusBarStyle:${value}`);
 	}
 
+	public _childIndexToNativeChildIndex(index?: number): number {
+		if (typeof index !== 'number') {
+			return index;
+		}
+		// The glass effect view is a subview but not a child: it sits at subview
+		// 0, so every child's subview index is one past its child index.
+		const effectView = this._glassEffectView;
+		if (effectView && effectView.superview === this.nativeViewProtected) {
+			return index + 1;
+		}
+		return index;
+	}
+
 	[iosGlassEffectProperty.setNative](value: GlassEffectType) {
 		if (!this.nativeViewProtected || !supportsGlass()) {
 			return;
@@ -1325,11 +1371,7 @@ export class CustomLayoutView extends ContainerView {
 		const childNativeView: NativeScriptUIView = <NativeScriptUIView>child.nativeViewProtected;
 
 		if (parentNativeView && childNativeView) {
-			if (typeof atIndex !== 'number' || atIndex >= parentNativeView.subviews.count) {
-				parentNativeView.addSubview(childNativeView);
-			} else {
-				parentNativeView.insertSubviewAtIndex(childNativeView, atIndex);
-			}
+			IOSHelper.insertNativeSubview(parentNativeView, childNativeView, atIndex);
 
 			// Add outer shadow layer manually as it belongs to parent layer tree (this is needed for reusable views)
 			if (childNativeView.outerShadowContainerLayer && !childNativeView.outerShadowContainerLayer.superlayer) {

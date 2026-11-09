@@ -31,6 +31,7 @@ import { ShadowCSSValues } from '../../styling/css-shadow';
 import { SharedTransition, SharedTransitionInteractiveOptions } from '../../transition/shared-transition';
 import { Flex, FlexFlow } from '../../layouts/flexbox-layout';
 import { CoreTypes, Trace } from '../../styling/styling-shared';
+import type { NativeWindow } from '../../../native-window';
 
 // helpers (these are okay re-exported here)
 export * from './view-helper';
@@ -72,11 +73,35 @@ type InteractiveTransitionState = { began?: boolean; cancelled?: boolean; option
 // TODO: remove once we fully switch to the new event system
 const warnedEvent = new Set<string>();
 
+// Resolves a max-width/max-height style value to an effective device-pixel constraint.
+// 'auto' (the default) or an unresolvable percent (parent size unknown) means "no maximum",
+// represented as Infinity so that Math.min(measured, effectiveMax) becomes a no-op.
+function resolveEffectiveMax(value: CoreTypes.PercentLengthType, availableSize: number): number {
+	if (value == null || value === 'auto') {
+		return Number.POSITIVE_INFINITY;
+	}
+	// A percent cannot be resolved when the parent size is unspecified (availableSize < 0);
+	// treat it as unconstrained rather than collapsing the view to ~0.
+	if (typeof value === 'object' && (value as CoreTypes.LengthPercentUnit).unit === '%' && availableSize < 0) {
+		return Number.POSITIVE_INFINITY;
+	}
+	const resolved = PercentLength.toDevicePixels(value, Number.POSITIVE_INFINITY, availableSize);
+	// Safety net for any other unresolved/bogus negative result.
+	return resolved < 0 ? Number.POSITIVE_INFINITY : resolved;
+}
+
 export abstract class ViewCommon extends ViewBase {
 	public static layoutChangedEvent = 'layoutChanged';
 	public static shownModallyEvent = 'shownModally';
 	public static showingModallyEvent = 'showingModally';
 	public static closingModallyEvent = 'closingModally';
+	/**
+	 * Fired on the modal view once its native dismissal has fully completed
+	 * (after the close callback and UI teardown). Unlike `closeCallback` —
+	 * which is captured per-show — any observer can listen for this, e.g.
+	 * tooling that needs to re-present a modal (dev-time HMR).
+	 */
+	public static closedModallyEvent = 'closedModally';
 	public static accessibilityBlurEvent = accessibilityBlurEvent;
 	public static accessibilityFocusEvent = accessibilityFocusEvent;
 	public static accessibilityFocusChangedEvent = accessibilityFocusChangedEvent;
@@ -116,6 +141,21 @@ export abstract class ViewCommon extends ViewBase {
 	protected _closeModalCallback: Function;
 	public _manager: any;
 	public _modalParent?: ViewCommon;
+	/**
+	 * @internal – the window this view is the root view of. Only ever set on a window's
+	 * root view; every other view resolves its window by walking up to that root.
+	 *
+	 * Kept on the view instead of in a window-side registry so the lookup needs no runtime
+	 * dependency on the native-window module.
+	 */
+	public _nativeWindow?: NativeWindow;
+	/**
+	 * The ShowModalOptions this view is currently presented with (set in
+	 * _showNativeModalView, cleared on close). Lets tooling re-present the
+	 * modal with its original options — e.g. dev-time HMR re-show — which
+	 * are otherwise only captured inside the close-callback closure.
+	 */
+	public _modalOptions?: ShowModalOptions;
 	private _modalContext: any;
 	private _modal: ViewCommon;
 
@@ -235,6 +275,34 @@ export abstract class ViewCommon extends ViewBase {
 
 	public _getRootModalViews(): Array<ViewBase> {
 		return _rootModalViews;
+	}
+
+	public _getRootModalHost(): ViewBase {
+		let view: ViewBase = this;
+
+		while (view) {
+			// A modal root has no parent, so the chain continues through the view it was
+			// presented over; nested modals therefore resolve to the same window root.
+			const next = view.parent ?? (<ViewCommon>view)._modalParent;
+			if (!next) {
+				break;
+			}
+			view = next;
+		}
+
+		return view;
+	}
+
+	/**
+	 * The window currently hosting this view, or `undefined` when the view is not part of
+	 * any window's view tree — including a view whose window has been closed.
+	 *
+	 * Resolved on every call by walking up to the root view — through the presenting view
+	 * of any modal on the way — so a view re-parented into another window's tree reports
+	 * the window it moved to.
+	 */
+	public getNativeWindow(): NativeWindow | undefined {
+		return (<ViewCommon>this._getRootModalHost())?._nativeWindow ?? undefined;
 	}
 
 	public _onLivesync(context?: ModuleContext): boolean {
@@ -459,10 +527,22 @@ export abstract class ViewCommon extends ViewBase {
 		const modalRootViewCssClasses = CSSUtils.getSystemCssClasses();
 		modalRootViewCssClasses.forEach((c) => this.cssClasses.add(c));
 
+		// Orientation/appearance/direction are not in the system class list because they
+		// differ per window, so they are inherited from the root this modal opens over.
+		const host = parent._getRootModalHost();
+		if (host) {
+			CSSUtils.WINDOW_SCOPED_CSS_CLASSES.forEach((c) => {
+				if (host.cssClasses.has(c)) {
+					this.cssClasses.add(c);
+				}
+			});
+		}
+
 		parent._modal = this;
 		this.style.fontScaleInternal = getFontScale();
 		this._modalParent = parent;
 		this._modalContext = options.context;
+		this._modalOptions = options;
 		this._closeModalCallback = (...originalArgs) => {
 			const cleanupModalViews = () => {
 				const modalIndex = _rootModalViews.indexOf(this);
@@ -472,6 +552,7 @@ export abstract class ViewCommon extends ViewBase {
 
 				this._modalParent = null;
 				this._modalContext = null;
+				this._modalOptions = null;
 				this._closeModalCallback = null;
 				this._dialogClosed();
 				parent._modal = null;
@@ -500,6 +581,15 @@ export abstract class ViewCommon extends ViewBase {
 
 					this._tearDownUI(true);
 					this.parent = null;
+
+					// Native dismissal fully completed (this callback runs in the
+					// platform dismissal completion) — observable counterpart to the
+					// per-show closeCallback. Used by dev tooling (HMR modal
+					// re-present) to know exactly when a new present is safe.
+					this.notify(<EventData>{
+						eventName: ViewCommon.closedModallyEvent,
+						object: this,
+					});
 				}
 			};
 
@@ -794,6 +884,20 @@ export abstract class ViewCommon extends ViewBase {
 	}
 	set minHeight(value: CoreTypes.LengthType) {
 		this.style.minHeight = value;
+	}
+
+	get maxWidth(): CoreTypes.PercentLengthType {
+		return this.style.maxWidth;
+	}
+	set maxWidth(value: CoreTypes.PercentLengthType) {
+		this.style.maxWidth = value;
+	}
+
+	get maxHeight(): CoreTypes.PercentLengthType {
+		return this.style.maxHeight;
+	}
+	set maxHeight(value: CoreTypes.PercentLengthType) {
+		this.style.maxHeight = value;
 	}
 
 	get width(): CoreTypes.PercentLengthType {
@@ -1262,12 +1366,14 @@ export abstract class ViewCommon extends ViewBase {
 		const availableWidth = parentWidthMeasureMode === layout.UNSPECIFIED ? -1 : parentWidthMeasureSize;
 
 		this.effectiveWidth = PercentLength.toDevicePixels(style.width, -2, availableWidth);
+		this.effectiveMaxWidth = resolveEffectiveMax(style.maxWidth, availableWidth);
 		this.effectiveMarginLeft = PercentLength.toDevicePixels(style.marginLeft, 0, availableWidth);
 		this.effectiveMarginRight = PercentLength.toDevicePixels(style.marginRight, 0, availableWidth);
 
 		const availableHeight = parentHeightMeasureMode === layout.UNSPECIFIED ? -1 : parentHeightMeasureSize;
 
 		this.effectiveHeight = PercentLength.toDevicePixels(style.height, -2, availableHeight);
+		this.effectiveMaxHeight = resolveEffectiveMax(style.maxHeight, availableHeight);
 		this.effectiveMarginTop = PercentLength.toDevicePixels(style.marginTop, 0, availableHeight);
 		this.effectiveMarginBottom = PercentLength.toDevicePixels(style.marginBottom, 0, availableHeight);
 	}

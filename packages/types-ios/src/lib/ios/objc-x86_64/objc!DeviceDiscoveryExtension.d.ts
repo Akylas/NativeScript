@@ -11,9 +11,9 @@ declare class DDDevice extends NSObject {
 	/**
 	 * @since 18.0
 	 */
-	SSID: string;
+	SSID: string | null;
 
-	bluetoothIdentifier: NSUUID;
+	bluetoothIdentifier: NSUUID | null;
 
 	category: DDDeviceCategory;
 
@@ -25,19 +25,31 @@ declare class DDDevice extends NSObject {
 	/**
 	 * @since 18.0
 	 */
-	displayImageName: string;
+	displayImageName: string | null;
 
 	displayName: string;
 
 	identifier: string;
 
-	mediaContentSubtitle: string;
+	/**
+	 * @since 16.0
+	 * @deprecated 27.0
+	 */
+	mediaContentSubtitle: string | null;
 
-	mediaContentTitle: string;
+	/**
+	 * @since 16.0
+	 * @deprecated 27.0
+	 */
+	mediaContentTitle: string | null;
 
+	/**
+	 * @since 16.0
+	 * @deprecated 27.0
+	 */
 	mediaPlaybackState: DDDeviceMediaPlaybackState;
 
-	networkEndpoint: NSObject & OS_nw_endpoint;
+	networkEndpoint: NSObject & OS_nw_endpoint | null;
 
 	protocol: DDDeviceProtocol;
 
@@ -50,19 +62,19 @@ declare class DDDevice extends NSObject {
 	 */
 	supportsGrouping: boolean;
 
-	txtRecordData: NSData;
+	txtRecordData: NSData | null;
 
 	url: NSURL;
 
 	/**
 	 * @since 26.0
 	 */
-	wifiAwareModelName: string;
+	wifiAwareModelName: string | null;
 
 	/**
 	 * @since 26.0
 	 */
-	wifiAwareServiceName: string;
+	wifiAwareServiceName: string | null;
 
 	/**
 	 * @since 26.0
@@ -72,7 +84,7 @@ declare class DDDevice extends NSObject {
 	/**
 	 * @since 26.0
 	 */
-	wifiAwareVendorName: string;
+	wifiAwareVendorName: string | null;
 
 	constructor(o: { displayName: string; category: DDDeviceCategory; protocolType: UTType; identifier: string; });
 

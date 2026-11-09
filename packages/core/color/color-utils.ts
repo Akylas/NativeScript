@@ -2,11 +2,25 @@ import { Trace } from '../trace';
 
 export const HEX_REGEX = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)|(^#[0-9A-F]{8}$)|(^#[0-9A-F]{4}$)/i;
 
+const CSS_COLOR_FUNCTION_REGEX = /^(?:oklch|oklab|lab|lch|hwb|color)\(/;
+
 export function isCssColorMixExpression(value: string) {
 	return value.includes('color-mix(');
 }
 
-export function argbFromColorMix(value: string): number {
+export function isCssColorFunction(value: string) {
+	return CSS_COLOR_FUNCTION_REGEX.test(value);
+}
+
+export function isModernRgbOrHsl(value: string) {
+	return value.includes('/') || value.includes('none') || value.includes('from ') || (value.startsWith('rgb') && value.includes('%'));
+}
+
+export function argbFromCssColor(value: string): number | null {
+	return argbFromColorMix(value);
+}
+
+export function argbFromColorMix(value: string): number | null {
 	if (__CSS_USE_CSS_TOOLS__) {
 		const parseComponentValue = require('@csstools/css-parser-algorithms').parseComponentValue;
 		const serializeRGB = require('@csstools/css-color-parser').serializeRGB;
@@ -14,22 +28,15 @@ export function argbFromColorMix(value: string): number {
 		const color = require('@csstools/css-color-parser').color;
 		const astComponentValue = parseComponentValue(tokenize({ css: value }));
 		const colorData = color(astComponentValue);
-
-		let argb: number;
-
-		if (colorData) {
-			const serialized = serializeRGB(colorData);
-			argb = argbFromRgbOrRgba(serialized.toString());
-		} else {
-			argb = -1;
+		if (!colorData) {
+			return null;
 		}
 
-		return argb;
+		return argbFromRgbOrRgba(serializeRGB(colorData).toString());
 	} else {
 		Trace.write(`To use color-mix you must define __CSS_USE_CSS_TOOLS__ in webpack Define`, Trace.categories.Accessibility, Trace.messageType.error);
-		return -1;
+		return null;
 	}
-	
 }
 
 export function fromArgbToRgba(argb: number): { a: number; r: number; g: number; b: number } {

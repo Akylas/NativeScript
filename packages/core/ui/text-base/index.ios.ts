@@ -346,7 +346,29 @@ export class TextBase extends TextBaseCommon {
 		}
 	}
 
+	private _deferNativeText = false;
+	private _pendingNativeTextReset: boolean | undefined;
+
+	public onResumeNativeUpdates(): void {
+		// Each text setter rebuilds the native text; the initial apply needs it once.
+		this._deferNativeText = true;
+		try {
+			super.onResumeNativeUpdates();
+		} finally {
+			this._deferNativeText = false;
+		}
+		const reset = this._pendingNativeTextReset;
+		if (reset !== undefined) {
+			this._pendingNativeTextReset = undefined;
+			this._setNativeText(reset);
+		}
+	}
+
 	_setNativeText(reset = false): void {
+		if (this._deferNativeText) {
+			this._pendingNativeTextReset = reset;
+			return;
+		}
 		this._animationWrap(() => {
 			const nativeView = this.nativeTextViewProtected;
 			if (reset) {
@@ -624,13 +646,15 @@ export function getTransformedText(text: string, textTransform: CoreTypes.TextTr
 		return '';
 	}
 
+	// Use the NSString localized properties to get localized transformations.
+	// This will respect the locale set by native apis or the localize plugins.
 	switch (textTransform) {
 		case 'uppercase':
-			return NSStringFromNSAttributedString(text).uppercaseString;
+			return NSStringFromNSAttributedString(text).localizedUppercaseString;
 		case 'lowercase':
-			return NSStringFromNSAttributedString(text).lowercaseString;
+			return NSStringFromNSAttributedString(text).localizedLowercaseString;
 		case 'capitalize':
-			return NSStringFromNSAttributedString(text).capitalizedString;
+			return NSStringFromNSAttributedString(text).localizedCapitalizedString;
 		default:
 			return text;
 	}

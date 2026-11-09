@@ -59,7 +59,7 @@ declare class AVCaptureEventInteraction extends NSObject implements UIInteractio
 
 	readonly superclass: typeof NSObject; // inherited from NSObjectProtocol
 
-	readonly view: UIView; // inherited from UIInteraction
+	readonly view: UIView | null; // inherited from UIInteraction
 
 	readonly  // inherited from NSObjectProtocol
 
@@ -71,7 +71,7 @@ declare class AVCaptureEventInteraction extends NSObject implements UIInteractio
 
 	conformsToProtocol(aProtocol: any /* Protocol */): boolean;
 
-	didMoveToView(view: UIView): void;
+	didMoveToView(view: UIView | null): void;
 
 	initWithEventHandler(handler: (p1: AVCaptureEvent) => void): this;
 
@@ -95,7 +95,7 @@ declare class AVCaptureEventInteraction extends NSObject implements UIInteractio
 
 	self(): this;
 
-	willMoveToView(view: UIView): void;
+	willMoveToView(view: UIView | null): void;
 }
 
 /**
@@ -155,7 +155,7 @@ declare class AVInputPickerInteraction extends NSObject implements UIInteraction
 
 	audioSession: AVAudioSession;
 
-	delegate: AVInputPickerInteractionDelegate;
+	delegate: AVInputPickerInteractionDelegate | null;
 
 	readonly presented: boolean;
 
@@ -169,21 +169,21 @@ declare class AVInputPickerInteraction extends NSObject implements UIInteraction
 
 	readonly superclass: typeof NSObject; // inherited from NSObjectProtocol
 
-	readonly view: UIView; // inherited from UIInteraction
+	readonly view: UIView | null; // inherited from UIInteraction
 
 	readonly  // inherited from NSObjectProtocol
 
-	constructor(o: { audioSession: AVAudioSession; });
+	constructor(o: { audioSession: AVAudioSession | null; });
 
 	class(): typeof NSObject;
 
 	conformsToProtocol(aProtocol: any /* Protocol */): boolean;
 
-	didMoveToView(view: UIView): void;
+	didMoveToView(view: UIView | null): void;
 
 	dismiss(): void;
 
-	initWithAudioSession(audioSession: AVAudioSession): this;
+	initWithAudioSession(audioSession: AVAudioSession | null): this;
 
 	isEqual(object: any): boolean;
 
@@ -205,7 +205,7 @@ declare class AVInputPickerInteraction extends NSObject implements UIInteraction
 
 	self(): this;
 
-	willMoveToView(view: UIView): void;
+	willMoveToView(view: UIView | null): void;
 }
 
 /**
@@ -241,7 +241,7 @@ declare class AVInterstitialTimeRange extends NSObject implements NSCopying, NSS
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -272,6 +272,72 @@ declare const enum AVKitError {
 declare var AVKitErrorDomain: string;
 
 /**
+ * @since 26.4
+ */
+declare const enum AVLegibleMediaOptionsMenuContents {
+
+	Legible = 1,
+
+	CaptionAppearance = 2,
+
+	All = 3
+}
+
+/**
+ * @since 26.4
+ */
+declare class AVLegibleMediaOptionsMenuController extends NSObject {
+
+	static alloc(): AVLegibleMediaOptionsMenuController; // inherited from NSObject
+
+	static new(): AVLegibleMediaOptionsMenuController; // inherited from NSObject
+
+	delegate: AVLegibleMediaOptionsMenuControllerDelegate | null;
+
+	readonly menuState: AVLegibleMediaOptionsMenuState;
+
+	player: AVPlayer;
+
+	constructor(o: { player: AVPlayer | null; });
+
+	initWithPlayer(player: AVPlayer | null): this;
+
+	menuWithContents(contents: AVLegibleMediaOptionsMenuContents): UIMenu | null;
+}
+
+/**
+ * @since 26.4
+ */
+interface AVLegibleMediaOptionsMenuControllerDelegate extends NSObjectProtocol {
+
+	legibleMenuControllerDidChangeMenuState?(menuController: AVLegibleMediaOptionsMenuController, state: AVLegibleMediaOptionsMenuState): void;
+
+	legibleMenuControllerDidRequestCaptionPreviewForProfileID?(menuController: AVLegibleMediaOptionsMenuController, profileID: string): void;
+
+	legibleMenuControllerDidRequestStoppingSubtitleCaptionPreview?(menuController: AVLegibleMediaOptionsMenuController): void;
+}
+declare var AVLegibleMediaOptionsMenuControllerDelegate: {
+
+	prototype: AVLegibleMediaOptionsMenuControllerDelegate;
+};
+
+interface AVLegibleMediaOptionsMenuState {
+	enabled: boolean;
+	reason: AVLegibleMediaOptionsMenuStateChangeReason;
+}
+declare var AVLegibleMediaOptionsMenuState: interop.StructType<AVLegibleMediaOptionsMenuState>;
+
+/**
+ * @since 26.4
+ */
+declare const enum AVLegibleMediaOptionsMenuStateChangeReason {
+
+	None = 0,
+
+	LanguageMismatch = 1
+}
+
+/**
  * @since 9.0
  */
 declare class AVPictureInPictureController extends NSObject {
@@ -282,9 +348,9 @@ declare class AVPictureInPictureController extends NSObject {
 
 	static new(): AVPictureInPictureController; // inherited from NSObject
 
-	static pictureInPictureButtonStartImageCompatibleWithTraitCollection(traitCollection: UITraitCollection): UIImage;
+	static pictureInPictureButtonStartImageCompatibleWithTraitCollection(traitCollection: UITraitCollection | null): UIImage;
 
-	static pictureInPictureButtonStopImageCompatibleWithTraitCollection(traitCollection: UITraitCollection): UIImage;
+	static pictureInPictureButtonStopImageCompatibleWithTraitCollection(traitCollection: UITraitCollection | null): UIImage;
 
 	/**
 	 * @since 14.2
@@ -294,9 +360,9 @@ declare class AVPictureInPictureController extends NSObject {
 	/**
 	 * @since 15.0
 	 */
-	contentSource: AVPictureInPictureControllerContentSource;
+	contentSource: AVPictureInPictureControllerContentSource | null;
 
-	delegate: AVPictureInPictureControllerDelegate;
+	delegate: AVPictureInPictureControllerDelegate | null;
 
 	readonly pictureInPictureActive: boolean;
 
@@ -362,13 +428,13 @@ declare class AVPictureInPictureControllerContentSource extends NSObject {
 	/**
 	 * @since 15.0
 	 */
-	readonly activeVideoCallSourceView: UIView;
+	readonly activeVideoCallSourceView: UIView | null;
 
-	readonly playerLayer: AVPlayerLayer;
+	readonly playerLayer: AVPlayerLayer | null;
 
-	readonly sampleBufferDisplayLayer: AVSampleBufferDisplayLayer;
+	readonly sampleBufferDisplayLayer: AVSampleBufferDisplayLayer | null;
 
-	readonly sampleBufferPlaybackDelegate: AVPictureInPictureSampleBufferPlaybackDelegate;
+	readonly sampleBufferPlaybackDelegate: AVPictureInPictureSampleBufferPlaybackDelegate | null;
 
 	/**
 	 * @since 15.0
@@ -466,6 +532,388 @@ declare class AVPlaybackSpeed extends NSObject {
 }
 
 /**
+ * @since 27.0
+ */
+declare class AVPlaybackUserInterfaceContentArtwork extends NSObject implements NSCopying, NSSecureCoding {
+
+	static alloc(): AVPlaybackUserInterfaceContentArtwork; // inherited from NSObject
+
+	static artworkWithURLContentTypeSize(url: NSURL, type: UTType, size: CGSize): AVPlaybackUserInterfaceContentURLArtwork;
+
+	static new(): AVPlaybackUserInterfaceContentArtwork; // inherited from NSObject
+
+	readonly size: CGSize;
+
+	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
+
+	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
+
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+
+	encodeWithCoder(coder: NSCoder): void;
+
+	initWithCoder(coder: NSCoder): this;
+}
+
+/**
+ * @since 27.0
+ */
+declare class AVPlaybackUserInterfaceContentMetadata extends NSObject implements NSCopying, NSSecureCoding {
+
+	static alloc(): AVPlaybackUserInterfaceContentMetadata; // inherited from NSObject
+
+	static new(): AVPlaybackUserInterfaceContentMetadata; // inherited from NSObject
+
+	readonly artworkRepresentations: NSArray<AVPlaybackUserInterfaceContentArtwork>;
+
+	readonly subtitle: string | null;
+
+	readonly title: string | null;
+
+	readonly videoProperties: AVPlaybackUserInterfaceContentVideoProperties | null;
+
+	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
+
+	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
+
+	constructor(o: { template: AVPlaybackUserInterfaceContentMetadataTemplate | null; });
+
+	constructor(o: { videoProperties: AVPlaybackUserInterfaceContentVideoProperties | null; title: string | null; subtitle: string | null; artworkRepresentations: NSArray<AVPlaybackUserInterfaceContentArtwork> | AVPlaybackUserInterfaceContentArtwork[]; });
+
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+
+	encodeWithCoder(coder: NSCoder): void;
+
+	initWithCoder(coder: NSCoder): this;
+
+	initWithTemplate(metadataTemplate: AVPlaybackUserInterfaceContentMetadataTemplate | null): this;
+
+	initWithVideoPropertiesTitleSubtitleArtworkRepresentations(videoProperties: AVPlaybackUserInterfaceContentVideoProperties | null, title: string | null, subtitle: string | null, artworkRepresentations: NSArray<AVPlaybackUserInterfaceContentArtwork> | AVPlaybackUserInterfaceContentArtwork[]): this;
+}
+
+/**
+ * @since 27.0
+ */
+declare class AVPlaybackUserInterfaceContentMetadataTemplate extends NSObject implements NSCopying, NSSecureCoding {
+
+	static alloc(): AVPlaybackUserInterfaceContentMetadataTemplate; // inherited from NSObject
+
+	static new(): AVPlaybackUserInterfaceContentMetadataTemplate; // inherited from NSObject
+
+	artworkRepresentations: NSArray<AVPlaybackUserInterfaceContentArtwork>;
+
+	subtitle: string | null;
+
+	title: string | null;
+
+	videoProperties: AVPlaybackUserInterfaceContentVideoProperties | null;
+
+	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
+
+	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
+
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+
+	encodeWithCoder(coder: NSCoder): void;
+
+	initWithCoder(coder: NSCoder): this;
+}
+
+/**
+ * @since 27.0
+ */
+declare class AVPlaybackUserInterfaceContentURLArtwork extends AVPlaybackUserInterfaceContentArtwork {
+
+	static alloc(): AVPlaybackUserInterfaceContentURLArtwork; // inherited from NSObject
+
+	static new(): AVPlaybackUserInterfaceContentURLArtwork; // inherited from NSObject
+
+	readonly contentType: UTType;
+
+	readonly url: NSURL;
+}
+
+/**
+ * @since 27.0
+ */
+declare class AVPlaybackUserInterfaceContentVideoProperties extends NSObject implements NSCopying, NSSecureCoding {
+
+	static alloc(): AVPlaybackUserInterfaceContentVideoProperties; // inherited from NSObject
+
+	static new(): AVPlaybackUserInterfaceContentVideoProperties; // inherited from NSObject
+
+	readonly presentationSize: CGSize;
+
+	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
+
+	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
+
+	constructor(o: { presentationSize: CGSize; });
+
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+
+	encodeWithCoder(coder: NSCoder): void;
+
+	initWithCoder(coder: NSCoder): this;
+
+	initWithPresentationSize(presentationSize: CGSize): this;
+}
+
+/**
+ * @since 27.0
+ */
+interface AVPlaybackUserInterfaceControllable extends AVPlaybackUserInterfaceMediaSelectionControllable, AVPlaybackUserInterfaceMetadataProviding, AVPlaybackUserInterfacePlaybackControllable, AVPlaybackUserInterfaceTimeControllable, AVPlaybackUserInterfaceVolumeControllable {
+}
+declare var AVPlaybackUserInterfaceControllable: {
+
+	prototype: AVPlaybackUserInterfaceControllable;
+};
+
+/**
+ * @since 27.0
+ */
+interface AVPlaybackUserInterfaceMediaSelectionControllable extends NSObjectProtocol {
+
+	audioDescriptionOptions: NSArray<AVPlaybackUserInterfaceMediaSelectionOption>;
+
+	audioOptions: NSArray<AVPlaybackUserInterfaceMediaSelectionOption>;
+
+	currentAudioDescriptionOption: AVPlaybackUserInterfaceMediaSelectionOption | null;
+
+	currentAudioOption: AVPlaybackUserInterfaceMediaSelectionOption | null;
+
+	currentLegibleOption: AVPlaybackUserInterfaceMediaSelectionOption | null;
+
+	legibleOptions: NSArray<AVPlaybackUserInterfaceMediaSelectionOption>;
+}
+declare var AVPlaybackUserInterfaceMediaSelectionControllable: {
+
+	prototype: AVPlaybackUserInterfaceMediaSelectionControllable;
+};
+
+/**
+ * @since 27.0
+ */
+declare class AVPlaybackUserInterfaceMediaSelectionOption extends NSObject implements NSCopying, NSSecureCoding {
+
+	static alloc(): AVPlaybackUserInterfaceMediaSelectionOption; // inherited from NSObject
+
+	static new(): AVPlaybackUserInterfaceMediaSelectionOption; // inherited from NSObject
+
+	readonly displayName: string;
+
+	readonly extendedLanguageTag: string | null;
+
+	readonly identifier: string;
+
+	readonly mediaCharacteristics: NSArray<string>;
+
+	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
+
+	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
+
+	constructor(o: { displayName: string; identifier: string; extendedLanguageTag: string | null; mediaCharacteristics: NSArray<string> | string[]; });
+
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+
+	encodeWithCoder(coder: NSCoder): void;
+
+	initWithCoder(coder: NSCoder): this;
+
+	initWithDisplayNameIdentifierExtendedLanguageTagMediaCharacteristics(displayName: string, identifier: string, extendedLanguageTag: string | null, mediaCharacteristics: NSArray<string> | string[]): this;
+}
+
+/**
+ * @since 27.0
+ */
+interface AVPlaybackUserInterfaceMetadataProviding extends NSObjectProtocol {
+
+	metadata: AVPlaybackUserInterfaceContentMetadata;
+}
+declare var AVPlaybackUserInterfaceMetadataProviding: {
+
+	prototype: AVPlaybackUserInterfaceMetadataProviding;
+};
+
+/**
+ * @since 27.0
+ */
+interface AVPlaybackUserInterfacePlaybackControllable extends NSObjectProtocol {
+
+	buffering: boolean;
+
+	containsLiveStreamingContent: boolean;
+
+	error: NSError | null;
+
+	playbackSpeed: number;
+
+	playing: boolean;
+
+	ready: boolean;
+
+	scanSpeed: number;
+
+	state: AVPlaybackUserInterfacePlaybackState;
+
+	supportedSeekCapabilities: AVPlaybackUserInterfaceSeekCapabilities;
+}
+declare var AVPlaybackUserInterfacePlaybackControllable: {
+
+	prototype: AVPlaybackUserInterfacePlaybackControllable;
+};
+
+/**
+ * @since 27.0
+ */
+declare class AVPlaybackUserInterfacePlaybackPosition extends NSObject implements NSCopying, NSSecureCoding {
+
+	static alloc(): AVPlaybackUserInterfacePlaybackPosition; // inherited from NSObject
+
+	static new(): AVPlaybackUserInterfacePlaybackPosition; // inherited from NSObject
+
+	readonly hostTime: CMTime;
+
+	readonly position: CMTime;
+
+	readonly rate: number;
+
+	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
+
+	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
+
+	constructor(o: { position: CMTime; hostTime: CMTime; rate: number; });
+
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+
+	encodeWithCoder(coder: NSCoder): void;
+
+	initWithCoder(coder: NSCoder): this;
+
+	initWithPositionHostTimeRate(position: CMTime, hostTime: CMTime, rate: number): this;
+}
+
+/**
+ * @since 27.0
+ */
+declare const enum AVPlaybackUserInterfacePlaybackState {
+
+	Normal = 0,
+
+	Scanning = 1,
+
+	Scrubbing = 2
+}
+
+/**
+ * @since 27.0
+ */
+declare const enum AVPlaybackUserInterfaceSeekCapabilities {
+
+	None = 0,
+
+	ScanForward = 1,
+
+	ScanBackward = 2,
+
+	Seek = 4
+}
+
+/**
+ * @since 27.0
+ */
+interface AVPlaybackUserInterfaceTimeControllable extends NSObjectProtocol {
+
+	currentSegment: AVPlaybackUserInterfaceTimelineSegment;
+
+	playbackPosition: AVPlaybackUserInterfacePlaybackPosition;
+
+	seekableTimeRanges: NSArray<NSValue> | null;
+
+	segments: NSArray<AVPlaybackUserInterfaceTimelineSegment>;
+
+	timeRange: CMTimeRange;
+
+	seekToPositionTolerance(position: CMTime, tolerance: CMTime): void;
+}
+declare var AVPlaybackUserInterfaceTimeControllable: {
+
+	prototype: AVPlaybackUserInterfaceTimeControllable;
+};
+
+/**
+ * @since 27.0
+ */
+declare class AVPlaybackUserInterfaceTimelineSegment extends NSObject implements NSCopying, NSSecureCoding {
+
+	static alloc(): AVPlaybackUserInterfaceTimelineSegment; // inherited from NSObject
+
+	static new(): AVPlaybackUserInterfaceTimelineSegment; // inherited from NSObject
+
+	readonly identifier: string | null;
+
+	readonly marked: boolean;
+
+	readonly requiresLinearPlayback: boolean;
+
+	readonly segmentType: AVPlaybackUserInterfaceTimelineSegmentType;
+
+	readonly timeRange: CMTimeRange;
+
+	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
+
+	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
+
+	constructor(o: { timeRange: CMTimeRange; segmentType: AVPlaybackUserInterfaceTimelineSegmentType; marked: boolean; requiresLinearPlayback: boolean; identifier: string | null; });
+
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+
+	encodeWithCoder(coder: NSCoder): void;
+
+	initWithCoder(coder: NSCoder): this;
+
+	initWithTimeRangeSegmentTypeMarkedRequiresLinearPlaybackIdentifier(timeRange: CMTimeRange, segmentType: AVPlaybackUserInterfaceTimelineSegmentType, marked: boolean, requiresLinearPlayback: boolean, identifier: string | null): this;
+}
+
+/**
+ * @since 27.0
+ */
+declare const enum AVPlaybackUserInterfaceTimelineSegmentType {
+
+	Primary = 0,
+
+	Advertisement = 1,
+
+	Bonus = 2,
+
+	Credits = 3,
+
+	Intro = 4,
+
+	Recap = 5,
+
+	Trailer = 6,
+
+	Other = 7
+}
+
+/**
+ * @since 27.0
+ */
+interface AVPlaybackUserInterfaceVolumeControllable extends NSObjectProtocol {
+
+	hasAudio: boolean;
+
+	muted: boolean;
+
+	volume: number;
+}
+declare var AVPlaybackUserInterfaceVolumeControllable: {
+
+	prototype: AVPlaybackUserInterfaceVolumeControllable;
+};
+
+/**
  * @since 8.0
  */
 declare class AVPlayerViewController extends UIViewController {
@@ -489,12 +937,12 @@ declare class AVPlayerViewController extends UIViewController {
 	 */
 	canStartPictureInPictureAutomaticallyFromInline: boolean;
 
-	readonly contentOverlayView: UIView;
+	readonly contentOverlayView: UIView | null;
 
 	/**
 	 * @since 9.0
 	 */
-	delegate: AVPlayerViewControllerDelegate;
+	delegate: AVPlayerViewControllerDelegate | null;
 
 	/**
 	 * @since 11.0
@@ -509,9 +957,9 @@ declare class AVPlayerViewController extends UIViewController {
 	/**
 	 * @since 9.0
 	 */
-	pixelBufferAttributes: NSDictionary<string, any>;
+	pixelBufferAttributes: NSDictionary<string, any> | null;
 
-	player: AVPlayer;
+	player: AVPlayer | null;
 
 	/**
 	 * @since 26.0
@@ -528,7 +976,7 @@ declare class AVPlayerViewController extends UIViewController {
 	/**
 	 * @since 16.0
 	 */
-	readonly selectedSpeed: AVPlaybackSpeed;
+	readonly selectedSpeed: AVPlaybackSpeed | null;
 
 	showsPlaybackControls: boolean;
 
@@ -660,7 +1108,7 @@ declare class AVRoutePickerView extends UIView {
 	 * @since 8.0
 	 * @deprecated 9.0
 	 */
-	static appearanceForTraitCollectionWhenContainedIn(trait: UITraitCollection, ContainerClass: typeof NSObject): AVRoutePickerView; // inherited from UIAppearance
+	static appearanceForTraitCollectionWhenContainedIn(trait: UITraitCollection, ContainerClass: typeof NSObject | null): AVRoutePickerView; // inherited from UIAppearance
 
 	/**
 	 * @since 9.0
@@ -671,7 +1119,7 @@ declare class AVRoutePickerView extends UIView {
 	 * @since 5.0
 	 * @deprecated 9.0
 	 */
-	static appearanceWhenContainedIn(ContainerClass: typeof NSObject): AVRoutePickerView; // inherited from UIAppearance
+	static appearanceWhenContainedIn(ContainerClass: typeof NSObject | null): AVRoutePickerView; // inherited from UIAppearance
 
 	/**
 	 * @since 9.0
@@ -688,9 +1136,9 @@ declare class AVRoutePickerView extends UIView {
 	/**
 	 * @since 16.0
 	 */
-	customRoutingController: AVCustomRoutingController;
+	customRoutingController: AVCustomRoutingController | null;
 
-	delegate: AVRoutePickerViewDelegate;
+	delegate: AVRoutePickerViewDelegate | null;
 
 	/**
 	 * @since 13.0

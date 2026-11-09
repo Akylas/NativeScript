@@ -5,7 +5,7 @@ echo "Deleting old ios typings (ios/objc-x86_64)..."
 rm packages/types-minimal/src/lib/ios/objc-x86_64/*
 
 echo "Copying minimal typings to ios/objc-x86_64..."
-array=( objc!ARKit.d.ts objc!AVFAudio.d.ts objc!AudioToolbox.d.ts objc!AVFoundation.d.ts objc!CoreGraphics.d.ts objc!CoreMIDI.d.ts objc!CoreMotion.d.ts objc!Foundation.d.ts objc!ObjectiveC.d.ts objc!PDFKit.d.ts objc!Speech.d.ts objc!UIKit.d.ts objc!Vision.d.ts objc!WebKit.d.ts )
+array=( objc!ARKit.d.ts objc!AVFAudio.d.ts objc!AudioToolbox.d.ts objc!AVFoundation.d.ts objc!CoreGraphics.d.ts objc!CoreMIDI.d.ts objc!CoreMotion.d.ts objc!Foundation.d.ts objc!ObjectiveC.d.ts objc!PDFKit.d.ts objc!Speech.d.ts objc!UIKit.d.ts objc!UIUtilities.d.ts objc!Vision.d.ts objc!WebKit.d.ts )
 for i in "${array[@]}"
 do
 	echo "Including: $i"
@@ -28,7 +28,7 @@ echo "Deleting old android typings..."
 rm packages/types-minimal/src/lib/android/api/*
 
 echo "Copying minimal typings to android/api..."
-array=( android-declarations.d.ts android-platform-33.d.ts androidx-32.d.ts )
+array=( android-declarations.d.ts android-platform-37.d.ts androidx-32.d.ts )
 for i in "${array[@]}"
 do
 	echo "Including: $i"

@@ -1,7 +1,7 @@
 
 /**
  * @since 11.0
- * @deprecated 100000
+ * @deprecated 27.0
  */
 declare class AVAggregateAssetDownloadTask extends NSURLSessionTask {
 
@@ -70,7 +70,7 @@ declare class AVAsset extends NSObject implements AVAsynchronousKeyValueLoading,
 	/**
 	 * @since 5.0
 	 */
-	readonly creationDate: AVMetadataItem;
+	readonly creationDate: AVMetadataItem | null;
 
 	readonly duration: CMTime;
 
@@ -84,7 +84,7 @@ declare class AVAsset extends NSObject implements AVAsynchronousKeyValueLoading,
 	 */
 	readonly hasProtectedContent: boolean;
 
-	readonly lyrics: string;
+	readonly lyrics: string | null;
 
 	/**
 	 * @since 8.0
@@ -154,57 +154,57 @@ declare class AVAsset extends NSObject implements AVAsynchronousKeyValueLoading,
 	 * @since 4.3
 	 * @deprecated 18.0
 	 */
-	chapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeys(locale: NSLocale, commonKeys: NSArray<string> | string[]): NSArray<AVTimedMetadataGroup>;
+	chapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeys(locale: NSLocale, commonKeys: NSArray<string> | string[] | null): NSArray<AVTimedMetadataGroup>;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
-
-	/**
-	 * @since 15.0
-	 */
-	findUnusedTrackIDWithCompletionHandler(completionHandler: (p1: number, p2: NSError) => void): void;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	/**
 	 * @since 15.0
 	 */
-	loadChapterMetadataGroupsBestMatchingPreferredLanguagesCompletionHandler(preferredLanguages: NSArray<string> | string[], completionHandler: (p1: NSArray<AVTimedMetadataGroup>, p2: NSError) => void): void;
+	findUnusedTrackIDWithCompletionHandler(completionHandler: (p1: number, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 15.0
 	 */
-	loadChapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeysCompletionHandler(locale: NSLocale, commonKeys: NSArray<string> | string[], completionHandler: (p1: NSArray<AVTimedMetadataGroup>, p2: NSError) => void): void;
+	loadChapterMetadataGroupsBestMatchingPreferredLanguagesCompletionHandler(preferredLanguages: NSArray<string> | string[], completionHandler: (p1: NSArray<AVTimedMetadataGroup> | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 15.0
 	 */
-	loadMediaSelectionGroupForMediaCharacteristicCompletionHandler(mediaCharacteristic: string, completionHandler: (p1: AVMediaSelectionGroup, p2: NSError) => void): void;
+	loadChapterMetadataGroupsWithTitleLocaleContainingItemsWithCommonKeysCompletionHandler(locale: NSLocale, commonKeys: NSArray<string> | string[], completionHandler: (p1: NSArray<AVTimedMetadataGroup> | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 15.0
 	 */
-	loadMetadataForFormatCompletionHandler(format: string, completionHandler: (p1: NSArray<AVMetadataItem>, p2: NSError) => void): void;
+	loadMediaSelectionGroupForMediaCharacteristicCompletionHandler(mediaCharacteristic: string, completionHandler: (p1: AVMediaSelectionGroup, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 15.0
 	 */
-	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVAssetTrack, p2: NSError) => void): void;
+	loadMetadataForFormatCompletionHandler(format: string, completionHandler: (p1: NSArray<AVMetadataItem> | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 15.0
 	 */
-	loadTracksWithMediaCharacteristicCompletionHandler(mediaCharacteristic: string, completionHandler: (p1: NSArray<AVAssetTrack>, p2: NSError) => void): void;
+	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVAssetTrack, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 15.0
 	 */
-	loadTracksWithMediaTypeCompletionHandler(mediaType: string, completionHandler: (p1: NSArray<AVAssetTrack>, p2: NSError) => void): void;
+	loadTracksWithMediaCharacteristicCompletionHandler(mediaCharacteristic: string, completionHandler: (p1: NSArray<AVAssetTrack> | null, p2: NSError | null) => void): void;
 
-	loadValuesAsynchronouslyForKeysCompletionHandler(keys: NSArray<string> | string[], handler: () => void): void;
+	/**
+	 * @since 15.0
+	 */
+	loadTracksWithMediaTypeCompletionHandler(mediaType: string, completionHandler: (p1: NSArray<AVAssetTrack> | null, p2: NSError | null) => void): void;
+
+	loadValuesAsynchronouslyForKeysCompletionHandler(keys: NSArray<string> | string[], handler: () => void | null): void;
 
 	/**
 	 * @since 5.0
 	 * @deprecated 18.0
 	 */
-	mediaSelectionGroupForMediaCharacteristic(mediaCharacteristic: string): AVMediaSelectionGroup;
+	mediaSelectionGroupForMediaCharacteristic(mediaCharacteristic: string): AVMediaSelectionGroup | null;
 
 	/**
 	 * @since 4.0
@@ -218,7 +218,7 @@ declare class AVAsset extends NSObject implements AVAsynchronousKeyValueLoading,
 	 * @since 4.0
 	 * @deprecated 18.0
 	 */
-	trackWithTrackID(trackID: number): AVAssetTrack;
+	trackWithTrackID(trackID: number): AVAssetTrack | null;
 
 	/**
 	 * @since 4.0
@@ -284,9 +284,14 @@ declare class AVAssetDownloadConfiguration extends NSObject {
 
 	static new(): AVAssetDownloadConfiguration; // inherited from NSObject
 
-	artworkData: NSData;
+	artworkData: NSData | null;
 
 	auxiliaryContentConfigurations: NSArray<AVAssetDownloadContentConfiguration>;
+
+	/**
+	 * @since 18.0
+	 */
+	downloadsInterstitialAssets: boolean;
 
 	optimizesAuxiliaryContentConfigurations: boolean;
 
@@ -311,7 +316,7 @@ declare class AVAssetDownloadContentConfiguration extends NSObject implements NS
 
 	variantQualifiers: NSArray<AVAssetVariantQualifier>;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -321,31 +326,31 @@ interface AVAssetDownloadDelegate extends NSURLSessionTaskDelegate {
 
 	/**
 	 * @since 11.0
-	 * @deprecated 100000
+	 * @deprecated 27.0
 	 */
 	URLSessionAggregateAssetDownloadTaskDidCompleteForMediaSelection?(session: NSURLSession, aggregateAssetDownloadTask: AVAggregateAssetDownloadTask, mediaSelection: AVMediaSelection): void;
 
 	/**
 	 * @since 11.0
-	 * @deprecated 100000
+	 * @deprecated 27.0
 	 */
 	URLSessionAggregateAssetDownloadTaskDidLoadTimeRangeTotalTimeRangesLoadedTimeRangeExpectedToLoadForMediaSelection?(session: NSURLSession, aggregateAssetDownloadTask: AVAggregateAssetDownloadTask, timeRange: CMTimeRange, loadedTimeRanges: NSArray<NSValue> | NSValue[], timeRangeExpectedToLoad: CMTimeRange, mediaSelection: AVMediaSelection): void;
 
 	/**
 	 * @since 11.0
-	 * @deprecated 100000
+	 * @deprecated 27.0
 	 */
 	URLSessionAggregateAssetDownloadTaskWillDownloadToURL?(session: NSURLSession, aggregateAssetDownloadTask: AVAggregateAssetDownloadTask, location: NSURL): void;
 
 	/**
 	 * @since 10.0
-	 * @deprecated 100000
+	 * @deprecated 27.0
 	 */
 	URLSessionAssetDownloadTaskDidFinishDownloadingToURL?(session: NSURLSession, assetDownloadTask: AVAssetDownloadTask, location: NSURL): void;
 
 	/**
 	 * @since 9.0
-	 * @deprecated 100000
+	 * @deprecated 27.0
 	 */
 	URLSessionAssetDownloadTaskDidLoadTimeRangeTotalTimeRangesLoadedTimeRangeExpectedToLoad?(session: NSURLSession, assetDownloadTask: AVAssetDownloadTask, timeRange: CMTimeRange, loadedTimeRanges: NSArray<NSValue> | NSValue[], timeRangeExpectedToLoad: CMTimeRange): void;
 
@@ -387,9 +392,9 @@ declare class AVAssetDownloadStorageManagementPolicy extends NSObject implements
 
 	readonly priority: string;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -405,7 +410,7 @@ declare class AVAssetDownloadStorageManager extends NSObject {
 
 	setStorageManagementPolicyForURL(storageManagementPolicy: AVAssetDownloadStorageManagementPolicy, downloadStorageURL: NSURL): void;
 
-	storageManagementPolicyForURL(downloadStorageURL: NSURL): AVAssetDownloadStorageManagementPolicy;
+	storageManagementPolicyForURL(downloadStorageURL: NSURL): AVAssetDownloadStorageManagementPolicy | null;
 }
 
 /**
@@ -427,50 +432,50 @@ declare class AVAssetDownloadTask extends NSURLSessionTask {
 
 	/**
 	 * @since 9.0
-	 * @deprecated 100000
+	 * @deprecated 27.0
 	 */
 	readonly loadedTimeRanges: NSArray<NSValue>;
 
 	/**
 	 * @since 9.0
-	 * @deprecated 100000
+	 * @deprecated 27.0
 	 */
-	readonly options: NSDictionary<string, any>;
+	readonly options: NSDictionary<string, any> | null;
 }
 
 /**
  * @since 9.0
- * @deprecated 100000
+ * @deprecated 27.0
  */
 declare var AVAssetDownloadTaskMediaSelectionKey: string;
 
 /**
  * @since 13.0
- * @deprecated 100000
+ * @deprecated 27.0
  */
 declare var AVAssetDownloadTaskMediaSelectionPrefersMultichannelKey: string;
 
 /**
  * @since 9.0
- * @deprecated 100000
+ * @deprecated 27.0
  */
 declare var AVAssetDownloadTaskMinimumRequiredMediaBitrateKey: string;
 
 /**
  * @since 14.0
- * @deprecated 100000
+ * @deprecated 27.0
  */
 declare var AVAssetDownloadTaskMinimumRequiredPresentationSizeKey: string;
 
 /**
  * @since 14.0
- * @deprecated 100000
+ * @deprecated 27.0
  */
 declare var AVAssetDownloadTaskPrefersHDRKey: string;
 
 /**
  * @since 14.5
- * @deprecated 100000
+ * @deprecated 27.0
  */
 declare var AVAssetDownloadTaskPrefersLosslessAudioKey: string;
 
@@ -483,13 +488,13 @@ declare class AVAssetDownloadURLSession extends NSURLSession {
 
 	static new(): AVAssetDownloadURLSession; // inherited from NSObject
 
-	static sessionWithConfigurationAssetDownloadDelegateDelegateQueue(configuration: NSURLSessionConfiguration, delegate: AVAssetDownloadDelegate, delegateQueue: NSOperationQueue): AVAssetDownloadURLSession;
+	static sessionWithConfigurationAssetDownloadDelegateDelegateQueue(configuration: NSURLSessionConfiguration, delegate: AVAssetDownloadDelegate | null, delegateQueue: NSOperationQueue | null): AVAssetDownloadURLSession;
 
 	/**
 	 * @since 11.0
-	 * @deprecated 100000
+	 * @deprecated 27.0
 	 */
-	aggregateAssetDownloadTaskWithURLAssetMediaSelectionsAssetTitleAssetArtworkDataOptions(URLAsset: AVURLAsset, mediaSelections: NSArray<AVMediaSelection> | AVMediaSelection[], title: string, artworkData: NSData, options: NSDictionary<string, any>): AVAggregateAssetDownloadTask;
+	aggregateAssetDownloadTaskWithURLAssetMediaSelectionsAssetTitleAssetArtworkDataOptions(URLAsset: AVURLAsset, mediaSelections: NSArray<AVMediaSelection> | AVMediaSelection[], title: string, artworkData: NSData | null, options: NSDictionary<string, any> | null): AVAggregateAssetDownloadTask | null;
 
 	/**
 	 * @since 15.0
@@ -498,15 +503,15 @@ declare class AVAssetDownloadURLSession extends NSURLSession {
 
 	/**
 	 * @since 10.0
-	 * @deprecated 100000
+	 * @deprecated 27.0
 	 */
-	assetDownloadTaskWithURLAssetAssetTitleAssetArtworkDataOptions(URLAsset: AVURLAsset, title: string, artworkData: NSData, options: NSDictionary<string, any>): AVAssetDownloadTask;
+	assetDownloadTaskWithURLAssetAssetTitleAssetArtworkDataOptions(URLAsset: AVURLAsset, title: string, artworkData: NSData | null, options: NSDictionary<string, any> | null): AVAssetDownloadTask | null;
 
 	/**
 	 * @since 9.0
 	 * @deprecated 10.0
 	 */
-	assetDownloadTaskWithURLAssetDestinationURLOptions(URLAsset: AVURLAsset, destinationURL: NSURL, options: NSDictionary<string, any>): AVAssetDownloadTask;
+	assetDownloadTaskWithURLAssetDestinationURLOptions(URLAsset: AVURLAsset, destinationURL: NSURL, options: NSDictionary<string, any> | null): AVAssetDownloadTask | null;
 }
 
 /**
@@ -656,7 +661,7 @@ declare class AVAssetExportSession extends NSObject {
 	/**
 	 * @since 6.0
 	 */
-	static determineCompatibilityOfExportPresetWithAssetOutputFileTypeCompletionHandler(presetName: string, asset: AVAsset, outputFileType: string, handler: (p1: boolean) => void): void;
+	static determineCompatibilityOfExportPresetWithAssetOutputFileTypeCompletionHandler(presetName: string, asset: AVAsset, outputFileType: string | null, handler: (p1: boolean) => void): void;
 
 	/**
 	 * @since 4.0
@@ -676,7 +681,7 @@ declare class AVAssetExportSession extends NSObject {
 	 */
 	readonly asset: AVAsset;
 
-	audioMix: AVAudioMix;
+	audioMix: AVAudioMix | null;
 
 	/**
 	 * @since 7.0
@@ -696,14 +701,14 @@ declare class AVAssetExportSession extends NSObject {
 	/**
 	 * @since 7.0
 	 */
-	readonly customVideoCompositor: AVVideoCompositing;
+	readonly customVideoCompositor: AVVideoCompositing | null;
 
 	/**
 	 * @since 8.0
 	 */
-	directoryForTemporaryFiles: NSURL;
+	directoryForTemporaryFiles: NSURL | null;
 
-	readonly error: NSError;
+	readonly error: NSError | null;
 
 	/**
 	 * @since 5.0
@@ -722,16 +727,16 @@ declare class AVAssetExportSession extends NSObject {
 	 */
 	readonly maxDuration: CMTime;
 
-	metadata: NSArray<AVMetadataItem>;
+	metadata: NSArray<AVMetadataItem> | null;
 
 	/**
 	 * @since 7.0
 	 */
-	metadataItemFilter: AVMetadataItemFilter;
+	metadataItemFilter: AVMetadataItemFilter | null;
 
-	outputFileType: string;
+	outputFileType: string | null;
 
-	outputURL: NSURL;
+	outputURL: NSURL | null;
 
 	readonly presetName: string;
 
@@ -745,11 +750,13 @@ declare class AVAssetExportSession extends NSObject {
 
 	timeRange: CMTimeRange;
 
-	videoComposition: AVVideoComposition;
+	videoComposition: AVVideoComposition | null;
 
 	constructor(o: { asset: AVAsset; presetName: string; });
 
 	cancelExport(): void;
+
+	configureForResumableExportWithCompletionHandler(handler: (p1: AVAssetExportSessionResumptionState) => void): void;
 
 	/**
 	 * @since 6.0
@@ -759,16 +766,52 @@ declare class AVAssetExportSession extends NSObject {
 	/**
 	 * @since 13.0
 	 */
-	estimateMaximumDurationWithCompletionHandler(handler: (p1: CMTime, p2: NSError) => void): void;
+	estimateMaximumDurationWithCompletionHandler(handler: (p1: CMTime, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 13.0
 	 */
-	estimateOutputFileLengthWithCompletionHandler(handler: (p1: number, p2: NSError) => void): void;
+	estimateOutputFileLengthWithCompletionHandler(handler: (p1: number, p2: NSError | null) => void): void;
 
 	exportAsynchronouslyWithCompletionHandler(handler: () => void): void;
 
 	initWithAssetPresetName(asset: AVAsset, presetName: string): this;
+}
+
+/**
+ * @since 27.0
+ */
+declare var AVAssetExportSessionResumptionFailureReasonIncompatibleSessionSettings: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVAssetExportSessionResumptionFailureReasonIncompatibleTemporaryDirectoryContents: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVAssetExportSessionResumptionFailureReasonTemporaryDirectoryDoesNotExist: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVAssetExportSessionResumptionFailureReasonUnsupportedForPresetOnPlatform: string;
+
+/**
+ * @since 27.0
+ */
+declare class AVAssetExportSessionResumptionState extends NSObject {
+
+	static alloc(): AVAssetExportSessionResumptionState; // inherited from NSObject
+
+	static new(): AVAssetExportSessionResumptionState; // inherited from NSObject
+
+	readonly configurationFailureReason: string | null;
+
+	readonly resumingFromPreviousState: boolean;
+
+	readonly resumptionConfigured: boolean;
 }
 
 declare const enum AVAssetExportSessionStatus {
@@ -797,7 +840,7 @@ declare class AVAssetImageGenerator extends NSObject {
 
 	static new(): AVAssetImageGenerator; // inherited from NSObject
 
-	apertureMode: string;
+	apertureMode: string | null;
 
 	appliesPreferredTrackTransform: boolean;
 
@@ -809,7 +852,7 @@ declare class AVAssetImageGenerator extends NSObject {
 	/**
 	 * @since 7.0
 	 */
-	readonly customVideoCompositor: AVVideoCompositing;
+	readonly customVideoCompositor: AVVideoCompositing | null;
 
 	/**
 	 * @since 18.0
@@ -828,7 +871,7 @@ declare class AVAssetImageGenerator extends NSObject {
 	 */
 	requestedTimeToleranceBefore: CMTime;
 
-	videoComposition: AVVideoComposition;
+	videoComposition: AVVideoComposition | null;
 
 	constructor(o: { asset: AVAsset; });
 
@@ -838,14 +881,14 @@ declare class AVAssetImageGenerator extends NSObject {
 	 * @since 4.0
 	 * @deprecated 18.0
 	 */
-	copyCGImageAtTimeActualTimeError(requestedTime: CMTime, actualTime: interop.Pointer | interop.Reference<CMTime>, error?: interop.Reference<NSError>): any;
+	copyCGImageAtTimeActualTimeError(requestedTime: CMTime, actualTime: interop.Pointer | interop.Reference<CMTime> | ArrayBufferLike | ArrayBufferView | null, error?: interop.Reference<NSError>): any | null;
 
 	/**
 	 * @since 16.0
 	 */
-	generateCGImageAsynchronouslyForTimeCompletionHandler(requestedTime: CMTime, handler: (p1: any, p2: CMTime, p3: NSError) => void): void;
+	generateCGImageAsynchronouslyForTimeCompletionHandler(requestedTime: CMTime, handler: (p1: any | null, p2: CMTime, p3: NSError | null) => void): void;
 
-	generateCGImagesAsynchronouslyForTimesCompletionHandler(requestedTimes: NSArray<NSValue> | NSValue[], handler: (p1: CMTime, p2: any, p3: CMTime, p4: AVAssetImageGeneratorResult, p5: NSError) => void): void;
+	generateCGImagesAsynchronouslyForTimesCompletionHandler(requestedTimes: NSArray<NSValue> | NSValue[], handler: (p1: CMTime, p2: any | null, p3: CMTime, p4: AVAssetImageGeneratorResult, p5: NSError | null) => void): void;
 
 	initWithAsset(asset: AVAsset): this;
 }
@@ -936,7 +979,7 @@ declare class AVAssetReader extends NSObject {
 
 	readonly asset: AVAsset;
 
-	readonly error: NSError;
+	readonly error: NSError | null;
 
 	readonly outputs: NSArray<AVAssetReaderOutput>;
 
@@ -970,13 +1013,13 @@ declare class AVAssetReaderAudioMixOutput extends AVAssetReaderOutput {
 
 	static alloc(): AVAssetReaderAudioMixOutput; // inherited from NSObject
 
-	static assetReaderAudioMixOutputWithAudioTracksAudioSettings(audioTracks: NSArray<AVAssetTrack> | AVAssetTrack[], audioSettings: NSDictionary<string, any>): AVAssetReaderAudioMixOutput;
+	static assetReaderAudioMixOutputWithAudioTracksAudioSettings(audioTracks: NSArray<AVAssetTrack> | AVAssetTrack[], audioSettings: NSDictionary<string, any> | null): AVAssetReaderAudioMixOutput;
 
 	static new(): AVAssetReaderAudioMixOutput; // inherited from NSObject
 
-	audioMix: AVAudioMix;
+	audioMix: AVAudioMix | null;
 
-	readonly audioSettings: NSDictionary<string, any>;
+	readonly audioSettings: NSDictionary<string, any> | null;
 
 	/**
 	 * @since 7.0
@@ -985,9 +1028,9 @@ declare class AVAssetReaderAudioMixOutput extends AVAssetReaderOutput {
 
 	readonly audioTracks: NSArray<AVAssetTrack>;
 
-	constructor(o: { audioTracks: NSArray<AVAssetTrack> | AVAssetTrack[]; audioSettings: NSDictionary<string, any>; });
+	constructor(o: { audioTracks: NSArray<AVAssetTrack> | AVAssetTrack[]; audioSettings: NSDictionary<string, any> | null; });
 
-	initWithAudioTracksAudioSettings(audioTracks: NSArray<AVAssetTrack> | AVAssetTrack[], audioSettings: NSDictionary<string, any>): this;
+	initWithAudioTracksAudioSettings(audioTracks: NSArray<AVAssetTrack> | AVAssetTrack[], audioSettings: NSDictionary<string, any> | null): this;
 }
 
 /**
@@ -1023,7 +1066,7 @@ declare class AVAssetReaderOutput extends NSObject {
 	 */
 	supportsRandomAccess: boolean;
 
-	copyNextSampleBuffer(): any;
+	copyNextSampleBuffer(): any | null;
 
 	/**
 	 * @since 8.0
@@ -1049,7 +1092,7 @@ declare class AVAssetReaderOutputCaptionAdaptor extends NSObject {
 
 	readonly assetReaderTrackOutput: AVAssetReaderTrackOutput;
 
-	validationDelegate: AVAssetReaderCaptionValidationHandling;
+	validationDelegate: AVAssetReaderCaptionValidationHandling | null;
 
 	constructor(o: { assetReaderTrackOutput: AVAssetReaderTrackOutput; });
 
@@ -1057,7 +1100,7 @@ declare class AVAssetReaderOutputCaptionAdaptor extends NSObject {
 
 	initWithAssetReaderTrackOutput(trackOutput: AVAssetReaderTrackOutput): this;
 
-	nextCaptionGroup(): AVCaptionGroup;
+	nextCaptionGroup(): AVCaptionGroup | null;
 }
 
 /**
@@ -1077,7 +1120,7 @@ declare class AVAssetReaderOutputMetadataAdaptor extends NSObject {
 
 	initWithAssetReaderTrackOutput(trackOutput: AVAssetReaderTrackOutput): this;
 
-	nextTimedMetadataGroup(): AVTimedMetadataGroup;
+	nextTimedMetadataGroup(): AVTimedMetadataGroup | null;
 }
 
 /**
@@ -1118,7 +1161,7 @@ declare class AVAssetReaderTrackOutput extends AVAssetReaderOutput {
 
 	static alloc(): AVAssetReaderTrackOutput; // inherited from NSObject
 
-	static assetReaderTrackOutputWithTrackOutputSettings(track: AVAssetTrack, outputSettings: NSDictionary<string, any>): AVAssetReaderTrackOutput;
+	static assetReaderTrackOutputWithTrackOutputSettings(track: AVAssetTrack, outputSettings: NSDictionary<string, any> | null): AVAssetReaderTrackOutput;
 
 	static new(): AVAssetReaderTrackOutput; // inherited from NSObject
 
@@ -1127,13 +1170,13 @@ declare class AVAssetReaderTrackOutput extends AVAssetReaderOutput {
 	 */
 	audioTimePitchAlgorithm: string;
 
-	readonly outputSettings: NSDictionary<string, any>;
+	readonly outputSettings: NSDictionary<string, any> | null;
 
 	readonly track: AVAssetTrack;
 
-	constructor(o: { track: AVAssetTrack; outputSettings: NSDictionary<string, any>; });
+	constructor(o: { track: AVAssetTrack; outputSettings: NSDictionary<string, any> | null; });
 
-	initWithTrackOutputSettings(track: AVAssetTrack, outputSettings: NSDictionary<string, any>): this;
+	initWithTrackOutputSettings(track: AVAssetTrack, outputSettings: NSDictionary<string, any> | null): this;
 }
 
 /**
@@ -1143,24 +1186,24 @@ declare class AVAssetReaderVideoCompositionOutput extends AVAssetReaderOutput {
 
 	static alloc(): AVAssetReaderVideoCompositionOutput; // inherited from NSObject
 
-	static assetReaderVideoCompositionOutputWithVideoTracksVideoSettings(videoTracks: NSArray<AVAssetTrack> | AVAssetTrack[], videoSettings: NSDictionary<string, any>): AVAssetReaderVideoCompositionOutput;
+	static assetReaderVideoCompositionOutputWithVideoTracksVideoSettings(videoTracks: NSArray<AVAssetTrack> | AVAssetTrack[], videoSettings: NSDictionary<string, any> | null): AVAssetReaderVideoCompositionOutput;
 
 	static new(): AVAssetReaderVideoCompositionOutput; // inherited from NSObject
 
 	/**
 	 * @since 7.0
 	 */
-	readonly customVideoCompositor: AVVideoCompositing;
+	readonly customVideoCompositor: AVVideoCompositing | null;
 
-	videoComposition: AVVideoComposition;
+	videoComposition: AVVideoComposition | null;
 
-	readonly videoSettings: NSDictionary<string, any>;
+	readonly videoSettings: NSDictionary<string, any> | null;
 
 	readonly videoTracks: NSArray<AVAssetTrack>;
 
-	constructor(o: { videoTracks: NSArray<AVAssetTrack> | AVAssetTrack[]; videoSettings: NSDictionary<string, any>; });
+	constructor(o: { videoTracks: NSArray<AVAssetTrack> | AVAssetTrack[]; videoSettings: NSDictionary<string, any> | null; });
 
-	initWithVideoTracksVideoSettings(videoTracks: NSArray<AVAssetTrack> | AVAssetTrack[], videoSettings: NSDictionary<string, any>): this;
+	initWithVideoTracksVideoSettings(videoTracks: NSArray<AVAssetTrack> | AVAssetTrack[], videoSettings: NSDictionary<string, any> | null): this;
 }
 
 declare const enum AVAssetReferenceRestrictions {
@@ -1189,9 +1232,9 @@ declare class AVAssetResourceLoader extends NSObject {
 
 	static new(): AVAssetResourceLoader; // inherited from NSObject
 
-	readonly delegate: AVAssetResourceLoaderDelegate;
+	readonly delegate: AVAssetResourceLoaderDelegate | null;
 
-	readonly delegateQueue: NSObject & OS_dispatch_queue;
+	readonly delegateQueue: NSObject & OS_dispatch_queue | null;
 
 	/**
 	 * @since 9.0
@@ -1200,7 +1243,7 @@ declare class AVAssetResourceLoader extends NSObject {
 
 	sendsCommonMediaClientDataAsHTTPHeaders: boolean;
 
-	setDelegateQueue(delegate: AVAssetResourceLoaderDelegate, delegateQueue: NSObject & OS_dispatch_queue): void;
+	setDelegateQueue(delegate: AVAssetResourceLoaderDelegate | null, delegateQueue: NSObject & OS_dispatch_queue | null): void;
 }
 
 interface AVAssetResourceLoaderDelegate extends NSObjectProtocol {
@@ -1247,13 +1290,13 @@ declare class AVAssetResourceLoadingContentInformationRequest extends NSObject {
 	/**
 	 * @since 11.2
 	 */
-	readonly allowedContentTypes: NSArray<string>;
+	readonly allowedContentTypes: NSArray<string> | null;
 
 	byteRangeAccessSupported: boolean;
 
 	contentLength: number;
 
-	contentType: string;
+	contentType: string | null;
 
 	/**
 	 * @since 16.0
@@ -1263,7 +1306,7 @@ declare class AVAssetResourceLoadingContentInformationRequest extends NSObject {
 	/**
 	 * @since 8.0
 	 */
-	renewalDate: Date;
+	renewalDate: Date | null;
 }
 
 /**
@@ -1306,19 +1349,19 @@ declare class AVAssetResourceLoadingRequest extends NSObject {
 	/**
 	 * @since 7.0
 	 */
-	readonly contentInformationRequest: AVAssetResourceLoadingContentInformationRequest;
+	readonly contentInformationRequest: AVAssetResourceLoadingContentInformationRequest | null;
 
 	/**
 	 * @since 7.0
 	 */
-	readonly dataRequest: AVAssetResourceLoadingDataRequest;
+	readonly dataRequest: AVAssetResourceLoadingDataRequest | null;
 
 	readonly finished: boolean;
 
 	/**
 	 * @since 7.0
 	 */
-	redirect: NSURLRequest;
+	redirect: NSURLRequest | null;
 
 	readonly request: NSURLRequest;
 
@@ -1330,32 +1373,32 @@ declare class AVAssetResourceLoadingRequest extends NSObject {
 	/**
 	 * @since 7.0
 	 */
-	response: NSURLResponse;
+	response: NSURLResponse | null;
 
 	/**
 	 * @since 7.0
 	 */
 	finishLoading(): void;
 
-	finishLoadingWithError(error: NSError): void;
+	finishLoadingWithError(error: NSError | null): void;
 
 	/**
 	 * @since 6.0
 	 * @deprecated 7.0
 	 */
-	finishLoadingWithResponseDataRedirect(response: NSURLResponse, data: NSData, redirect: NSURLRequest): void;
+	finishLoadingWithResponseDataRedirect(response: NSURLResponse | null, data: NSData | null, redirect: NSURLRequest | null): void;
 
 	/**
 	 * @since 9.0
 	 * @deprecated 18.0
 	 */
-	persistentContentKeyFromKeyVendorResponseOptionsError(keyVendorResponse: NSData, options: NSDictionary<string, any>, error?: interop.Reference<NSError>): NSData;
+	persistentContentKeyFromKeyVendorResponseOptionsError(keyVendorResponse: NSData, options: NSDictionary<string, any> | null, error?: interop.Reference<NSError>): NSData | null;
 
 	/**
 	 * @since 7.0
 	 * @deprecated 18.0
 	 */
-	streamingContentKeyRequestDataForAppContentIdentifierOptionsError(appIdentifier: NSData, contentIdentifier: NSData, options: NSDictionary<string, any>, error?: interop.Reference<NSError>): NSData;
+	streamingContentKeyRequestDataForAppContentIdentifierOptionsError(appIdentifier: NSData, contentIdentifier: NSData, options: NSDictionary<string, any> | null, error?: interop.Reference<NSError>): NSData | null;
 }
 
 /**
@@ -1431,7 +1474,7 @@ declare class AVAssetSegmentTrackReport extends NSObject {
 
 	readonly earliestPresentationTimeStamp: CMTime;
 
-	readonly firstVideoSampleInformation: AVAssetSegmentReportSampleInformation;
+	readonly firstVideoSampleInformation: AVAssetSegmentReportSampleInformation | null;
 
 	readonly mediaType: string;
 
@@ -1457,7 +1500,7 @@ declare class AVAssetTrack extends NSObject implements AVAsynchronousKeyValueLoa
 
 	static new(): AVAssetTrack; // inherited from NSObject
 
-	readonly asset: AVAsset;
+	readonly asset: AVAsset | null;
 
 	readonly availableMetadataFormats: NSArray<string>;
 
@@ -1482,7 +1525,7 @@ declare class AVAssetTrack extends NSObject implements AVAsynchronousKeyValueLoa
 
 	readonly estimatedDataRate: number;
 
-	readonly extendedLanguageTag: string;
+	readonly extendedLanguageTag: string | null;
 
 	readonly formatDescriptions: NSArray<any>;
 
@@ -1491,7 +1534,7 @@ declare class AVAssetTrack extends NSObject implements AVAsynchronousKeyValueLoa
 	 */
 	readonly hasAudioSampleDependencies: boolean;
 
-	readonly languageCode: string;
+	readonly languageCode: string | null;
 
 	readonly mediaType: string;
 
@@ -1541,46 +1584,46 @@ declare class AVAssetTrack extends NSObject implements AVAsynchronousKeyValueLoa
 	 */
 	associatedTracksOfType(trackAssociationType: string): NSArray<AVAssetTrack>;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	hasMediaCharacteristic(mediaCharacteristic: string): boolean;
 
 	/**
 	 * @since 15.0
 	 */
-	loadAssociatedTracksOfTypeCompletionHandler(trackAssociationType: string, completionHandler: (p1: NSArray<AVAssetTrack>, p2: NSError) => void): void;
+	loadAssociatedTracksOfTypeCompletionHandler(trackAssociationType: string, completionHandler: (p1: NSArray<AVAssetTrack> | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 15.0
 	 */
-	loadMetadataForFormatCompletionHandler(format: string, completionHandler: (p1: NSArray<AVMetadataItem>, p2: NSError) => void): void;
+	loadMetadataForFormatCompletionHandler(format: string, completionHandler: (p1: NSArray<AVMetadataItem> | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 15.0
 	 */
-	loadSamplePresentationTimeForTrackTimeCompletionHandler(trackTime: CMTime, completionHandler: (p1: CMTime, p2: NSError) => void): void;
+	loadSamplePresentationTimeForTrackTimeCompletionHandler(trackTime: CMTime, completionHandler: (p1: CMTime, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 15.0
 	 */
-	loadSegmentForTrackTimeCompletionHandler(trackTime: CMTime, completionHandler: (p1: AVAssetTrackSegment, p2: NSError) => void): void;
+	loadSegmentForTrackTimeCompletionHandler(trackTime: CMTime, completionHandler: (p1: AVAssetTrackSegment, p2: NSError | null) => void): void;
 
-	loadValuesAsynchronouslyForKeysCompletionHandler(keys: NSArray<string> | string[], handler: () => void): void;
-
-	/**
-	 * @since 16.0
-	 */
-	makeSampleCursorAtFirstSampleInDecodeOrder(): AVSampleCursor;
+	loadValuesAsynchronouslyForKeysCompletionHandler(keys: NSArray<string> | string[], handler: () => void | null): void;
 
 	/**
 	 * @since 16.0
 	 */
-	makeSampleCursorAtLastSampleInDecodeOrder(): AVSampleCursor;
+	makeSampleCursorAtFirstSampleInDecodeOrder(): AVSampleCursor | null;
 
 	/**
 	 * @since 16.0
 	 */
-	makeSampleCursorWithPresentationTimeStamp(presentationTimeStamp: CMTime): AVSampleCursor;
+	makeSampleCursorAtLastSampleInDecodeOrder(): AVSampleCursor | null;
+
+	/**
+	 * @since 16.0
+	 */
+	makeSampleCursorWithPresentationTimeStamp(presentationTimeStamp: CMTime): AVSampleCursor | null;
 
 	/**
 	 * @since 4.0
@@ -1598,7 +1641,7 @@ declare class AVAssetTrack extends NSObject implements AVAsynchronousKeyValueLoa
 	 * @since 4.0
 	 * @deprecated 18.0
 	 */
-	segmentForTrackTime(trackTime: CMTime): AVAssetTrackSegment;
+	segmentForTrackTime(trackTime: CMTime): AVAssetTrackSegment | null;
 
 	statusOfValueForKeyError(key: string, error?: interop.Reference<NSError>): AVKeyValueStatus;
 }
@@ -1614,7 +1657,7 @@ declare class AVAssetTrackGroup extends NSObject implements NSCopying {
 
 	readonly trackIDs: NSArray<number>;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -1627,6 +1670,26 @@ declare const enum AVAssetTrackGroupOutputHandling {
 	PreserveAlternateTracks = 1,
 
 	DefaultPolicy = 0
+}
+
+/**
+ * @since 27.0
+ */
+declare class AVAssetTrackPlan extends NSObject {
+
+	static alloc(): AVAssetTrackPlan; // inherited from NSObject
+
+	static new(): AVAssetTrackPlan; // inherited from NSObject
+
+	readonly assemblyTrackID: number;
+
+	readonly mediaType: string;
+
+	readonly segmentConfigurations: NSArray<AVPlannedSegmentConfiguration>;
+
+	constructor(o: { mediaType: string; segmentConfigurations: NSArray<AVPlannedSegmentConfiguration> | AVPlannedSegmentConfiguration[]; assemblyTrackID: number; });
+
+	initWithMediaTypeSegmentConfigurationsAssemblyTrackID(mediaType: string, segmentConfigurations: NSArray<AVPlannedSegmentConfiguration> | AVPlannedSegmentConfiguration[], trackID: number): this;
 }
 
 /**
@@ -1672,13 +1735,13 @@ declare class AVAssetVariant extends NSObject {
 	 */
 	readonly URL: NSURL;
 
-	readonly audioAttributes: AVAssetVariantAudioAttributes;
+	readonly audioAttributes: AVAssetVariantAudioAttributes | null;
 
 	readonly averageBitRate: number;
 
 	readonly peakBitRate: number;
 
-	readonly videoAttributes: AVAssetVariantVideoAttributes;
+	readonly videoAttributes: AVAssetVariantVideoAttributes | null;
 }
 
 /**
@@ -1692,7 +1755,7 @@ declare class AVAssetVariantAudioAttributes extends NSObject {
 
 	readonly formatIDs: NSArray<number>;
 
-	renditionSpecificAttributesForMediaOption(mediaSelectionOption: AVMediaSelectionOption): AVAssetVariantAudioRenditionSpecificAttributes;
+	renditionSpecificAttributesForMediaOption(mediaSelectionOption: AVMediaSelectionOption): AVAssetVariantAudioRenditionSpecificAttributes | null;
 }
 
 /**
@@ -1738,7 +1801,7 @@ declare class AVAssetVariantQualifier extends NSObject implements NSCopying {
 	/**
 	 * @since 18.0
 	 */
-	static predicateForAudioSampleRateMediaSelectionOptionOperatorType(sampleRate: number, mediaSelectionOption: AVMediaSelectionOption, operatorType: NSPredicateOperatorType): NSPredicate;
+	static predicateForAudioSampleRateMediaSelectionOptionOperatorType(sampleRate: number, mediaSelectionOption: AVMediaSelectionOption | null, operatorType: NSPredicateOperatorType): NSPredicate;
 
 	/**
 	 * @since 18.5
@@ -1753,9 +1816,9 @@ declare class AVAssetVariantQualifier extends NSObject implements NSCopying {
 	/**
 	 * @since 17.0
 	 */
-	static predicateForBinauralAudioMediaSelectionOption(isBinauralAudio: boolean, mediaSelectionOption: AVMediaSelectionOption): NSPredicate;
+	static predicateForBinauralAudioMediaSelectionOption(isBinauralAudio: boolean, mediaSelectionOption: AVMediaSelectionOption | null): NSPredicate;
 
-	static predicateForChannelCountMediaSelectionOptionOperatorType(channelCount: number, mediaSelectionOption: AVMediaSelectionOption, operatorType: NSPredicateOperatorType): NSPredicate;
+	static predicateForChannelCountMediaSelectionOptionOperatorType(channelCount: number, mediaSelectionOption: AVMediaSelectionOption | null, operatorType: NSPredicateOperatorType): NSPredicate;
 
 	/**
 	 * @since 18.5
@@ -1770,7 +1833,7 @@ declare class AVAssetVariantQualifier extends NSObject implements NSCopying {
 	/**
 	 * @since 17.0
 	 */
-	static predicateForDownmixAudioMediaSelectionOption(isDownmixAudio: boolean, mediaSelectionOption: AVMediaSelectionOption): NSPredicate;
+	static predicateForDownmixAudioMediaSelectionOption(isDownmixAudio: boolean, mediaSelectionOption: AVMediaSelectionOption | null): NSPredicate;
 
 	/**
 	 * @since 18.5
@@ -1780,13 +1843,13 @@ declare class AVAssetVariantQualifier extends NSObject implements NSCopying {
 	/**
 	 * @since 17.0
 	 */
-	static predicateForImmersiveAudioMediaSelectionOption(isImmersiveAudio: boolean, mediaSelectionOption: AVMediaSelectionOption): NSPredicate;
+	static predicateForImmersiveAudioMediaSelectionOption(isImmersiveAudio: boolean, mediaSelectionOption: AVMediaSelectionOption | null): NSPredicate;
 
 	static predicateForPresentationHeightOperatorType(height: number, operatorType: NSPredicateOperatorType): NSPredicate;
 
 	static predicateForPresentationWidthOperatorType(width: number, operatorType: NSPredicateOperatorType): NSPredicate;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -1827,6 +1890,22 @@ declare class AVAssetVariantVideoLayoutAttributes extends NSObject {
 }
 
 /**
+ * @since 27.0
+ */
+declare class AVAssetVideoTrackPlan extends AVAssetTrackPlan {
+
+	static alloc(): AVAssetVideoTrackPlan; // inherited from NSObject
+
+	static new(): AVAssetVideoTrackPlan; // inherited from NSObject
+
+	readonly videoCodecType: string;
+
+	constructor(o: { videoCodecType: string; encoderSpecification: NSDictionary<any, any> | null; mediaType: string; segmentConfigurations: NSArray<AVPlannedSegmentConfiguration> | AVPlannedSegmentConfiguration[]; assemblyTrackID: number; });
+
+	initWithVideoCodecTypeEncoderSpecificationMediaTypeSegmentConfigurationsAssemblyTrackID(videoCodecType: string, encoderSpecification: NSDictionary<any, any> | null, mediaType: string, segmentConfigurations: NSArray<AVPlannedSegmentConfiguration> | AVPlannedSegmentConfiguration[], trackID: number): this;
+}
+
+/**
  * @since 12.0
  */
 declare var AVAssetWasDefragmentedNotification: string;
@@ -1847,14 +1926,14 @@ declare class AVAssetWriter extends NSObject {
 	/**
 	 * @since 14.0
 	 */
-	delegate: AVAssetWriterDelegate;
+	delegate: AVAssetWriterDelegate | null;
 
 	/**
 	 * @since 8.0
 	 */
-	directoryForTemporaryFiles: NSURL;
+	directoryForTemporaryFiles: NSURL | null;
 
-	readonly error: NSError;
+	readonly error: NSError | null;
 
 	/**
 	 * @since 17.0
@@ -1892,7 +1971,7 @@ declare class AVAssetWriter extends NSObject {
 	/**
 	 * @since 14.0
 	 */
-	outputFileTypeProfile: string;
+	outputFileTypeProfile: string | null;
 
 	readonly outputURL: NSURL;
 
@@ -1904,6 +1983,11 @@ declare class AVAssetWriter extends NSObject {
 	preferredOutputSegmentInterval: CMTime;
 
 	/**
+	 * @since 27.0
+	 */
+	readonly proVideoStorageSupported: boolean;
+
+	/**
 	 * @since 14.0
 	 */
 	producesCombinableFragments: boolean;
@@ -1911,6 +1995,11 @@ declare class AVAssetWriter extends NSObject {
 	shouldOptimizeForNetworkUse: boolean;
 
 	readonly status: AVAssetWriterStatus;
+
+	/**
+	 * @since 27.0
+	 */
+	usesProVideoStorage: boolean;
 
 	/**
 	 * @since 14.0
@@ -1936,7 +2025,7 @@ declare class AVAssetWriter extends NSObject {
 	 */
 	canAddInputGroup(inputGroup: AVAssetWriterInputGroup): boolean;
 
-	canApplyOutputSettingsForMediaType(outputSettings: NSDictionary<string, any>, mediaType: string): boolean;
+	canApplyOutputSettingsForMediaType(outputSettings: NSDictionary<string, any> | null, mediaType: string): boolean;
 
 	cancelWriting(): void;
 
@@ -1980,7 +2069,7 @@ interface AVAssetWriterDelegate extends NSObjectProtocol {
 
 	assetWriterDidOutputSegmentDataSegmentType?(writer: AVAssetWriter, segmentData: NSData, segmentType: AVAssetSegmentType): void;
 
-	assetWriterDidOutputSegmentDataSegmentTypeSegmentReport?(writer: AVAssetWriter, segmentData: NSData, segmentType: AVAssetSegmentType, segmentReport: AVAssetSegmentReport): void;
+	assetWriterDidOutputSegmentDataSegmentTypeSegmentReport?(writer: AVAssetWriter, segmentData: NSData, segmentType: AVAssetSegmentType, segmentReport: AVAssetSegmentReport | null): void;
 }
 declare var AVAssetWriterDelegate: {
 
@@ -1994,12 +2083,12 @@ declare class AVAssetWriterInput extends NSObject {
 
 	static alloc(): AVAssetWriterInput; // inherited from NSObject
 
-	static assetWriterInputWithMediaTypeOutputSettings(mediaType: string, outputSettings: NSDictionary<string, any>): AVAssetWriterInput;
+	static assetWriterInputWithMediaTypeOutputSettings(mediaType: string, outputSettings: NSDictionary<string, any> | null): AVAssetWriterInput;
 
 	/**
 	 * @since 6.0
 	 */
-	static assetWriterInputWithMediaTypeOutputSettingsSourceFormatHint(mediaType: string, outputSettings: NSDictionary<string, any>, sourceFormatHint: any): AVAssetWriterInput;
+	static assetWriterInputWithMediaTypeOutputSettingsSourceFormatHint(mediaType: string, outputSettings: NSDictionary<string, any> | null, sourceFormatHint: any | null): AVAssetWriterInput;
 
 	static new(): AVAssetWriterInput; // inherited from NSObject
 
@@ -2011,7 +2100,7 @@ declare class AVAssetWriterInput extends NSObject {
 	/**
 	 * @since 8.0
 	 */
-	readonly currentPassDescription: AVAssetWriterInputPassDescription;
+	readonly currentPassDescription: AVAssetWriterInputPassDescription | null;
 
 	/**
 	 * @since 4.1
@@ -2021,12 +2110,12 @@ declare class AVAssetWriterInput extends NSObject {
 	/**
 	 * @since 7.0
 	 */
-	extendedLanguageTag: string;
+	extendedLanguageTag: string | null;
 
 	/**
 	 * @since 7.0
 	 */
-	languageCode: string;
+	languageCode: string | null;
 
 	/**
 	 * @since 7.0
@@ -2052,7 +2141,7 @@ declare class AVAssetWriterInput extends NSObject {
 	 */
 	naturalSize: CGSize;
 
-	readonly outputSettings: NSDictionary<string, any>;
+	readonly outputSettings: NSDictionary<string, any> | null;
 
 	/**
 	 * @since 8.0
@@ -2082,21 +2171,21 @@ declare class AVAssetWriterInput extends NSObject {
 	/**
 	 * @since 8.0
 	 */
-	sampleReferenceBaseURL: NSURL;
+	sampleReferenceBaseURL: NSURL | null;
 
 	/**
 	 * @since 6.0
 	 */
-	readonly sourceFormatHint: any;
+	readonly sourceFormatHint: any | null;
 
 	transform: CGAffineTransform;
 
-	constructor(o: { mediaType: string; outputSettings: NSDictionary<string, any>; });
+	constructor(o: { mediaType: string; outputSettings: NSDictionary<string, any> | null; });
 
 	/**
 	 * @since 6.0
 	 */
-	constructor(o: { mediaType: string; outputSettings: NSDictionary<string, any>; sourceFormatHint: any; });
+	constructor(o: { mediaType: string; outputSettings: NSDictionary<string, any> | null; sourceFormatHint: any | null; });
 
 	/**
 	 * @since 7.0
@@ -2113,12 +2202,12 @@ declare class AVAssetWriterInput extends NSObject {
 	 */
 	canAddTrackAssociationWithTrackOfInputType(input: AVAssetWriterInput, trackAssociationType: string): boolean;
 
-	initWithMediaTypeOutputSettings(mediaType: string, outputSettings: NSDictionary<string, any>): this;
+	initWithMediaTypeOutputSettings(mediaType: string, outputSettings: NSDictionary<string, any> | null): this;
 
 	/**
 	 * @since 6.0
 	 */
-	initWithMediaTypeOutputSettingsSourceFormatHint(mediaType: string, outputSettings: NSDictionary<string, any>, sourceFormatHint: any): this;
+	initWithMediaTypeOutputSettingsSourceFormatHint(mediaType: string, outputSettings: NSDictionary<string, any> | null, sourceFormatHint: any | null): this;
 
 	markAsFinished(): void;
 
@@ -2167,17 +2256,17 @@ declare class AVAssetWriterInputGroup extends AVMediaSelectionGroup {
 
 	static alloc(): AVAssetWriterInputGroup; // inherited from NSObject
 
-	static assetWriterInputGroupWithInputsDefaultInput(inputs: NSArray<AVAssetWriterInput> | AVAssetWriterInput[], defaultInput: AVAssetWriterInput): AVAssetWriterInputGroup;
+	static assetWriterInputGroupWithInputsDefaultInput(inputs: NSArray<AVAssetWriterInput> | AVAssetWriterInput[], defaultInput: AVAssetWriterInput | null): AVAssetWriterInputGroup;
 
 	static new(): AVAssetWriterInputGroup; // inherited from NSObject
 
-	readonly defaultInput: AVAssetWriterInput;
+	readonly defaultInput: AVAssetWriterInput | null;
 
 	readonly inputs: NSArray<AVAssetWriterInput>;
 
-	constructor(o: { inputs: NSArray<AVAssetWriterInput> | AVAssetWriterInput[]; defaultInput: AVAssetWriterInput; });
+	constructor(o: { inputs: NSArray<AVAssetWriterInput> | AVAssetWriterInput[]; defaultInput: AVAssetWriterInput | null; });
 
-	initWithInputsDefaultInput(inputs: NSArray<AVAssetWriterInput> | AVAssetWriterInput[], defaultInput: AVAssetWriterInput): this;
+	initWithInputsDefaultInput(inputs: NSArray<AVAssetWriterInput> | AVAssetWriterInput[], defaultInput: AVAssetWriterInput | null): this;
 }
 
 /**
@@ -2234,21 +2323,21 @@ declare class AVAssetWriterInputPixelBufferAdaptor extends NSObject {
 
 	static alloc(): AVAssetWriterInputPixelBufferAdaptor; // inherited from NSObject
 
-	static assetWriterInputPixelBufferAdaptorWithAssetWriterInputSourcePixelBufferAttributes(input: AVAssetWriterInput, sourcePixelBufferAttributes: NSDictionary<string, any>): AVAssetWriterInputPixelBufferAdaptor;
+	static assetWriterInputPixelBufferAdaptorWithAssetWriterInputSourcePixelBufferAttributes(input: AVAssetWriterInput, sourcePixelBufferAttributes: NSDictionary<string, any> | null): AVAssetWriterInputPixelBufferAdaptor;
 
 	static new(): AVAssetWriterInputPixelBufferAdaptor; // inherited from NSObject
 
 	readonly assetWriterInput: AVAssetWriterInput;
 
-	readonly pixelBufferPool: any;
+	readonly pixelBufferPool: any | null;
 
-	readonly sourcePixelBufferAttributes: NSDictionary<string, any>;
+	readonly sourcePixelBufferAttributes: NSDictionary<string, any> | null;
 
-	constructor(o: { assetWriterInput: AVAssetWriterInput; sourcePixelBufferAttributes: NSDictionary<string, any>; });
+	constructor(o: { assetWriterInput: AVAssetWriterInput; sourcePixelBufferAttributes: NSDictionary<string, any> | null; });
 
 	appendPixelBufferWithPresentationTime(pixelBuffer: any, presentationTime: CMTime): boolean;
 
-	initWithAssetWriterInputSourcePixelBufferAttributes(input: AVAssetWriterInput, sourcePixelBufferAttributes: NSDictionary<string, any>): this;
+	initWithAssetWriterInputSourcePixelBufferAttributes(input: AVAssetWriterInput, sourcePixelBufferAttributes: NSDictionary<string, any> | null): this;
 }
 
 /**
@@ -2258,21 +2347,21 @@ declare class AVAssetWriterInputTaggedPixelBufferGroupAdaptor extends NSObject {
 
 	static alloc(): AVAssetWriterInputTaggedPixelBufferGroupAdaptor; // inherited from NSObject
 
-	static assetWriterInputTaggedPixelBufferGroupAdaptorWithAssetWriterInputSourcePixelBufferAttributes(input: AVAssetWriterInput, sourcePixelBufferAttributes: NSDictionary<string, any>): AVAssetWriterInputTaggedPixelBufferGroupAdaptor;
+	static assetWriterInputTaggedPixelBufferGroupAdaptorWithAssetWriterInputSourcePixelBufferAttributes(input: AVAssetWriterInput, sourcePixelBufferAttributes: NSDictionary<string, any> | null): AVAssetWriterInputTaggedPixelBufferGroupAdaptor;
 
 	static new(): AVAssetWriterInputTaggedPixelBufferGroupAdaptor; // inherited from NSObject
 
 	readonly assetWriterInput: AVAssetWriterInput;
 
-	readonly pixelBufferPool: any;
+	readonly pixelBufferPool: any | null;
 
-	readonly sourcePixelBufferAttributes: NSDictionary<string, any>;
+	readonly sourcePixelBufferAttributes: NSDictionary<string, any> | null;
 
-	constructor(o: { assetWriterInput: AVAssetWriterInput; sourcePixelBufferAttributes: NSDictionary<string, any>; });
+	constructor(o: { assetWriterInput: AVAssetWriterInput; sourcePixelBufferAttributes: NSDictionary<string, any> | null; });
 
 	appendTaggedPixelBufferGroupWithPresentationTime(taggedPixelBufferGroup: any, presentationTime: CMTime): boolean;
 
-	initWithAssetWriterInputSourcePixelBufferAttributes(input: AVAssetWriterInput, sourcePixelBufferAttributes: NSDictionary<string, any>): this;
+	initWithAssetWriterInputSourcePixelBufferAttributes(input: AVAssetWriterInput, sourcePixelBufferAttributes: NSDictionary<string, any> | null): this;
 }
 
 declare const enum AVAssetWriterStatus {
@@ -2286,6 +2375,46 @@ declare const enum AVAssetWriterStatus {
 	Failed = 3,
 
 	Cancelled = 4
+}
+
+/**
+ * @since 27.0
+ */
+declare class AVAssetWritingPlanner extends NSObject {
+
+	static alloc(): AVAssetWritingPlanner; // inherited from NSObject
+
+	static new(): AVAssetWritingPlanner; // inherited from NSObject
+
+	static segmentBoundaryGuidelinesForVideoCodecTypeVideoEncoderSpecification(videoCodecType: string, videoEncoderSpecification: NSDictionary<any, any>): AVPlannedVideoSegmentBoundaryGuidelines;
+
+	static segmentBoundaryRecommendationsForVideoAVAssetTrackMinimumSegmentDurationMinimumSegmentFrameCount(videoAssetTrack: AVAssetTrack, minimumSegmentDuration: CMTime, minimumSegmentFrameCount: number): NSArray<AVPlannedVideoSegmentConfiguration>;
+
+	readonly progress: AVAssetWritingPlannerProgress;
+
+	constructor(o: { directoryForTemporaryFiles: NSURL; });
+
+	executePlanOnQueueWithCompletionHandler(executionQueue: NSObject & OS_dispatch_queue, completionHandler: (p1: AVComposition | null, p2: NSError | null) => void): void;
+
+	executePlanWithCompletionHandler(completionHandler: (p1: AVComposition | null, p2: NSError | null) => void): void;
+
+	initWithDirectoryForTemporaryFiles(directoryForTemporaryFiles: NSURL): this;
+
+	planTrackWithSegmentsGeneratedBy(trackPlan: AVAssetTrackPlan, writingSegmentCallbackBlock: (p1: AVPlannedSegmentWritingRequest) => void): void;
+}
+
+/**
+ * @since 27.0
+ */
+declare class AVAssetWritingPlannerProgress extends NSObject {
+
+	static alloc(): AVAssetWritingPlannerProgress; // inherited from NSObject
+
+	static new(): AVAssetWritingPlannerProgress; // inherited from NSObject
+
+	readonly overallProgress: number;
+
+	progressForTrack(assemblyTrackID: number): number;
 }
 
 /**
@@ -2303,16 +2432,16 @@ declare class AVAsynchronousCIImageFilteringRequest extends NSObject implements 
 
 	readonly sourceImage: CIImage;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	finishWithError(error: NSError): void;
 
-	finishWithImageContext(filteredImage: CIImage, context: CIContext): void;
+	finishWithImageContext(filteredImage: CIImage, context: CIContext | null): void;
 }
 
 interface AVAsynchronousKeyValueLoading {
 
-	loadValuesAsynchronouslyForKeysCompletionHandler(keys: NSArray<string> | string[], handler: () => void): void;
+	loadValuesAsynchronouslyForKeysCompletionHandler(keys: NSArray<string> | string[], handler: () => void | null): void;
 
 	statusOfValueForKeyError(key: string, error?: interop.Reference<NSError>): AVKeyValueStatus;
 }
@@ -2346,9 +2475,9 @@ declare class AVAsynchronousVideoCompositionRequest extends NSObject implements 
 	/**
 	 * @since 26.0
 	 */
-	attachSpatialVideoConfigurationToPixelBuffer(spatialVideoConfiguration: AVSpatialVideoConfiguration, pixelBuffer: any): void;
+	attachSpatialVideoConfigurationToPixelBuffer(spatialVideoConfiguration: AVSpatialVideoConfiguration | null, pixelBuffer: any): void;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	finishCancelledRequest(): void;
 
@@ -2361,19 +2490,19 @@ declare class AVAsynchronousVideoCompositionRequest extends NSObject implements 
 
 	finishWithError(error: NSError): void;
 
-	sourceFrameByTrackID(trackID: number): any;
+	sourceFrameByTrackID(trackID: number): any | null;
 
-	sourceSampleBufferByTrackID(trackID: number): any;
+	sourceSampleBufferByTrackID(trackID: number): any | null;
 
 	/**
 	 * @since 26.0
 	 */
-	sourceTaggedBufferGroupByTrackID(trackID: number): any;
+	sourceTaggedBufferGroupByTrackID(trackID: number): any | null;
 
 	/**
 	 * @since 15.0
 	 */
-	sourceTimedMetadataByTrackID(trackID: number): AVTimedMetadataGroup;
+	sourceTimedMetadataByTrackID(trackID: number): AVTimedMetadataGroup | null;
 }
 
 /**
@@ -2387,9 +2516,9 @@ declare class AVAudioMix extends NSObject implements NSCopying, NSMutableCopying
 
 	readonly inputParameters: NSArray<AVAudioMixInputParameters>;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -2404,20 +2533,28 @@ declare class AVAudioMixInputParameters extends NSObject implements NSCopying, N
 	/**
 	 * @since 6.0
 	 */
-	readonly audioTapProcessor: any;
+	readonly audioTapProcessor: any | null;
 
 	/**
 	 * @since 7.0
 	 */
-	readonly audioTimePitchAlgorithm: string;
+	readonly audioTimePitchAlgorithm: string | null;
 
 	readonly trackID: number;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
-	getVolumeRampForTimeStartVolumeEndVolumeTimeRange(time: CMTime, startVolume: interop.Pointer | interop.Reference<number>, endVolume: interop.Pointer | interop.Reference<number>, timeRange: interop.Pointer | interop.Reference<CMTimeRange>): boolean;
+	getVolumeRampForTimeStartVolumeEndVolumeTimeRange(time: CMTime, startVolume: interop.Pointer | interop.Reference<number> | ArrayBufferLike | ArrayBufferView | null, endVolume: interop.Pointer | interop.Reference<number> | ArrayBufferLike | ArrayBufferView | null, timeRange: interop.Pointer | interop.Reference<CMTimeRange> | ArrayBufferLike | ArrayBufferView | null): boolean;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+}
+
+/**
+ * @since 27.0
+ */
+declare const enum AVAudioMixInputParametersTrackID {
+
+	MixID = 0
 }
 
 declare const enum AVAudioSpatializationFormats {
@@ -2481,11 +2618,11 @@ declare class AVCameraCalibrationData extends NSObject {
 
 	readonly intrinsicMatrixReferenceDimensions: CGSize;
 
-	readonly inverseLensDistortionLookupTable: NSData;
+	readonly inverseLensDistortionLookupTable: NSData | null;
 
 	readonly lensDistortionCenter: CGPoint;
 
-	readonly lensDistortionLookupTable: NSData;
+	readonly lensDistortionLookupTable: NSData | null;
 
 	readonly pixelSize: number;
 }
@@ -2501,7 +2638,7 @@ declare class AVCaption extends NSObject implements NSCopying, NSMutableCopying,
 
 	readonly animation: AVCaptionAnimation;
 
-	readonly region: AVCaptionRegion;
+	readonly region: AVCaptionRegion | null;
 
 	readonly text: string;
 
@@ -2515,29 +2652,29 @@ declare class AVCaption extends NSObject implements NSCopying, NSMutableCopying,
 
 	constructor(o: { text: string; timeRange: CMTimeRange; });
 
-	backgroundColorAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange>): any;
+	backgroundColorAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange> | ArrayBufferLike | ArrayBufferView | null): any | null;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
-	decorationAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange>): AVCaptionDecoration;
+	decorationAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange> | ArrayBufferLike | ArrayBufferView | null): AVCaptionDecoration;
 
 	encodeWithCoder(coder: NSCoder): void;
 
-	fontStyleAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange>): AVCaptionFontStyle;
+	fontStyleAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange> | ArrayBufferLike | ArrayBufferView | null): AVCaptionFontStyle;
 
-	fontWeightAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange>): AVCaptionFontWeight;
+	fontWeightAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange> | ArrayBufferLike | ArrayBufferView | null): AVCaptionFontWeight;
 
 	initWithCoder(coder: NSCoder): this;
 
 	initWithTextTimeRange(text: string, timeRange: CMTimeRange): this;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
-	rubyAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange>): AVCaptionRuby;
+	rubyAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange> | ArrayBufferLike | ArrayBufferView | null): AVCaptionRuby | null;
 
-	textColorAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange>): any;
+	textColorAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange> | ArrayBufferLike | ArrayBufferView | null): any | null;
 
-	textCombineAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange>): AVCaptionTextCombine;
+	textCombineAtIndexRange(index: number, outRange: interop.Pointer | interop.Reference<NSRange> | ArrayBufferLike | ArrayBufferView | null): AVCaptionTextCombine;
 }
 
 /**
@@ -2606,7 +2743,7 @@ declare class AVCaptionConversionValidator extends NSObject {
 
 	stopValidating(): void;
 
-	validateCaptionConversionWithWarningHandler(handler: (p1: AVCaptionConversionWarning) => void): void;
+	validateCaptionConversionWithWarningHandler(handler: (p1: AVCaptionConversionWarning | null) => void): void;
 }
 
 /**
@@ -2632,7 +2769,7 @@ declare class AVCaptionConversionWarning extends NSObject {
 
 	static new(): AVCaptionConversionWarning; // inherited from NSObject
 
-	readonly adjustment: AVCaptionConversionAdjustment;
+	readonly adjustment: AVCaptionConversionAdjustment | null;
 
 	readonly rangeOfCaptions: NSRange;
 
@@ -2708,7 +2845,7 @@ declare class AVCaptionFormatConformer extends NSObject {
 
 	constructor(o: { conversionSettings: NSDictionary<string, any>; });
 
-	conformedCaptionForCaptionError(caption: AVCaption, error?: interop.Reference<NSError>): AVCaption;
+	conformedCaptionForCaptionError(caption: AVCaption, error?: interop.Reference<NSError>): AVCaption | null;
 
 	initWithConversionSettings(conversionSettings: NSDictionary<string, any>): this;
 }
@@ -2781,7 +2918,7 @@ declare class AVCaptionRegion extends NSObject implements NSCopying, NSMutableCo
 
 	readonly displayAlignment: AVCaptionRegionDisplayAlignment;
 
-	readonly identifier: string;
+	readonly identifier: string | null;
 
 	readonly origin: AVCaptionPoint;
 
@@ -2805,13 +2942,13 @@ declare class AVCaptionRegion extends NSObject implements NSCopying, NSMutableCo
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
 	initWithCoder(coder: NSCoder): this;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -2853,14 +2990,28 @@ declare class AVCaptionRenderer extends NSObject {
 
 	static alloc(): AVCaptionRenderer; // inherited from NSObject
 
+	static captionPreviewForProfileIDExtendedLanguageTagRenderSize(profileID: string, extendedLanguageTag: string | null, renderSize: CGSize): NSAttributedString;
+
 	static new(): AVCaptionRenderer; // inherited from NSObject
 
+	/**
+	 * @since 18.0
+	 */
 	bounds: CGRect;
 
+	/**
+	 * @since 18.0
+	 */
 	captions: NSArray<AVCaption>;
 
+	/**
+	 * @since 18.0
+	 */
 	captionSceneChangesInRange(consideredTimeRange: CMTimeRange): NSArray<AVCaptionRendererScene>;
 
+	/**
+	 * @since 18.0
+	 */
 	renderInContextForTime(ctx: any, time: CMTime): void;
 }
 
@@ -2879,7 +3030,7 @@ declare class AVCaptionRendererScene extends NSObject implements NSCopying {
 
 	readonly timeRange: CMTimeRange;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -2905,7 +3056,7 @@ declare class AVCaptionRuby extends NSObject implements NSCopying, NSSecureCodin
 
 	constructor(o: { text: string; position: AVCaptionRubyPosition; alignment: AVCaptionRubyAlignment; });
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -3005,6 +3156,45 @@ declare const enum AVCaptionUnitsType {
 declare var AVCaptionUseDropFrameTimeCodeKey: string;
 
 /**
+ * @since 27.0
+ */
+declare class AVCaptureAncillaryDataEncoder extends NSObject {
+
+	static alloc(): AVCaptureAncillaryDataEncoder; // inherited from NSObject
+
+	static new(): AVCaptureAncillaryDataEncoder; // inherited from NSObject
+
+	readonly currentUserDefinedAncillaryData: NSDictionary<string, any>;
+
+	enabled: boolean;
+
+	readonly userDefinedAncillaryDataSizeRemaining: number;
+
+	removeRDD18AncillaryDataForTag(tag: number): void;
+
+	setRDD18AncillaryDataForTagError(data: NSData, tag: number, error?: interop.Reference<NSError>): boolean;
+
+	setRDD18AncillaryDataStringForTagError(string: string, tag: number, error?: interop.Reference<NSError>): boolean;
+
+	setUserInstanceUIDForUserUDAMVersion(uuid: NSUUID, version: number): void;
+}
+
+/**
+ * @since 27.0
+ */
+declare var AVCaptureAncillaryDataUserKeyRDD18InstanceUID: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVCaptureAncillaryDataUserKeyRDD18UDAMSetVersion: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVCaptureAncillaryDataUserKeyRDD18UserItems: string;
+
+/**
  * @since 26.0
  */
 declare var AVCaptureAspectRatio16x9: string;
@@ -3052,9 +3242,9 @@ declare class AVCaptureAudioDataOutput extends AVCaptureOutput {
 
 	static new(): AVCaptureAudioDataOutput; // inherited from NSObject
 
-	readonly sampleBufferCallbackQueue: NSObject & OS_dispatch_queue;
+	readonly sampleBufferCallbackQueue: NSObject & OS_dispatch_queue | null;
 
-	readonly sampleBufferDelegate: AVCaptureAudioDataOutputSampleBufferDelegate;
+	readonly sampleBufferDelegate: AVCaptureAudioDataOutputSampleBufferDelegate | null;
 
 	/**
 	 * @since 26.0
@@ -3064,9 +3254,9 @@ declare class AVCaptureAudioDataOutput extends AVCaptureOutput {
 	/**
 	 * @since 7.0
 	 */
-	recommendedAudioSettingsForAssetWriterWithOutputFileType(outputFileType: string): NSDictionary<string, any>;
+	recommendedAudioSettingsForAssetWriterWithOutputFileType(outputFileType: string): NSDictionary<string, any> | null;
 
-	setSampleBufferDelegateQueue(sampleBufferDelegate: AVCaptureAudioDataOutputSampleBufferDelegate, sampleBufferCallbackQueue: NSObject & OS_dispatch_queue): void;
+	setSampleBufferDelegateQueue(sampleBufferDelegate: AVCaptureAudioDataOutputSampleBufferDelegate | null, sampleBufferCallbackQueue: NSObject & OS_dispatch_queue | null): void;
 }
 
 /**
@@ -3127,6 +3317,56 @@ declare class AVCaptureBracketedStillImageSettings extends NSObject {
 	static alloc(): AVCaptureBracketedStillImageSettings; // inherited from NSObject
 
 	static new(): AVCaptureBracketedStillImageSettings; // inherited from NSObject
+}
+
+/**
+ * @since 27.0
+ */
+declare class AVCaptureBroadcastVideoOutput extends AVCaptureOutput {
+
+	static alloc(): AVCaptureBroadcastVideoOutput; // inherited from NSObject
+
+	static new(): AVCaptureBroadcastVideoOutput; // inherited from NSObject
+
+	readonly ancillaryDataEncoder: AVCaptureAncillaryDataEncoder;
+
+	readonly delegate: AVCaptureBroadcastVideoOutputDelegate | null;
+
+	readonly delegateCallbackQueue: NSObject & OS_dispatch_queue | null;
+
+	droppedFrameReplacementPolicy: AVCaptureBroadcastVideoOutputDroppedFrameReplacementPolicy;
+
+	maxBufferedFrameCount: number;
+
+	readonly videoSettings: NSDictionary<string, any> | null;
+
+	static readonly maxSupportedBufferedFrameCount: number;
+
+	resetFrameBuffer(): void;
+
+	setDelegateQueue(delegate: AVCaptureBroadcastVideoOutputDelegate | null, delegateCallbackQueue: NSObject & OS_dispatch_queue | null): void;
+}
+
+/**
+ * @since 27.0
+ */
+interface AVCaptureBroadcastVideoOutputDelegate extends NSObjectProtocol {
+
+	broadcastVideoOutputDidDropVideoFrameWithPresentationTimeStampFromConnection?(output: AVCaptureBroadcastVideoOutput, presentationTimeStamp: CMTime, connection: AVCaptureConnection): void;
+}
+declare var AVCaptureBroadcastVideoOutputDelegate: {
+
+	prototype: AVCaptureBroadcastVideoOutputDelegate;
+};
+
+/**
+ * @since 27.0
+ */
+declare const enum AVCaptureBroadcastVideoOutputDroppedFrameReplacementPolicy {
+
+	RepeatPreviousFrame = 0,
+
+	BlackFrame = 1
 }
 
 /**
@@ -3217,6 +3457,11 @@ declare class AVCaptureConnection extends NSObject {
 	automaticallyAdjustsVideoMirroring: boolean;
 
 	/**
+	 * @since 27.0
+	 */
+	automaticallyEnablesLowLightVideoNoiseReduction: boolean;
+
+	/**
 	 * @since 11.0
 	 */
 	cameraIntrinsicMatrixDeliveryEnabled: boolean;
@@ -3236,7 +3481,17 @@ declare class AVCaptureConnection extends NSObject {
 
 	readonly inputPorts: NSArray<AVCaptureInputPort>;
 
-	readonly output: AVCaptureOutput;
+	/**
+	 * @since 27.0
+	 */
+	lowLightVideoNoiseReductionEnabled: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly lowLightVideoNoiseReductionSupported: boolean;
+
+	readonly output: AVCaptureOutput | null;
 
 	/**
 	 * @since 8.0
@@ -3296,7 +3551,7 @@ declare class AVCaptureConnection extends NSObject {
 	/**
 	 * @since 6.0
 	 */
-	readonly videoPreviewLayer: AVCaptureVideoPreviewLayer;
+	readonly videoPreviewLayer: AVCaptureVideoPreviewLayer | null;
 
 	/**
 	 * @since 17.0
@@ -3334,6 +3589,9 @@ declare class AVCaptureConnection extends NSObject {
 	 */
 	initWithInputPortsOutput(ports: NSArray<AVCaptureInputPort> | AVCaptureInputPort[], output: AVCaptureOutput): this;
 
+	/**
+	 * @since 17.0
+	 */
 	isVideoRotationAngleSupported(videoRotationAngle: number): boolean;
 }
 
@@ -3360,15 +3618,15 @@ declare class AVCaptureDataOutputSynchronizer extends NSObject {
 
 	readonly dataOutputs: NSArray<AVCaptureOutput>;
 
-	readonly delegate: AVCaptureDataOutputSynchronizerDelegate;
+	readonly delegate: AVCaptureDataOutputSynchronizerDelegate | null;
 
-	readonly delegateCallbackQueue: NSObject & OS_dispatch_queue;
+	readonly delegateCallbackQueue: NSObject & OS_dispatch_queue | null;
 
 	constructor(o: { dataOutputs: NSArray<AVCaptureOutput> | AVCaptureOutput[]; });
 
 	initWithDataOutputs(dataOutputs: NSArray<AVCaptureOutput> | AVCaptureOutput[]): this;
 
-	setDelegateQueue(delegate: AVCaptureDataOutputSynchronizerDelegate, delegateCallbackQueue: NSObject & OS_dispatch_queue): void;
+	setDelegateQueue(delegate: AVCaptureDataOutputSynchronizerDelegate | null, delegateCallbackQueue: NSObject & OS_dispatch_queue | null): void;
 }
 
 /**
@@ -3404,13 +3662,13 @@ declare class AVCaptureDepthDataOutput extends AVCaptureOutput {
 
 	alwaysDiscardsLateDepthData: boolean;
 
-	readonly delegate: AVCaptureDepthDataOutputDelegate;
+	readonly delegate: AVCaptureDepthDataOutputDelegate | null;
 
-	readonly delegateCallbackQueue: NSObject & OS_dispatch_queue;
+	readonly delegateCallbackQueue: NSObject & OS_dispatch_queue | null;
 
 	filteringEnabled: boolean;
 
-	setDelegateCallbackQueue(delegate: AVCaptureDepthDataOutputDelegate, callbackQueue: NSObject & OS_dispatch_queue): void;
+	setDelegateCallbackQueue(delegate: AVCaptureDepthDataOutputDelegate | null, callbackQueue: NSObject & OS_dispatch_queue | null): void;
 }
 
 /**
@@ -3442,11 +3700,11 @@ declare class AVCaptureDevice extends NSObject {
 	/**
 	 * @since 10.0
 	 */
-	static defaultDeviceWithDeviceTypeMediaTypePosition(deviceType: string, mediaType: string, position: AVCaptureDevicePosition): AVCaptureDevice;
+	static defaultDeviceWithDeviceTypeMediaTypePosition(deviceType: string, mediaType: string | null, position: AVCaptureDevicePosition): AVCaptureDevice | null;
 
-	static defaultDeviceWithMediaType(mediaType: string): AVCaptureDevice;
+	static defaultDeviceWithMediaType(mediaType: string): AVCaptureDevice | null;
 
-	static deviceWithUniqueID(deviceUniqueID: string): AVCaptureDevice;
+	static deviceWithUniqueID(deviceUniqueID: string): AVCaptureDevice | null;
 
 	/**
 	 * @since 4.0
@@ -3463,7 +3721,7 @@ declare class AVCaptureDevice extends NSObject {
 	/**
 	 * @since 13.0
 	 */
-	static extrinsicMatrixFromDeviceToDevice(fromDevice: AVCaptureDevice, toDevice: AVCaptureDevice): NSData;
+	static extrinsicMatrixFromDeviceToDevice(fromDevice: AVCaptureDevice, toDevice: AVCaptureDevice): NSData | null;
 
 	static new(): AVCaptureDevice; // inherited from NSObject
 
@@ -3490,12 +3748,17 @@ declare class AVCaptureDevice extends NSObject {
 	/**
 	 * @since 11.0
 	 */
-	activeDepthDataFormat: AVCaptureDeviceFormat;
+	activeDepthDataFormat: AVCaptureDeviceFormat | null;
 
 	/**
 	 * @since 12.0
 	 */
 	activeDepthDataMinFrameDuration: CMTime;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly activeExposureSignals: NSSet<string>;
 
 	/**
 	 * @since 7.0
@@ -3510,7 +3773,7 @@ declare class AVCaptureDevice extends NSObject {
 	/**
 	 * @since 15.0
 	 */
-	readonly activePrimaryConstituentDevice: AVCaptureDevice;
+	readonly activePrimaryConstituentDevice: AVCaptureDevice | null;
 
 	/**
 	 * @since 15.0
@@ -3536,7 +3799,17 @@ declare class AVCaptureDevice extends NSObject {
 
 	readonly adjustingFocus: boolean;
 
+	/**
+	 * @since 27.0
+	 */
+	readonly adjustingSignalCompensationDelayWhileRunningSupported: boolean;
+
 	readonly adjustingWhiteBalance: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	autoExposureLensApertureRateLimit: number;
 
 	/**
 	 * @since 7.0
@@ -3554,6 +3827,11 @@ declare class AVCaptureDevice extends NSObject {
 	autoVideoFrameRateEnabled: boolean;
 
 	/**
+	 * @since 27.0
+	 */
+	readonly automaticallyAdjustsExposureDuration: boolean;
+
+	/**
 	 * @since 15.4
 	 */
 	automaticallyAdjustsFaceDrivenAutoExposureEnabled: boolean;
@@ -3564,9 +3842,24 @@ declare class AVCaptureDevice extends NSObject {
 	automaticallyAdjustsFaceDrivenAutoFocusEnabled: boolean;
 
 	/**
+	 * @since 27.0
+	 */
+	readonly automaticallyAdjustsISO: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly automaticallyAdjustsLensAperture: boolean;
+
+	/**
 	 * @since 8.0
 	 */
 	automaticallyAdjustsVideoHDREnabled: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	automaticallyEnablesExposureSignals: boolean;
 
 	/**
 	 * @since 6.0
@@ -3618,7 +3911,7 @@ declare class AVCaptureDevice extends NSObject {
 	/**
 	 * @since 16.0
 	 */
-	readonly companionDeskViewCamera: AVCaptureDevice;
+	readonly companionDeskViewCamera: AVCaptureDevice | null;
 
 	readonly connected: boolean;
 
@@ -3631,6 +3924,21 @@ declare class AVCaptureDevice extends NSObject {
 	 * @since 16.0
 	 */
 	readonly continuityCamera: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	continuousAutoFocusTrackingEnabled: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	continuousAutoFocusTrackingLensPositionBias: number;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly continuousAutoFocusTrackingSubjectAcquired: boolean;
 
 	/**
 	 * @since 10.0
@@ -3653,9 +3961,14 @@ declare class AVCaptureDevice extends NSObject {
 	 */
 	readonly dualCameraSwitchOverVideoZoomFactor: number;
 
-	readonly dynamicAspectRatio: string;
+	readonly dynamicAspectRatio: string | null;
 
 	readonly dynamicDimensions: CMVideoDimensions;
+
+	/**
+	 * @since 27.0
+	 */
+	enabledExposureSignals: NSSet<string>;
 
 	/**
 	 * @since 8.0
@@ -3882,6 +4195,11 @@ declare class AVCaptureDevice extends NSObject {
 	readonly primaryConstituentDeviceSwitchingBehavior: AVCapturePrimaryConstituentDeviceSwitchingBehavior;
 
 	/**
+	 * @since 27.0
+	 */
+	readonly primaryConstituentDeviceSwitchingBehaviorLockedWithDeviceSupported: boolean;
+
+	/**
 	 * @since 7.0
 	 */
 	readonly rampingVideoZoom: boolean;
@@ -3891,7 +4209,7 @@ declare class AVCaptureDevice extends NSObject {
 	 */
 	readonly reactionEffectsInProgress: NSArray<AVCaptureReactionEffectState>;
 
-	readonly smartFramingMonitor: AVCaptureSmartFramingMonitor;
+	readonly smartFramingMonitor: AVCaptureSmartFramingMonitor | null;
 
 	/**
 	 * @since 7.0
@@ -3917,6 +4235,11 @@ declare class AVCaptureDevice extends NSObject {
 	 * @since 5.0
 	 */
 	subjectAreaChangeMonitoringEnabled: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly supportedExposureSignals: NSSet<string>;
 
 	/**
 	 * @since 15.0
@@ -4000,6 +4323,16 @@ declare class AVCaptureDevice extends NSObject {
 	static centerStageEnabled: boolean;
 
 	/**
+	 * @since 26.2
+	 */
+	static readonly edgeLightActive: boolean;
+
+	/**
+	 * @since 26.2
+	 */
+	static readonly edgeLightEnabled: boolean;
+
+	/**
 	 * @since 15.0
 	 */
 	static readonly portraitEffectEnabled: boolean;
@@ -4027,12 +4360,12 @@ declare class AVCaptureDevice extends NSObject {
 	/**
 	 * @since 17.0
 	 */
-	static readonly systemPreferredCamera: AVCaptureDevice;
+	static readonly systemPreferredCamera: AVCaptureDevice | null;
 
 	/**
 	 * @since 17.0
 	 */
-	static userPreferredCamera: AVCaptureDevice;
+	static userPreferredCamera: AVCaptureDevice | null;
 
 	/**
 	 * @since 7.0
@@ -4112,22 +4445,32 @@ declare class AVCaptureDevice extends NSObject {
 	 */
 	setCinematicVideoTrackingFocusWithDetectedObjectIDFocusMode(detectedObjectID: number, focusMode: AVCaptureCinematicVideoFocusMode): void;
 
-	setDynamicAspectRatioCompletionHandler(dynamicAspectRatio: string, handler: (p1: CMTime, p2: NSError) => void): void;
+	setDynamicAspectRatioCompletionHandler(dynamicAspectRatio: string, handler: (p1: CMTime, p2: NSError | null) => void | null): void;
 
 	/**
 	 * @since 8.0
 	 */
-	setExposureModeCustomWithDurationISOCompletionHandler(duration: CMTime, ISO: number, handler: (p1: CMTime) => void): void;
+	setExposureModeCustomWithDurationISOCompletionHandler(duration: CMTime, ISO: number, handler: (p1: CMTime) => void | null): void;
+
+	/**
+	 * @since 27.0
+	 */
+	setExposureModeCustomWithLensApertureDurationISOCompletionHandler(lensAperture: number, duration: CMTime, ISO: number, handler: (p1: CMTime) => void | null): void;
 
 	/**
 	 * @since 8.0
 	 */
-	setExposureTargetBiasCompletionHandler(bias: number, handler: (p1: CMTime) => void): void;
+	setExposureTargetBiasCompletionHandler(bias: number, handler: (p1: CMTime) => void | null): void;
 
 	/**
 	 * @since 8.0
 	 */
-	setFocusModeLockedWithLensPositionCompletionHandler(lensPosition: number, handler: (p1: CMTime) => void): void;
+	setFocusModeLockedWithLensPositionCompletionHandler(lensPosition: number, handler: (p1: CMTime) => void | null): void;
+
+	/**
+	 * @since 27.0
+	 */
+	setPrimaryConstituentDeviceSwitchingBehaviorLockedWithDevice(device: AVCaptureDevice): void;
 
 	/**
 	 * @since 15.0
@@ -4142,12 +4485,12 @@ declare class AVCaptureDevice extends NSObject {
 	/**
 	 * @since 8.0
 	 */
-	setWhiteBalanceModeLockedWithDeviceWhiteBalanceGainsCompletionHandler(whiteBalanceGains: AVCaptureWhiteBalanceGains, handler: (p1: CMTime) => void): void;
+	setWhiteBalanceModeLockedWithDeviceWhiteBalanceGainsCompletionHandler(whiteBalanceGains: AVCaptureWhiteBalanceGains, handler: (p1: CMTime) => void | null): void;
 
 	/**
 	 * @since 26.0
 	 */
-	setWhiteBalanceModeLockedWithDeviceWhiteBalanceTemperatureAndTintValuesCompletionHandler(whiteBalanceTemperatureAndTintValues: AVCaptureWhiteBalanceTemperatureAndTintValues, handler: (p1: CMTime) => void): void;
+	setWhiteBalanceModeLockedWithDeviceWhiteBalanceTemperatureAndTintValuesCompletionHandler(whiteBalanceTemperatureAndTintValues: AVCaptureWhiteBalanceTemperatureAndTintValues, handler: (p1: CMTime) => void | null): void;
 
 	supportsAVCaptureSessionPreset(preset: string): boolean;
 
@@ -4166,7 +4509,7 @@ declare class AVCaptureDeviceDiscoverySession extends NSObject {
 
 	static alloc(): AVCaptureDeviceDiscoverySession; // inherited from NSObject
 
-	static discoverySessionWithDeviceTypesMediaTypePosition(deviceTypes: NSArray<string> | string[], mediaType: string, position: AVCaptureDevicePosition): AVCaptureDeviceDiscoverySession;
+	static discoverySessionWithDeviceTypesMediaTypePosition(deviceTypes: NSArray<string> | string[], mediaType: string | null, position: AVCaptureDevicePosition): AVCaptureDeviceDiscoverySession;
 
 	static new(): AVCaptureDeviceDiscoverySession; // inherited from NSObject
 
@@ -4177,6 +4520,31 @@ declare class AVCaptureDeviceDiscoverySession extends NSObject {
 	 */
 	readonly supportedMultiCamDeviceSets: NSArray<NSSet<AVCaptureDevice>>;
 }
+
+/**
+ * @since 27.0
+ */
+declare var AVCaptureDeviceExposureSignalDocument: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVCaptureDeviceExposureSignalFlicker: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVCaptureDeviceExposureSignalGroupPhoto: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVCaptureDeviceExposureSignalStarburst: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVCaptureDeviceExposureSignalSubjectMotion: string;
 
 /**
  * @since 7.0
@@ -4218,9 +4586,29 @@ declare class AVCaptureDeviceFormat extends NSObject {
 	readonly cinematicVideoCaptureSupported: boolean;
 
 	/**
+	 * @since 27.0
+	 */
+	readonly cinematicVideoMetadataCaptureSupported: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly continuousAutoFocusTrackingSupported: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly defaultLensAperture: number;
+
+	/**
 	 * @since 26.0
 	 */
 	readonly defaultSimulatedAperture: number;
+
+	/**
+	 * @since 26.2
+	 */
+	readonly edgeLightSupported: boolean;
 
 	readonly formatDescription: any;
 
@@ -4251,6 +4639,11 @@ declare class AVCaptureDeviceFormat extends NSObject {
 	readonly highestPhotoQualitySupported: boolean;
 
 	/**
+	 * @since 27.0
+	 */
+	readonly lowLightVideoNoiseReductionSupported: boolean;
+
+	/**
 	 * @since 8.0
 	 */
 	readonly maxExposureDuration: CMTime;
@@ -4259,6 +4652,11 @@ declare class AVCaptureDeviceFormat extends NSObject {
 	 * @since 8.0
 	 */
 	readonly maxISO: number;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly maxLensAperture: number;
 
 	/**
 	 * @since 26.0
@@ -4276,6 +4674,11 @@ declare class AVCaptureDeviceFormat extends NSObject {
 	 * @since 8.0
 	 */
 	readonly minISO: number;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly minLensAperture: number;
 
 	/**
 	 * @since 26.0
@@ -4301,6 +4704,11 @@ declare class AVCaptureDeviceFormat extends NSObject {
 	 * @since 17.0
 	 */
 	readonly reactionEffectsSupported: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly recommendedLensApertureStops: NSArray<number>;
 
 	/**
 	 * @since 16.0
@@ -4347,12 +4755,12 @@ declare class AVCaptureDeviceFormat extends NSObject {
 	/**
 	 * @since 18.0
 	 */
-	readonly systemRecommendedExposureBiasRange: AVExposureBiasRange;
+	readonly systemRecommendedExposureBiasRange: AVExposureBiasRange | null;
 
 	/**
 	 * @since 18.0
 	 */
-	readonly systemRecommendedVideoZoomRange: AVZoomRange;
+	readonly systemRecommendedVideoZoomRange: AVZoomRange | null;
 
 	/**
 	 * @since 11.0
@@ -4366,32 +4774,32 @@ declare class AVCaptureDeviceFormat extends NSObject {
 	/**
 	 * @since 18.0
 	 */
-	readonly videoFrameRateRangeForBackgroundReplacement: AVFrameRateRange;
+	readonly videoFrameRateRangeForBackgroundReplacement: AVFrameRateRange | null;
 
 	/**
 	 * @since 14.5
 	 */
-	readonly videoFrameRateRangeForCenterStage: AVFrameRateRange;
+	readonly videoFrameRateRangeForCenterStage: AVFrameRateRange | null;
 
 	/**
 	 * @since 26.0
 	 */
-	readonly videoFrameRateRangeForCinematicVideo: AVFrameRateRange;
+	readonly videoFrameRateRangeForCinematicVideo: AVFrameRateRange | null;
 
 	/**
 	 * @since 15.0
 	 */
-	readonly videoFrameRateRangeForPortraitEffect: AVFrameRateRange;
+	readonly videoFrameRateRangeForPortraitEffect: AVFrameRateRange | null;
 
 	/**
 	 * @since 17.0
 	 */
-	readonly videoFrameRateRangeForReactionEffectsInProgress: AVFrameRateRange;
+	readonly videoFrameRateRangeForReactionEffectsInProgress: AVFrameRateRange | null;
 
 	/**
 	 * @since 16.0
 	 */
-	readonly videoFrameRateRangeForStudioLight: AVFrameRateRange;
+	readonly videoFrameRateRangeForStudioLight: AVFrameRateRange | null;
 
 	/**
 	 * @since 8.0
@@ -4452,6 +4860,11 @@ declare class AVCaptureDeviceFormat extends NSObject {
 	 */
 	isVideoStabilizationModeSupported(videoStabilizationMode: AVCaptureVideoStabilizationMode): boolean;
 
+	/**
+	 * @since 27.0
+	 */
+	supportsExposureModeCustomWithLensApertureDurationISO(lensAperture: number, duration: CMTime, ISO: number): boolean;
+
 	videoFieldOfViewForAspectRatioGeometricDistortionCorrected(aspectRatio: string, geometricDistortionCorrected: boolean): number;
 }
 
@@ -4477,6 +4890,16 @@ declare class AVCaptureDeviceInput extends AVCaptureInput {
 	activeLockedVideoFrameDuration: CMTime;
 
 	/**
+	 * @since 26.4
+	 */
+	audioZoomEnabled: boolean;
+
+	/**
+	 * @since 26.4
+	 */
+	readonly audioZoomSupported: boolean;
+
+	/**
 	 * @since 26.0
 	 */
 	cinematicVideoCaptureEnabled: boolean;
@@ -4491,7 +4914,7 @@ declare class AVCaptureDeviceInput extends AVCaptureInput {
 	/**
 	 * @since 26.0
 	 */
-	readonly externalSyncDevice: AVExternalSyncDevice;
+	readonly externalSyncDevice: AVExternalSyncDevice | null;
 
 	/**
 	 * @since 26.0
@@ -4538,7 +4961,7 @@ declare class AVCaptureDeviceInput extends AVCaptureInput {
 	/**
 	 * @since 26.0
 	 */
-	followExternalSyncDeviceVideoFrameDurationDelegate(externalSyncDevice: AVExternalSyncDevice, frameDuration: CMTime, delegate: AVExternalSyncDeviceDelegate): void;
+	followExternalSyncDeviceVideoFrameDurationDelegate(externalSyncDevice: AVExternalSyncDevice, frameDuration: CMTime, delegate: AVExternalSyncDeviceDelegate | null): void;
 
 	initWithDeviceError(device: AVCaptureDevice, error?: interop.Reference<NSError>): this;
 
@@ -4550,7 +4973,7 @@ declare class AVCaptureDeviceInput extends AVCaptureInput {
 	/**
 	 * @since 13.0
 	 */
-	portsWithMediaTypeSourceDeviceTypeSourceDevicePosition(mediaType: string, sourceDeviceType: string, sourceDevicePosition: AVCaptureDevicePosition): NSArray<AVCaptureInputPort>;
+	portsWithMediaTypeSourceDeviceTypeSourceDevicePosition(mediaType: string | null, sourceDeviceType: string | null, sourceDevicePosition: AVCaptureDevicePosition): NSArray<AVCaptureInputPort>;
 
 	/**
 	 * @since 26.0
@@ -4579,17 +5002,22 @@ declare class AVCaptureDeviceRotationCoordinator extends NSObject {
 
 	static new(): AVCaptureDeviceRotationCoordinator; // inherited from NSObject
 
-	readonly device: AVCaptureDevice;
+	readonly device: AVCaptureDevice | null;
 
-	readonly previewLayer: CALayer;
+	readonly previewLayer: CALayer | null;
 
 	readonly videoRotationAngleForHorizonLevelCapture: number;
 
 	readonly videoRotationAngleForHorizonLevelPreview: number;
 
-	constructor(o: { device: AVCaptureDevice; previewLayer: CALayer; });
+	constructor(o: { device: AVCaptureDevice; previewLayer: CALayer | null; });
 
-	initWithDevicePreviewLayer(device: AVCaptureDevice, previewLayer: CALayer): this;
+	initWithDevicePreviewLayer(device: AVCaptureDevice, previewLayer: CALayer | null): this;
+
+	/**
+	 * @since 27.0
+	 */
+	videoRotationAngleRelativeToDeviceOrientation(deviceOrientation: AVCaptureVideoOrientation): number;
 }
 
 /**
@@ -4675,6 +5103,11 @@ declare var AVCaptureDeviceWasConnectedNotification: string;
 declare var AVCaptureDeviceWasDisconnectedNotification: string;
 
 /**
+ * @since 27.0
+ */
+declare var AVCaptureExposureDurationAuto: CMTime;
+
+/**
  * @since 8.0
  */
 declare var AVCaptureExposureDurationCurrent: CMTime;
@@ -4727,9 +5160,9 @@ declare class AVCaptureExternalDisplayConfigurator extends NSObject {
 
 	readonly activeExternalDisplayFrameRate: number;
 
-	readonly device: AVCaptureDevice;
+	readonly device: AVCaptureDevice | null;
 
-	readonly previewLayer: CALayer;
+	readonly previewLayer: CALayer | null;
 
 	static readonly shouldMatchFrameRateSupported: boolean;
 
@@ -4759,7 +5192,7 @@ declare class AVCaptureFileOutput extends AVCaptureOutput {
 
 	minFreeDiskSpaceLimit: number;
 
-	readonly outputFileURL: NSURL;
+	readonly outputFileURL: NSURL | null;
 
 	readonly recordedDuration: CMTime;
 
@@ -4792,7 +5225,7 @@ declare class AVCaptureFileOutput extends AVCaptureOutput {
  */
 interface AVCaptureFileOutputRecordingDelegate extends NSObjectProtocol {
 
-	captureOutputDidFinishRecordingToOutputFileAtURLFromConnectionsError(output: AVCaptureFileOutput, outputFileURL: NSURL, connections: NSArray<AVCaptureConnection> | AVCaptureConnection[], error: NSError): void;
+	captureOutputDidFinishRecordingToOutputFileAtURLFromConnectionsError(output: AVCaptureFileOutput, outputFileURL: NSURL, connections: NSArray<AVCaptureConnection> | AVCaptureConnection[], error: NSError | null): void;
 
 	/**
 	 * @since 18.0
@@ -4855,6 +5288,11 @@ declare class AVCaptureFraming extends NSObject {
 }
 
 /**
+ * @since 27.0
+ */
+declare var AVCaptureISOAuto: number;
+
+/**
  * @since 8.0
  */
 declare var AVCaptureISOCurrent: number;
@@ -4868,7 +5306,7 @@ declare class AVCaptureIndexPicker extends AVCaptureControl {
 
 	static new(): AVCaptureIndexPicker; // inherited from NSObject
 
-	accessibilityIdentifier: string;
+	accessibilityIdentifier: string | null;
 
 	readonly localizedIndexTitles: NSArray<string>;
 
@@ -4919,11 +5357,11 @@ declare class AVCaptureInputPort extends NSObject {
 	/**
 	 * @since 7.0
 	 */
-	readonly clock: any;
+	readonly clock: any | null;
 
 	enabled: boolean;
 
-	readonly formatDescription: any;
+	readonly formatDescription: any | null;
 
 	readonly input: AVCaptureInput;
 
@@ -4937,13 +5375,23 @@ declare class AVCaptureInputPort extends NSObject {
 	/**
 	 * @since 13.0
 	 */
-	readonly sourceDeviceType: string;
+	readonly sourceDeviceType: string | null;
 }
 
 /**
  * @since 4.0
  */
 declare var AVCaptureInputPortFormatDescriptionDidChangeNotification: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVCaptureLensApertureAuto: number;
+
+/**
+ * @since 27.0
+ */
+declare var AVCaptureLensApertureCurrent: number;
 
 /**
  * @since 8.0
@@ -5018,9 +5466,9 @@ declare class AVCaptureMetadataOutput extends AVCaptureOutput {
 
 	metadataObjectTypes: NSArray<string>;
 
-	readonly metadataObjectsCallbackQueue: NSObject & OS_dispatch_queue;
+	readonly metadataObjectsCallbackQueue: NSObject & OS_dispatch_queue | null;
 
-	readonly metadataObjectsDelegate: AVCaptureMetadataOutputObjectsDelegate;
+	readonly metadataObjectsDelegate: AVCaptureMetadataOutputObjectsDelegate | null;
 
 	/**
 	 * @since 7.0
@@ -5032,7 +5480,7 @@ declare class AVCaptureMetadataOutput extends AVCaptureOutput {
 	 */
 	readonly requiredMetadataObjectTypesForCinematicVideoCapture: NSArray<string>;
 
-	setMetadataObjectsDelegateQueue(objectsDelegate: AVCaptureMetadataOutputObjectsDelegate, objectsCallbackQueue: NSObject & OS_dispatch_queue): void;
+	setMetadataObjectsDelegateQueue(objectsDelegate: AVCaptureMetadataOutputObjectsDelegate | null, objectsCallbackQueue: NSObject & OS_dispatch_queue | null): void;
 }
 
 /**
@@ -5069,11 +5517,26 @@ declare class AVCaptureMovieFileOutput extends AVCaptureFileOutput {
 	static new(): AVCaptureMovieFileOutput; // inherited from NSObject
 
 	/**
+	 * @since 27.0
+	 */
+	automaticallyAdjustsCinematicVideoMetadataCaptureEnabled: boolean;
+
+	/**
 	 * @since 10.0
 	 */
 	readonly availableVideoCodecTypes: NSArray<string>;
 
-	metadata: NSArray<AVMetadataItem>;
+	/**
+	 * @since 27.0
+	 */
+	cinematicVideoMetadataCaptureEnabled: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly cinematicVideoMetadataCaptureSupported: boolean;
+
+	metadata: NSArray<AVMetadataItem> | null;
 
 	movieFragmentInterval: CMTime;
 
@@ -5093,6 +5556,11 @@ declare class AVCaptureMovieFileOutput extends AVCaptureFileOutput {
 	primaryConstituentDeviceSwitchingBehaviorForRecordingEnabled: boolean;
 
 	/**
+	 * @since 27.0
+	 */
+	readonly proVideoStorageSupported: boolean;
+
+	/**
 	 * @since 18.0
 	 */
 	spatialVideoCaptureEnabled: boolean;
@@ -5101,6 +5569,11 @@ declare class AVCaptureMovieFileOutput extends AVCaptureFileOutput {
 	 * @since 18.0
 	 */
 	readonly spatialVideoCaptureSupported: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	usesProVideoStorage: boolean;
 
 	/**
 	 * @since 10.0
@@ -5115,7 +5588,7 @@ declare class AVCaptureMovieFileOutput extends AVCaptureFileOutput {
 	/**
 	 * @since 10.0
 	 */
-	setOutputSettingsForConnection(outputSettings: NSDictionary<string, any>, connection: AVCaptureConnection): void;
+	setOutputSettingsForConnection(outputSettings: NSDictionary<string, any> | null, connection: AVCaptureConnection): void;
 
 	/**
 	 * @since 15.0
@@ -5183,7 +5656,7 @@ declare class AVCaptureOutput extends NSObject {
 	/**
 	 * @since 5.0
 	 */
-	connectionWithMediaType(mediaType: string): AVCaptureConnection;
+	connectionWithMediaType(mediaType: string): AVCaptureConnection | null;
 
 	/**
 	 * @since 7.0
@@ -5198,7 +5671,7 @@ declare class AVCaptureOutput extends NSObject {
 	/**
 	 * @since 6.0
 	 */
-	transformedMetadataObjectForMetadataObjectConnection(metadataObject: AVMetadataObject, connection: AVCaptureConnection): AVMetadataObject;
+	transformedMetadataObjectForMetadataObjectConnection(metadataObject: AVMetadataObject, connection: AVCaptureConnection): AVMetadataObject | null;
 }
 
 /**
@@ -5227,9 +5700,9 @@ declare class AVCapturePhoto extends NSObject {
 	/**
 	 * @since 11.0
 	 */
-	readonly bracketSettings: AVCaptureBracketedStillImageSettings;
+	readonly bracketSettings: AVCaptureBracketedStillImageSettings | null;
 
-	readonly cameraCalibrationData: AVCameraCalibrationData;
+	readonly cameraCalibrationData: AVCameraCalibrationData | null;
 
 	/**
 	 * @since 18.0
@@ -5239,16 +5712,16 @@ declare class AVCapturePhoto extends NSObject {
 	/**
 	 * @since 18.0
 	 */
-	readonly constantColorConfidenceMap: any;
+	readonly constantColorConfidenceMap: any | null;
 
 	/**
 	 * @since 18.0
 	 */
 	readonly constantColorFallbackPhoto: boolean;
 
-	readonly depthData: AVDepthData;
+	readonly depthData: AVDepthData | null;
 
-	readonly embeddedThumbnailPhotoFormat: NSDictionary<string, any>;
+	readonly embeddedThumbnailPhotoFormat: NSDictionary<string, any> | null;
 
 	/**
 	 * @since 11.0
@@ -5259,14 +5732,14 @@ declare class AVCapturePhoto extends NSObject {
 
 	readonly photoCount: number;
 
-	readonly pixelBuffer: any;
+	readonly pixelBuffer: any | null;
 
 	/**
 	 * @since 12.0
 	 */
-	readonly portraitEffectsMatte: AVPortraitEffectsMatte;
+	readonly portraitEffectsMatte: AVPortraitEffectsMatte | null;
 
-	readonly previewPixelBuffer: any;
+	readonly previewPixelBuffer: any | null;
 
 	readonly rawPhoto: boolean;
 
@@ -5277,40 +5750,40 @@ declare class AVCapturePhoto extends NSObject {
 	 */
 	readonly sequenceCount: number;
 
-	readonly sourceDeviceType: string;
+	readonly sourceDeviceType: string | null;
 
 	readonly timestamp: CMTime;
 
 	/**
 	 * @since 11.0
 	 */
-	CGImageRepresentation(): any;
+	CGImageRepresentation(): any | null;
 
 	/**
 	 * @since 11.0
 	 */
-	fileDataRepresentation(): NSData;
+	fileDataRepresentation(): NSData | null;
 
 	/**
 	 * @since 12.0
 	 */
-	fileDataRepresentationWithCustomizer(customizer: AVCapturePhotoFileDataRepresentationCustomizer): NSData;
+	fileDataRepresentationWithCustomizer(customizer: AVCapturePhotoFileDataRepresentationCustomizer): NSData | null;
 
 	/**
 	 * @since 11.0
 	 * @deprecated 12.0
 	 */
-	fileDataRepresentationWithReplacementMetadataReplacementEmbeddedThumbnailPhotoFormatReplacementEmbeddedThumbnailPixelBufferReplacementDepthData(replacementMetadata: NSDictionary<string, any>, replacementEmbeddedThumbnailPhotoFormat: NSDictionary<string, any>, replacementEmbeddedThumbnailPixelBuffer: any, replacementDepthData: AVDepthData): NSData;
+	fileDataRepresentationWithReplacementMetadataReplacementEmbeddedThumbnailPhotoFormatReplacementEmbeddedThumbnailPixelBufferReplacementDepthData(replacementMetadata: NSDictionary<string, any> | null, replacementEmbeddedThumbnailPhotoFormat: NSDictionary<string, any> | null, replacementEmbeddedThumbnailPixelBuffer: any | null, replacementDepthData: AVDepthData | null): NSData | null;
 
 	/**
 	 * @since 11.0
 	 */
-	previewCGImageRepresentation(): any;
+	previewCGImageRepresentation(): any | null;
 
 	/**
 	 * @since 13.0
 	 */
-	semanticSegmentationMatteForType(semanticSegmentationMatteType: string): AVSemanticSegmentationMatte;
+	semanticSegmentationMatteForType(semanticSegmentationMatteType: string): AVSemanticSegmentationMatte | null;
 }
 
 /**
@@ -5322,27 +5795,27 @@ declare class AVCapturePhotoBracketSettings extends AVCapturePhotoSettings {
 
 	static new(): AVCapturePhotoBracketSettings; // inherited from NSObject
 
-	static photoBracketSettingsWithRawPixelFormatTypeProcessedFormatBracketedSettings(rawPixelFormatType: number, processedFormat: NSDictionary<string, any>, bracketedSettings: NSArray<AVCaptureBracketedStillImageSettings> | AVCaptureBracketedStillImageSettings[]): AVCapturePhotoBracketSettings;
+	static photoBracketSettingsWithRawPixelFormatTypeProcessedFormatBracketedSettings(rawPixelFormatType: number, processedFormat: NSDictionary<string, any> | null, bracketedSettings: NSArray<AVCaptureBracketedStillImageSettings> | AVCaptureBracketedStillImageSettings[]): AVCapturePhotoBracketSettings;
 
 	/**
 	 * @since 11.0
 	 */
-	static photoBracketSettingsWithRawPixelFormatTypeRawFileTypeProcessedFormatProcessedFileTypeBracketedSettings(rawPixelFormatType: number, rawFileType: string, processedFormat: NSDictionary<string, any>, processedFileType: string, bracketedSettings: NSArray<AVCaptureBracketedStillImageSettings> | AVCaptureBracketedStillImageSettings[]): AVCapturePhotoBracketSettings;
+	static photoBracketSettingsWithRawPixelFormatTypeRawFileTypeProcessedFormatProcessedFileTypeBracketedSettings(rawPixelFormatType: number, rawFileType: string | null, processedFormat: NSDictionary<string, any> | null, processedFileType: string | null, bracketedSettings: NSArray<AVCaptureBracketedStillImageSettings> | AVCaptureBracketedStillImageSettings[]): AVCapturePhotoBracketSettings;
 
 	static photoSettings(): AVCapturePhotoBracketSettings; // inherited from AVCapturePhotoSettings
 
 	static photoSettingsFromPhotoSettings(photoSettings: AVCapturePhotoSettings): AVCapturePhotoBracketSettings; // inherited from AVCapturePhotoSettings
 
-	static photoSettingsWithFormat(format: NSDictionary<string, any>): AVCapturePhotoBracketSettings; // inherited from AVCapturePhotoSettings
+	static photoSettingsWithFormat(format: NSDictionary<string, any> | null): AVCapturePhotoBracketSettings; // inherited from AVCapturePhotoSettings
 
 	static photoSettingsWithRawPixelFormatType(rawPixelFormatType: number): AVCapturePhotoBracketSettings; // inherited from AVCapturePhotoSettings
 
-	static photoSettingsWithRawPixelFormatTypeProcessedFormat(rawPixelFormatType: number, processedFormat: NSDictionary<string, any>): AVCapturePhotoBracketSettings; // inherited from AVCapturePhotoSettings
+	static photoSettingsWithRawPixelFormatTypeProcessedFormat(rawPixelFormatType: number, processedFormat: NSDictionary<string, any> | null): AVCapturePhotoBracketSettings; // inherited from AVCapturePhotoSettings
 
 	/**
 	 * @since 11.0
 	 */
-	static photoSettingsWithRawPixelFormatTypeRawFileTypeProcessedFormatProcessedFileType(rawPixelFormatType: number, rawFileType: string, processedFormat: NSDictionary<string, any>, processedFileType: string): AVCapturePhotoBracketSettings; // inherited from AVCapturePhotoSettings
+	static photoSettingsWithRawPixelFormatTypeRawFileTypeProcessedFormatProcessedFileType(rawPixelFormatType: number, rawFileType: string | null, processedFormat: NSDictionary<string, any> | null, processedFileType: string | null): AVCapturePhotoBracketSettings; // inherited from AVCapturePhotoSettings
 
 	readonly bracketedSettings: NSArray<AVCaptureBracketedStillImageSettings>;
 
@@ -5356,31 +5829,31 @@ interface AVCapturePhotoCaptureDelegate extends NSObjectProtocol {
 
 	captureOutputDidCapturePhotoForResolvedSettings?(output: AVCapturePhotoOutput, resolvedSettings: AVCaptureResolvedPhotoSettings): void;
 
-	captureOutputDidFinishCaptureForResolvedSettingsError?(output: AVCapturePhotoOutput, resolvedSettings: AVCaptureResolvedPhotoSettings, error: NSError): void;
+	captureOutputDidFinishCaptureForResolvedSettingsError?(output: AVCapturePhotoOutput, resolvedSettings: AVCaptureResolvedPhotoSettings, error: NSError | null): void;
 
 	/**
 	 * @since 17.0
 	 */
-	captureOutputDidFinishCapturingDeferredPhotoProxyError?(output: AVCapturePhotoOutput, deferredPhotoProxy: AVCaptureDeferredPhotoProxy, error: NSError): void;
+	captureOutputDidFinishCapturingDeferredPhotoProxyError?(output: AVCapturePhotoOutput, deferredPhotoProxy: AVCaptureDeferredPhotoProxy | null, error: NSError | null): void;
 
-	captureOutputDidFinishProcessingLivePhotoToMovieFileAtURLDurationPhotoDisplayTimeResolvedSettingsError?(output: AVCapturePhotoOutput, outputFileURL: NSURL, duration: CMTime, photoDisplayTime: CMTime, resolvedSettings: AVCaptureResolvedPhotoSettings, error: NSError): void;
+	captureOutputDidFinishProcessingLivePhotoToMovieFileAtURLDurationPhotoDisplayTimeResolvedSettingsError?(output: AVCapturePhotoOutput, outputFileURL: NSURL, duration: CMTime, photoDisplayTime: CMTime, resolvedSettings: AVCaptureResolvedPhotoSettings, error: NSError | null): void;
 
 	/**
 	 * @since 11.0
 	 */
-	captureOutputDidFinishProcessingPhotoError?(output: AVCapturePhotoOutput, photo: AVCapturePhoto, error: NSError): void;
+	captureOutputDidFinishProcessingPhotoError?(output: AVCapturePhotoOutput, photo: AVCapturePhoto, error: NSError | null): void;
 
 	/**
 	 * @since 10.0
 	 * @deprecated 11.0
 	 */
-	captureOutputDidFinishProcessingPhotoSampleBufferPreviewPhotoSampleBufferResolvedSettingsBracketSettingsError?(output: AVCapturePhotoOutput, photoSampleBuffer: any, previewPhotoSampleBuffer: any, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings, error: NSError): void;
+	captureOutputDidFinishProcessingPhotoSampleBufferPreviewPhotoSampleBufferResolvedSettingsBracketSettingsError?(output: AVCapturePhotoOutput, photoSampleBuffer: any | null, previewPhotoSampleBuffer: any | null, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings | null, error: NSError | null): void;
 
 	/**
 	 * @since 10.0
 	 * @deprecated 11.0
 	 */
-	captureOutputDidFinishProcessingRawPhotoSampleBufferPreviewPhotoSampleBufferResolvedSettingsBracketSettingsError?(output: AVCapturePhotoOutput, rawSampleBuffer: any, previewPhotoSampleBuffer: any, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings, error: NSError): void;
+	captureOutputDidFinishProcessingRawPhotoSampleBufferPreviewPhotoSampleBufferResolvedSettingsBracketSettingsError?(output: AVCapturePhotoOutput, rawSampleBuffer: any | null, previewPhotoSampleBuffer: any | null, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings | null, error: NSError | null): void;
 
 	captureOutputDidFinishRecordingLivePhotoMovieForEventualFileAtURLResolvedSettings?(output: AVCapturePhotoOutput, outputFileURL: NSURL, resolvedSettings: AVCaptureResolvedPhotoSettings): void;
 
@@ -5403,18 +5876,18 @@ interface AVCapturePhotoFileDataRepresentationCustomizer extends NSObjectProtoco
 	 */
 	replacementAppleProRAWCompressionSettingsForPhotoDefaultSettingsMaximumBitDepth?(photo: AVCapturePhoto, defaultSettings: NSDictionary<string, any>, maximumBitDepth: number): NSDictionary<string, any>;
 
-	replacementDepthDataForPhoto?(photo: AVCapturePhoto): AVDepthData;
+	replacementDepthDataForPhoto?(photo: AVCapturePhoto): AVDepthData | null;
 
-	replacementEmbeddedThumbnailPixelBufferWithPhotoFormatForPhoto?(replacementEmbeddedThumbnailPhotoFormatOut: interop.Pointer | interop.Reference<NSDictionary<string, any>>, photo: AVCapturePhoto): any;
+	replacementEmbeddedThumbnailPixelBufferWithPhotoFormatForPhoto?(replacementEmbeddedThumbnailPhotoFormatOut: interop.Pointer | interop.Reference<NSDictionary<string, any> | null> | ArrayBufferLike | ArrayBufferView, photo: AVCapturePhoto): any | null;
 
-	replacementMetadataForPhoto?(photo: AVCapturePhoto): NSDictionary<string, any>;
+	replacementMetadataForPhoto?(photo: AVCapturePhoto): NSDictionary<string, any> | null;
 
-	replacementPortraitEffectsMatteForPhoto?(photo: AVCapturePhoto): AVPortraitEffectsMatte;
+	replacementPortraitEffectsMatteForPhoto?(photo: AVCapturePhoto): AVPortraitEffectsMatte | null;
 
 	/**
 	 * @since 13.0
 	 */
-	replacementSemanticSegmentationMatteOfTypeForPhoto?(semanticSegmentationMatteType: string, photo: AVCapturePhoto): AVSemanticSegmentationMatte;
+	replacementSemanticSegmentationMatteOfTypeForPhoto?(semanticSegmentationMatteType: string, photo: AVCapturePhoto): AVSemanticSegmentationMatte | null;
 }
 declare var AVCapturePhotoFileDataRepresentationCustomizer: {
 
@@ -5430,13 +5903,13 @@ declare class AVCapturePhotoOutput extends AVCaptureOutput {
 	 * @since 10.0
 	 * @deprecated 11.0
 	 */
-	static DNGPhotoDataRepresentationForRawSampleBufferPreviewPhotoSampleBuffer(rawSampleBuffer: any, previewPhotoSampleBuffer: any): NSData;
+	static DNGPhotoDataRepresentationForRawSampleBufferPreviewPhotoSampleBuffer(rawSampleBuffer: any, previewPhotoSampleBuffer: any | null): NSData | null;
 
 	/**
 	 * @since 10.0
 	 * @deprecated 11.0
 	 */
-	static JPEGPhotoDataRepresentationForJPEGSampleBufferPreviewPhotoSampleBuffer(JPEGSampleBuffer: any, previewPhotoSampleBuffer: any): NSData;
+	static JPEGPhotoDataRepresentationForJPEGSampleBufferPreviewPhotoSampleBuffer(JPEGSampleBuffer: any, previewPhotoSampleBuffer: any | null): NSData | null;
 
 	static alloc(): AVCapturePhotoOutput; // inherited from NSObject
 
@@ -5627,7 +6100,7 @@ declare class AVCapturePhotoOutput extends AVCaptureOutput {
 	 */
 	maxPhotoQualityPrioritization: AVCapturePhotoQualityPrioritization;
 
-	photoSettingsForSceneMonitoring: AVCapturePhotoSettings;
+	photoSettingsForSceneMonitoring: AVCapturePhotoSettings | null;
 
 	/**
 	 * @since 12.0
@@ -5696,7 +6169,7 @@ declare class AVCapturePhotoOutput extends AVCaptureOutput {
 
 	capturePhotoWithSettingsDelegate(settings: AVCapturePhotoSettings, delegate: AVCapturePhotoCaptureDelegate): void;
 
-	setPreparedPhotoSettingsArrayCompletionHandler(preparedPhotoSettingsArray: NSArray<AVCapturePhotoSettings> | AVCapturePhotoSettings[], completionHandler: (p1: boolean, p2: NSError) => void): void;
+	setPreparedPhotoSettingsArrayCompletionHandler(preparedPhotoSettingsArray: NSArray<AVCapturePhotoSettings> | AVCapturePhotoSettings[], completionHandler: (p1: boolean, p2: NSError | null) => void | null): void;
 
 	/**
 	 * @since 11.0
@@ -5746,7 +6219,7 @@ declare class AVCapturePhotoOutputReadinessCoordinator extends NSObject {
 
 	readonly captureReadiness: AVCapturePhotoOutputCaptureReadiness;
 
-	delegate: AVCapturePhotoOutputReadinessCoordinatorDelegate;
+	delegate: AVCapturePhotoOutputReadinessCoordinatorDelegate | null;
 
 	constructor(o: { photoOutput: AVCapturePhotoOutput; });
 
@@ -5794,16 +6267,16 @@ declare class AVCapturePhotoSettings extends NSObject implements NSCopying {
 
 	static photoSettingsFromPhotoSettings(photoSettings: AVCapturePhotoSettings): AVCapturePhotoSettings;
 
-	static photoSettingsWithFormat(format: NSDictionary<string, any>): AVCapturePhotoSettings;
+	static photoSettingsWithFormat(format: NSDictionary<string, any> | null): AVCapturePhotoSettings;
 
 	static photoSettingsWithRawPixelFormatType(rawPixelFormatType: number): AVCapturePhotoSettings;
 
-	static photoSettingsWithRawPixelFormatTypeProcessedFormat(rawPixelFormatType: number, processedFormat: NSDictionary<string, any>): AVCapturePhotoSettings;
+	static photoSettingsWithRawPixelFormatTypeProcessedFormat(rawPixelFormatType: number, processedFormat: NSDictionary<string, any> | null): AVCapturePhotoSettings;
 
 	/**
 	 * @since 11.0
 	 */
-	static photoSettingsWithRawPixelFormatTypeRawFileTypeProcessedFormatProcessedFileType(rawPixelFormatType: number, rawFileType: string, processedFormat: NSDictionary<string, any>, processedFileType: string): AVCapturePhotoSettings;
+	static photoSettingsWithRawPixelFormatTypeRawFileTypeProcessedFormatProcessedFileType(rawPixelFormatType: number, rawFileType: string | null, processedFormat: NSDictionary<string, any> | null, processedFileType: string | null): AVCapturePhotoSettings;
 
 	/**
 	 * @since 14.1
@@ -5878,7 +6351,7 @@ declare class AVCapturePhotoSettings extends NSObject implements NSCopying {
 	/**
 	 * @since 11.0
 	 */
-	embeddedThumbnailPhotoFormat: NSDictionary<string, any>;
+	embeddedThumbnailPhotoFormat: NSDictionary<string, any> | null;
 
 	/**
 	 * @since 11.0
@@ -5902,7 +6375,7 @@ declare class AVCapturePhotoSettings extends NSObject implements NSCopying {
 
 	flashMode: AVCaptureFlashMode;
 
-	readonly format: NSDictionary<string, any>;
+	readonly format: NSDictionary<string, any> | null;
 
 	/**
 	 * @since 10.0
@@ -5910,7 +6383,7 @@ declare class AVCapturePhotoSettings extends NSObject implements NSCopying {
 	 */
 	highResolutionPhotoEnabled: boolean;
 
-	livePhotoMovieFileURL: NSURL;
+	livePhotoMovieFileURL: NSURL | null;
 
 	livePhotoMovieMetadata: NSArray<AVMetadataItem>;
 
@@ -5939,27 +6412,27 @@ declare class AVCapturePhotoSettings extends NSObject implements NSCopying {
 	 */
 	portraitEffectsMatteDeliveryEnabled: boolean;
 
-	previewPhotoFormat: NSDictionary<string, any>;
+	previewPhotoFormat: NSDictionary<string, any> | null;
 
 	/**
 	 * @since 11.0
 	 */
-	readonly processedFileType: string;
+	readonly processedFileType: string | null;
 
 	/**
 	 * @since 12.0
 	 */
-	rawEmbeddedThumbnailPhotoFormat: NSDictionary<string, any>;
+	rawEmbeddedThumbnailPhotoFormat: NSDictionary<string, any> | null;
 
 	/**
 	 * @since 18.0
 	 */
-	rawFileFormat: NSDictionary<string, any>;
+	rawFileFormat: NSDictionary<string, any> | null;
 
 	/**
 	 * @since 11.0
 	 */
-	readonly rawFileType: string;
+	readonly rawFileType: string | null;
 
 	readonly rawPhotoPixelFormatType: number;
 
@@ -5975,7 +6448,7 @@ declare class AVCapturePhotoSettings extends NSObject implements NSCopying {
 	 */
 	virtualDeviceConstituentPhotoDeliveryEnabledDevices: NSArray<AVCaptureDevice>;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -6217,22 +6690,22 @@ declare class AVCaptureSession extends NSObject {
 	/**
 	 * @since 18.0
 	 */
-	readonly controlsDelegate: AVCaptureSessionControlsDelegate;
+	readonly controlsDelegate: AVCaptureSessionControlsDelegate | null;
 
 	/**
 	 * @since 18.0
 	 */
-	readonly controlsDelegateCallbackQueue: NSObject & OS_dispatch_queue;
+	readonly controlsDelegateCallbackQueue: NSObject & OS_dispatch_queue | null;
 
 	/**
 	 * @since 26.0
 	 */
-	readonly deferredStartDelegate: AVCaptureSessionDeferredStartDelegate;
+	readonly deferredStartDelegate: AVCaptureSessionDeferredStartDelegate | null;
 
 	/**
 	 * @since 26.0
 	 */
-	readonly deferredStartDelegateCallbackQueue: NSObject & OS_dispatch_queue;
+	readonly deferredStartDelegateCallbackQueue: NSObject & OS_dispatch_queue | null;
 
 	/**
 	 * @since 16.0
@@ -6255,7 +6728,7 @@ declare class AVCaptureSession extends NSObject {
 	 * @since 7.0
 	 * @deprecated 15.4
 	 */
-	readonly masterClock: any;
+	readonly masterClock: any | null;
 
 	/**
 	 * @since 18.0
@@ -6286,7 +6759,7 @@ declare class AVCaptureSession extends NSObject {
 	/**
 	 * @since 15.4
 	 */
-	readonly synchronizationClock: any;
+	readonly synchronizationClock: any | null;
 
 	/**
 	 * @since 7.0
@@ -6359,12 +6832,12 @@ declare class AVCaptureSession extends NSObject {
 	/**
 	 * @since 18.0
 	 */
-	setControlsDelegateQueue(controlsDelegate: AVCaptureSessionControlsDelegate, controlsDelegateCallbackQueue: NSObject & OS_dispatch_queue): void;
+	setControlsDelegateQueue(controlsDelegate: AVCaptureSessionControlsDelegate | null, controlsDelegateCallbackQueue: NSObject & OS_dispatch_queue | null): void;
 
 	/**
 	 * @since 26.0
 	 */
-	setDeferredStartDelegateDeferredStartDelegateCallbackQueue(deferredStartDelegate: AVCaptureSessionDeferredStartDelegate, deferredStartDelegateCallbackQueue: NSObject & OS_dispatch_queue): void;
+	setDeferredStartDelegateDeferredStartDelegateCallbackQueue(deferredStartDelegate: AVCaptureSessionDeferredStartDelegate | null, deferredStartDelegateCallbackQueue: NSObject & OS_dispatch_queue | null): void;
 
 	startRunning(): void;
 
@@ -6530,11 +7003,11 @@ declare class AVCaptureSlider extends AVCaptureControl {
 
 	static new(): AVCaptureSlider; // inherited from NSObject
 
-	accessibilityIdentifier: string;
+	accessibilityIdentifier: string | null;
 
 	readonly localizedTitle: string;
 
-	localizedValueFormat: string;
+	localizedValueFormat: string | null;
 
 	prominentValues: NSArray<number>;
 
@@ -6570,7 +7043,7 @@ declare class AVCaptureSmartFramingMonitor extends NSObject {
 
 	readonly monitoring: boolean;
 
-	readonly recommendedFraming: AVCaptureFraming;
+	readonly recommendedFraming: AVCaptureFraming | null;
 
 	readonly supportedFramings: NSArray<AVCaptureFraming>;
 
@@ -6592,7 +7065,7 @@ declare class AVCaptureSpatialAudioMetadataSampleGenerator extends NSObject {
 
 	analyzeAudioSample(sbuf: any): number;
 
-	newTimedMetadataSampleBufferAndResetAnalyzer(): any;
+	newTimedMetadataSampleBufferAndResetAnalyzer(): any | null;
 
 	resetAnalyzer(): void;
 }
@@ -6605,7 +7078,7 @@ declare class AVCaptureStillImageOutput extends AVCaptureOutput {
 
 	static alloc(): AVCaptureStillImageOutput; // inherited from NSObject
 
-	static jpegStillImageNSDataRepresentation(jpegSampleBuffer: any): NSData;
+	static jpegStillImageNSDataRepresentation(jpegSampleBuffer: any): NSData | null;
 
 	static new(): AVCaptureStillImageOutput; // inherited from NSObject
 
@@ -6668,19 +7141,19 @@ declare class AVCaptureStillImageOutput extends AVCaptureOutput {
 	 */
 	readonly stillImageStabilizationSupported: boolean;
 
-	captureStillImageAsynchronouslyFromConnectionCompletionHandler(connection: AVCaptureConnection, handler: (p1: any, p2: NSError) => void): void;
+	captureStillImageAsynchronouslyFromConnectionCompletionHandler(connection: AVCaptureConnection, handler: (p1: any | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 8.0
 	 * @deprecated 10.0
 	 */
-	captureStillImageBracketAsynchronouslyFromConnectionWithSettingsArrayCompletionHandler(connection: AVCaptureConnection, settings: NSArray<AVCaptureBracketedStillImageSettings> | AVCaptureBracketedStillImageSettings[], handler: (p1: any, p2: AVCaptureBracketedStillImageSettings, p3: NSError) => void): void;
+	captureStillImageBracketAsynchronouslyFromConnectionWithSettingsArrayCompletionHandler(connection: AVCaptureConnection, settings: NSArray<AVCaptureBracketedStillImageSettings> | AVCaptureBracketedStillImageSettings[], handler: (p1: any | null, p2: AVCaptureBracketedStillImageSettings | null, p3: NSError | null) => void): void;
 
 	/**
 	 * @since 8.0
 	 * @deprecated 10.0
 	 */
-	prepareToCaptureStillImageBracketFromConnectionWithSettingsArrayCompletionHandler(connection: AVCaptureConnection, settings: NSArray<AVCaptureBracketedStillImageSettings> | AVCaptureBracketedStillImageSettings[], handler: (p1: boolean, p2: NSError) => void): void;
+	prepareToCaptureStillImageBracketFromConnectionWithSettingsArrayCompletionHandler(connection: AVCaptureConnection, settings: NSArray<AVCaptureBracketedStillImageSettings> | AVCaptureBracketedStillImageSettings[], handler: (p1: boolean, p2: NSError | null) => void): void;
 }
 
 /**
@@ -6707,9 +7180,9 @@ declare class AVCaptureSynchronizedDataCollection extends NSObject implements NS
 	readonly count: number;
 	[Symbol.iterator](): Iterator<any>;
 
-	objectForKeyedSubscript(key: AVCaptureOutput): AVCaptureSynchronizedData;
+	objectForKeyedSubscript(key: AVCaptureOutput): AVCaptureSynchronizedData | null;
 
-	synchronizedDataForCaptureOutput(captureOutput: AVCaptureOutput): AVCaptureSynchronizedData;
+	synchronizedDataForCaptureOutput(captureOutput: AVCaptureOutput): AVCaptureSynchronizedData | null;
 }
 
 /**
@@ -6787,7 +7260,9 @@ declare const enum AVCaptureSystemPressureFactors {
 
 	DepthModuleTemperature = 4,
 
-	CameraTemperature = 8
+	CameraTemperature = 8,
+
+	BatteryStress = 16
 }
 
 /**
@@ -6857,6 +7332,9 @@ declare class AVCaptureSystemZoomSlider extends AVCaptureControl {
 	initWithDeviceAction(device: AVCaptureDevice, action: (p1: number) => void): this;
 }
 
+/**
+ * @since 26.0
+ */
 interface AVCaptureTimecode {
 	hours: number;
 	minutes: number;
@@ -6876,12 +7354,12 @@ declare function AVCaptureTimecodeAdvancedByFrames(timecode: AVCaptureTimecode, 
 /**
  * @since 26.0
  */
-declare function AVCaptureTimecodeCreateMetadataSampleBufferAssociatedWithPresentationTimeStamp(timecode: AVCaptureTimecode, presentationTimeStamp: CMTime): interop.Unmanaged<any>;
+declare function AVCaptureTimecodeCreateMetadataSampleBufferAssociatedWithPresentationTimeStamp(timecode: AVCaptureTimecode, presentationTimeStamp: CMTime): interop.Unmanaged<any | null>;
 
 /**
  * @since 26.0
  */
-declare function AVCaptureTimecodeCreateMetadataSampleBufferForDuration(timecode: AVCaptureTimecode, duration: CMTime): interop.Unmanaged<any>;
+declare function AVCaptureTimecodeCreateMetadataSampleBufferForDuration(timecode: AVCaptureTimecode, duration: CMTime): interop.Unmanaged<any | null>;
 
 /**
  * @since 26.0
@@ -6896,9 +7374,9 @@ declare class AVCaptureTimecodeGenerator extends NSObject {
 
 	readonly currentSource: AVCaptureTimecodeSource;
 
-	readonly delegate: AVCaptureTimecodeGeneratorDelegate;
+	readonly delegate: AVCaptureTimecodeGeneratorDelegate | null;
 
-	readonly delegateCallbackQueue: NSObject & OS_dispatch_queue;
+	readonly delegateCallbackQueue: NSObject & OS_dispatch_queue | null;
 
 	synchronizationTimeout: number;
 
@@ -6912,7 +7390,7 @@ declare class AVCaptureTimecodeGenerator extends NSObject {
 
 	generateInitialTimecode(): AVCaptureTimecode;
 
-	setDelegateQueue(delegate: AVCaptureTimecodeGeneratorDelegate, callbackQueue: NSObject & OS_dispatch_queue): void;
+	setDelegateQueue(delegate: AVCaptureTimecodeGeneratorDelegate | null, callbackQueue: NSObject & OS_dispatch_queue | null): void;
 
 	startSynchronizationWithTimecodeSource(source: AVCaptureTimecodeSource): void;
 }
@@ -6970,7 +7448,7 @@ declare class AVCaptureTimecodeSource extends NSObject implements NSCopying {
 
 	readonly uuid: NSUUID;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -7049,9 +7527,9 @@ declare class AVCaptureVideoDataOutput extends AVCaptureOutput {
 	 */
 	readonly recommendedMediaTimeScaleForAssetWriter: number;
 
-	readonly sampleBufferCallbackQueue: NSObject & OS_dispatch_queue;
+	readonly sampleBufferCallbackQueue: NSObject & OS_dispatch_queue | null;
 
-	readonly sampleBufferDelegate: AVCaptureVideoDataOutputSampleBufferDelegate;
+	readonly sampleBufferDelegate: AVCaptureVideoDataOutputSampleBufferDelegate | null;
 
 	videoSettings: NSDictionary<string, any>;
 
@@ -7063,24 +7541,24 @@ declare class AVCaptureVideoDataOutput extends AVCaptureOutput {
 	/**
 	 * @since 26.0
 	 */
-	recommendedMovieMetadataForVideoCodecTypeAssetWriterOutputFileType(videoCodecType: string, outputFileType: string): NSArray<AVMetadataItem>;
+	recommendedMovieMetadataForVideoCodecTypeAssetWriterOutputFileType(videoCodecType: string, outputFileType: string): NSArray<AVMetadataItem> | null;
 
 	/**
 	 * @since 7.0
 	 */
-	recommendedVideoSettingsForAssetWriterWithOutputFileType(outputFileType: string): NSDictionary<string, any>;
+	recommendedVideoSettingsForAssetWriterWithOutputFileType(outputFileType: string): NSDictionary<string, any> | null;
 
 	/**
 	 * @since 11.0
 	 */
-	recommendedVideoSettingsForVideoCodecTypeAssetWriterOutputFileType(videoCodecType: string, outputFileType: string): NSDictionary<string, any>;
+	recommendedVideoSettingsForVideoCodecTypeAssetWriterOutputFileType(videoCodecType: string, outputFileType: string): NSDictionary<string, any> | null;
 
 	/**
 	 * @since 17.0
 	 */
-	recommendedVideoSettingsForVideoCodecTypeAssetWriterOutputFileTypeOutputFileURL(videoCodecType: string, outputFileType: string, outputFileURL: NSURL): NSDictionary<string, any>;
+	recommendedVideoSettingsForVideoCodecTypeAssetWriterOutputFileTypeOutputFileURL(videoCodecType: string, outputFileType: string, outputFileURL: NSURL | null): NSDictionary<string, any> | null;
 
-	setSampleBufferDelegateQueue(sampleBufferDelegate: AVCaptureVideoDataOutputSampleBufferDelegate, sampleBufferCallbackQueue: NSObject & OS_dispatch_queue): void;
+	setSampleBufferDelegateQueue(sampleBufferDelegate: AVCaptureVideoDataOutputSampleBufferDelegate | null, sampleBufferCallbackQueue: NSObject & OS_dispatch_queue | null): void;
 }
 
 /**
@@ -7102,7 +7580,6 @@ declare var AVCaptureVideoDataOutputSampleBufferDelegate: {
 
 /**
  * @since 4.0
- * @deprecated 17.0
  */
 declare const enum AVCaptureVideoOrientation {
 
@@ -7142,7 +7619,7 @@ declare class AVCaptureVideoPreviewLayer extends CALayer {
 	/**
 	 * @since 6.0
 	 */
-	readonly connection: AVCaptureConnection;
+	readonly connection: AVCaptureConnection | null;
 
 	/**
 	 * @since 26.0
@@ -7183,7 +7660,7 @@ declare class AVCaptureVideoPreviewLayer extends CALayer {
 	 */
 	readonly previewing: boolean;
 
-	session: AVCaptureSession;
+	session: AVCaptureSession | null;
 
 	videoGravity: string;
 
@@ -7229,7 +7706,7 @@ declare class AVCaptureVideoPreviewLayer extends CALayer {
 	/**
 	 * @since 6.0
 	 */
-	transformedMetadataObjectForMetadataObject(metadataObject: AVMetadataObject): AVMetadataObject;
+	transformedMetadataObjectForMetadataObject(metadataObject: AVMetadataObject): AVMetadataObject | null;
 }
 
 /**
@@ -7334,11 +7811,11 @@ declare class AVComposition extends AVAsset implements NSMutableCopying {
 	/**
 	 * @since 15.0
 	 */
-	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVCompositionTrack, p2: NSError) => void): void;
+	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVCompositionTrack, p2: NSError | null) => void): void;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
-	trackWithTrackID(trackID: number): AVCompositionTrack;
+	trackWithTrackID(trackID: number): AVCompositionTrack | null;
 }
 
 /**
@@ -7355,7 +7832,7 @@ declare class AVCompositionTrack extends AVAssetTrack {
 	 */
 	readonly formatDescriptionReplacements: NSArray<AVCompositionTrackFormatDescriptionReplacement>;
 
-	segmentForTrackTime(trackTime: CMTime): AVCompositionTrackSegment;
+	segmentForTrackTime(trackTime: CMTime): AVCompositionTrackSegment | null;
 }
 
 /**
@@ -7395,7 +7872,7 @@ declare class AVCompositionTrackSegment extends AVAssetTrackSegment {
 
 	readonly sourceTrackID: number;
 
-	readonly sourceURL: NSURL;
+	readonly sourceURL: NSURL | null;
 
 	constructor(o: { timeRange: CMTimeRange; });
 
@@ -7454,23 +7931,28 @@ declare class AVContentKeyRequest extends NSObject {
 
 	static new(): AVContentKeyRequest; // inherited from NSObject
 
+	/**
+	 * @since 27.0
+	 */
+	readonly canBeFulfilledWithAdvisoryKey: boolean;
+
 	readonly canProvidePersistableContentKey: boolean;
 
 	/**
 	 * @since 14.5
 	 */
-	readonly contentKey: AVContentKey;
+	readonly contentKey: AVContentKey | null;
 
 	/**
 	 * @since 14.5
 	 */
 	readonly contentKeySpecifier: AVContentKeySpecifier;
 
-	readonly error: NSError;
+	readonly error: NSError | null;
 
-	readonly identifier: any;
+	readonly identifier: any | null;
 
-	readonly initializationData: NSData;
+	readonly initializationData: NSData | null;
 
 	/**
 	 * @since 12.2
@@ -7478,15 +7960,20 @@ declare class AVContentKeyRequest extends NSObject {
 	readonly options: NSDictionary<string, any>;
 
 	/**
-	 * @since 18.4
+	 * @since 26.0
 	 */
-	readonly originatingRecipient: AVContentKeyRecipient;
+	readonly originatingRecipient: AVContentKeyRecipient | null;
 
 	readonly renewsExpiringResponseData: boolean;
 
 	readonly status: AVContentKeyRequestStatus;
 
-	makeStreamingContentKeyRequestDataForAppContentIdentifierOptionsCompletionHandler(appIdentifier: NSData, contentIdentifier: NSData, options: NSDictionary<string, any>, handler: (p1: NSData, p2: NSError) => void): void;
+	/**
+	 * @since 27.0
+	 */
+	makeOptionalStreamingContentKeyRequestDataForAppContentIdentifierOptionsCompletionHandler(appIdentifier: NSData, contentIdentifier: NSData | null, options: NSDictionary<string, any> | null, completionHandler: (p1: NSData | null, p2: NSError | null) => void): void;
+
+	makeStreamingContentKeyRequestDataForAppContentIdentifierOptionsCompletionHandler(appIdentifier: NSData, contentIdentifier: NSData | null, options: NSDictionary<string, any> | null, handler: (p1: NSData | null, p2: NSError | null) => void): void;
 
 	processContentKeyResponse(keyResponse: AVContentKeyResponse): void;
 
@@ -7572,7 +8059,7 @@ declare class AVContentKeyResponse extends NSObject {
 	/**
 	 * @since 11.0
 	 */
-	static contentKeyResponseWithClearKeyDataInitializationVector(keyData: NSData, initializationVector: NSData): AVContentKeyResponse;
+	static contentKeyResponseWithClearKeyDataInitializationVector(keyData: NSData, initializationVector: NSData | null): AVContentKeyResponse;
 
 	static contentKeyResponseWithFairPlayStreamingKeyResponseData(keyResponseData: NSData): AVContentKeyResponse;
 
@@ -7601,15 +8088,20 @@ declare class AVContentKeySession extends NSObject {
 
 	readonly contentKeyRecipients: NSArray<AVContentKeyRecipient>;
 
-	readonly contentProtectionSessionIdentifier: NSData;
+	readonly contentProtectionSessionIdentifier: NSData | null;
 
-	readonly delegate: AVContentKeySessionDelegate;
+	readonly delegate: AVContentKeySessionDelegate | null;
 
-	readonly delegateQueue: NSObject & OS_dispatch_queue;
+	readonly delegateQueue: NSObject & OS_dispatch_queue | null;
 
 	readonly keySystem: string;
 
-	readonly storageURL: NSURL;
+	readonly storageURL: NSURL | null;
+
+	/**
+	 * @since 27.0
+	 */
+	supportsAdvisoryKeys: boolean;
 
 	addContentKeyRecipient(recipient: AVContentKeyRecipient): void;
 
@@ -7618,25 +8110,25 @@ declare class AVContentKeySession extends NSObject {
 	/**
 	 * @since 12.2
 	 */
-	invalidateAllPersistableContentKeysForAppOptionsCompletionHandler(appIdentifier: NSData, options: NSDictionary<string, any>, handler: (p1: NSData, p2: NSError) => void): void;
+	invalidateAllPersistableContentKeysForAppOptionsCompletionHandler(appIdentifier: NSData, options: NSDictionary<string, any> | null, handler: (p1: NSData | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 12.2
 	 */
-	invalidatePersistableContentKeyOptionsCompletionHandler(persistableContentKeyData: NSData, options: NSDictionary<string, any>, handler: (p1: NSData, p2: NSError) => void): void;
+	invalidatePersistableContentKeyOptionsCompletionHandler(persistableContentKeyData: NSData, options: NSDictionary<string, any> | null, handler: (p1: NSData | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 11.0
 	 */
-	makeSecureTokenForExpirationDateOfPersistableContentKeyCompletionHandler(persistableContentKeyData: NSData, handler: (p1: NSData, p2: NSError) => void): void;
+	makeSecureTokenForExpirationDateOfPersistableContentKeyCompletionHandler(persistableContentKeyData: NSData, handler: (p1: NSData | null, p2: NSError | null) => void): void;
 
-	processContentKeyRequestWithIdentifierInitializationDataOptions(identifier: any, initializationData: NSData, options: NSDictionary<string, any>): void;
+	processContentKeyRequestWithIdentifierInitializationDataOptions(identifier: any | null, initializationData: NSData | null, options: NSDictionary<string, any> | null): void;
 
 	removeContentKeyRecipient(recipient: AVContentKeyRecipient): void;
 
 	renewExpiringResponseDataForContentKeyRequest(contentKeyRequest: AVContentKeyRequest): void;
 
-	setDelegateQueue(delegate: AVContentKeySessionDelegate, delegateQueue: NSObject & OS_dispatch_queue): void;
+	setDelegateQueue(delegate: AVContentKeySessionDelegate | null, delegateQueue: NSObject & OS_dispatch_queue | null): void;
 }
 
 /**
@@ -7663,7 +8155,7 @@ interface AVContentKeySessionDelegate extends NSObjectProtocol {
 	/**
 	 * @since 17.4
 	 */
-	contentKeySessionDidProvideContentKeyRequestsForInitializationData?(session: AVContentKeySession, keyRequests: NSArray<AVContentKeyRequest> | AVContentKeyRequest[], initializationData: NSData): void;
+	contentKeySessionDidProvideContentKeyRequestsForInitializationData?(session: AVContentKeySession, keyRequests: NSArray<AVContentKeyRequest> | AVContentKeyRequest[], initializationData: NSData | null): void;
 
 	contentKeySessionDidProvidePersistableContentKeyRequest?(session: AVContentKeySession, keyRequest: AVPersistableContentKeyRequest): void;
 
@@ -7817,9 +8309,9 @@ declare class AVCustomMediaSelectionScheme extends NSObject implements NSCopying
 
 	readonly shouldOfferLanguageSelection: boolean;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
-	mediaPresentationSettingsForSelectorComplementaryToLanguageSettings(selector: AVMediaPresentationSelector, language: string, settings: NSArray<AVMediaPresentationSetting> | AVMediaPresentationSetting[]): NSArray<AVMediaPresentationSetting>;
+	mediaPresentationSettingsForSelectorComplementaryToLanguageSettings(selector: AVMediaPresentationSelector, language: string | null, settings: NSArray<AVMediaPresentationSetting> | AVMediaPresentationSetting[]): NSArray<AVMediaPresentationSetting>;
 }
 
 /**
@@ -7831,17 +8323,17 @@ declare class AVDateRangeMetadataGroup extends AVMetadataGroup implements NSCopy
 
 	static new(): AVDateRangeMetadataGroup; // inherited from NSObject
 
-	readonly endDate: Date;
+	readonly endDate: Date | null;
 
 	readonly startDate: Date;
 
-	constructor(o: { items: NSArray<AVMetadataItem> | AVMetadataItem[]; startDate: Date; endDate: Date; });
+	constructor(o: { items: NSArray<AVMetadataItem> | AVMetadataItem[]; startDate: Date; endDate: Date | null; });
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
-	initWithItemsStartDateEndDate(items: NSArray<AVMetadataItem> | AVMetadataItem[], startDate: Date, endDate: Date): this;
+	initWithItemsStartDateEndDate(items: NSArray<AVMetadataItem> | AVMetadataItem[], startDate: Date, endDate: Date | null): this;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -7853,9 +8345,9 @@ declare class AVDelegatingPlaybackCoordinator extends AVPlaybackCoordinator {
 
 	static new(): AVDelegatingPlaybackCoordinator; // inherited from NSObject
 
-	readonly currentItemIdentifier: string;
+	readonly currentItemIdentifier: string | null;
 
-	readonly playbackControlDelegate: AVPlaybackCoordinatorPlaybackControlDelegate;
+	readonly playbackControlDelegate: AVPlaybackCoordinatorPlaybackControlDelegate | null;
 
 	constructor(o: { playbackControlDelegate: AVPlaybackCoordinatorPlaybackControlDelegate; });
 
@@ -7867,7 +8359,7 @@ declare class AVDelegatingPlaybackCoordinator extends AVPlaybackCoordinator {
 
 	reapplyCurrentItemStateToPlaybackControlDelegate(): void;
 
-	transitionToItemWithIdentifierProposingInitialTimingBasedOnTimebase(itemIdentifier: string, snapshotTimebase: any): void;
+	transitionToItemWithIdentifierProposingInitialTimingBasedOnTimebase(itemIdentifier: string | null, snapshotTimebase: any | null): void;
 }
 
 /**
@@ -7881,7 +8373,7 @@ declare class AVDelegatingPlaybackCoordinatorBufferingCommand extends AVDelegati
 
 	readonly anticipatedPlaybackRate: number;
 
-	readonly completionDueDate: Date;
+	readonly completionDueDate: Date | null;
 }
 
 /**
@@ -7925,7 +8417,7 @@ declare class AVDelegatingPlaybackCoordinatorPlaybackControlCommand extends NSOb
 
 	readonly expectedCurrentItemIdentifier: string;
 
-	readonly originator: AVCoordinatedPlaybackParticipant;
+	readonly originator: AVCoordinatedPlaybackParticipant | null;
 }
 
 declare const enum AVDelegatingPlaybackCoordinatorRateChangeOptions {
@@ -7944,7 +8436,7 @@ declare class AVDelegatingPlaybackCoordinatorSeekCommand extends AVDelegatingPla
 
 	readonly anticipatedPlaybackRate: number;
 
-	readonly completionDueDate: Date;
+	readonly completionDueDate: Date | null;
 
 	readonly itemTime: CMTime;
 
@@ -7969,7 +8461,7 @@ declare class AVDepthData extends NSObject {
 
 	readonly availableDepthDataTypes: NSArray<number>;
 
-	readonly cameraCalibrationData: AVCameraCalibrationData;
+	readonly cameraCalibrationData: AVCameraCalibrationData | null;
 
 	readonly depthDataAccuracy: AVDepthDataAccuracy;
 
@@ -7987,7 +8479,7 @@ declare class AVDepthData extends NSObject {
 
 	depthDataByReplacingDepthDataMapWithPixelBufferError(pixelBuffer: any, error?: interop.Reference<NSError>): this;
 
-	dictionaryRepresentationForAuxiliaryDataType(outAuxDataType: interop.Pointer | interop.Reference<string>): NSDictionary<any, any>;
+	dictionaryRepresentationForAuxiliaryDataType(outAuxDataType: interop.Pointer | interop.Reference<string | null> | ArrayBufferLike | ArrayBufferView | null): NSDictionary<any, any> | null;
 }
 
 /**
@@ -8196,7 +8688,15 @@ declare const enum AVError {
 
 	AutoWhiteBalanceNotLocked = -11891,
 
-	FollowExternalSyncDeviceTimedOut = -11892
+	FollowExternalSyncDeviceTimedOut = -11892,
+
+	FollowExternalSyncFailed = -11894,
+
+	ExternalSyncDeviceFrequencyHigherThanSpecified = -11895,
+
+	ExternalSyncDeviceFrequencyLowerThanSpecified = -11896,
+
+	NotEnoughSpaceForProVideoStorageReplenishment = -11897
 }
 
 /**
@@ -8290,19 +8790,28 @@ declare class AVExternalStorageDevice extends NSObject {
 
 	readonly connected: boolean;
 
-	readonly displayName: string;
+	readonly displayName: string | null;
 
 	readonly freeSize: number;
 
+	/**
+	 * @since 17.0
+	 * @deprecated 27.0
+	 */
 	readonly notRecommendedForCaptureUse: boolean;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly reasonsNotRecommendedForCaptureUse: NSSet<string>;
 
 	readonly totalSize: number;
 
-	readonly uuid: NSUUID;
+	readonly uuid: NSUUID | null;
 
 	static readonly authorizationStatus: AVAuthorizationStatus;
 
-	nextAvailableURLsWithPathExtensionsError(extensionArray: NSArray<string> | string[], error?: interop.Reference<NSError>): NSArray<NSURL>;
+	nextAvailableURLsWithPathExtensionsError(extensionArray: NSArray<string> | string[], error?: interop.Reference<NSError>): NSArray<NSURL> | null;
 }
 
 /**
@@ -8316,10 +8825,30 @@ declare class AVExternalStorageDeviceDiscoverySession extends NSObject {
 
 	readonly externalStorageDevices: NSArray<AVExternalStorageDevice>;
 
-	static readonly sharedSession: AVExternalStorageDeviceDiscoverySession;
+	static readonly sharedSession: AVExternalStorageDeviceDiscoverySession | null;
 
 	static readonly supported: boolean;
 }
+
+/**
+ * @since 27.0
+ */
+declare var AVExternalStorageDeviceReasonNotRecommendedForCaptureUseEncrypted: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVExternalStorageDeviceReasonNotRecommendedForCaptureUseSlowWritingSpeed: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVExternalStorageDeviceReasonNotRecommendedForCaptureUseUnknownWritingSpeed: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVExternalStorageDeviceReasonNotRecommendedForCaptureUseUnsupportedFileSystem: string;
 
 /**
  * @since 26.0
@@ -8330,11 +8859,16 @@ declare class AVExternalSyncDevice extends NSObject {
 
 	static new(): AVExternalSyncDevice; // inherited from NSObject
 
-	readonly clock: any;
+	readonly clock: any | null;
 
 	readonly productID: number;
 
 	signalCompensationDelay: CMTime;
+
+	/**
+	 * @since 27.0
+	 */
+	readonly signalCompensationDelaySupported: boolean;
 
 	readonly status: AVExternalSyncDeviceStatus;
 
@@ -8348,7 +8882,7 @@ declare class AVExternalSyncDevice extends NSObject {
  */
 interface AVExternalSyncDeviceDelegate extends NSObjectProtocol {
 
-	externalSyncDeviceFailedWithError?(device: AVExternalSyncDevice, error: NSError): void;
+	externalSyncDeviceFailedWithError?(device: AVExternalSyncDevice, error: NSError | null): void;
 
 	externalSyncDeviceStatusDidChange?(device: AVExternalSyncDevice): void;
 }
@@ -8368,7 +8902,7 @@ declare class AVExternalSyncDeviceDiscoverySession extends NSObject {
 
 	readonly devices: NSArray<AVExternalSyncDevice>;
 
-	static readonly sharedSession: AVExternalSyncDeviceDiscoverySession;
+	static readonly sharedSession: AVExternalSyncDeviceDiscoverySession | null;
 
 	static readonly supported: boolean;
 }
@@ -8500,6 +9034,11 @@ declare var AVFileTypeProfileMPEG4AppleHLS: string;
 declare var AVFileTypeProfileMPEG4CMAFCompliant: string;
 
 /**
+ * @since 26.0
+ */
+declare var AVFileTypeQuickTimeAudio: string;
+
+/**
  * @since 4.0
  */
 declare var AVFileTypeQuickTimeMovie: string;
@@ -8546,13 +9085,13 @@ declare var AVFragmentMinding: {
  */
 declare class AVFragmentedAsset extends AVURLAsset implements AVFragmentMinding {
 
-	static URLAssetWithURLOptions(URL: NSURL, options: NSDictionary<string, any>): AVFragmentedAsset; // inherited from AVURLAsset
+	static URLAssetWithURLOptions(URL: NSURL, options: NSDictionary<string, any> | null): AVFragmentedAsset; // inherited from AVURLAsset
 
 	static alloc(): AVFragmentedAsset; // inherited from NSObject
 
 	static assetWithURL(URL: NSURL): AVFragmentedAsset; // inherited from AVAsset
 
-	static fragmentedAssetWithURLOptions(URL: NSURL, options: NSDictionary<string, any>): AVFragmentedAsset;
+	static fragmentedAssetWithURLOptions(URL: NSURL, options: NSDictionary<string, any> | null): AVFragmentedAsset;
 
 	static new(): AVFragmentedAsset; // inherited from NSObject
 
@@ -8566,13 +9105,13 @@ declare class AVFragmentedAsset extends AVURLAsset implements AVFragmentMinding 
 	/**
 	 * @since 15.0
 	 */
-	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVFragmentedAssetTrack, p2: NSError) => void): void;
+	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVFragmentedAssetTrack, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 4.0
 	 * @deprecated 18.0
 	 */
-	trackWithTrackID(trackID: number): AVFragmentedAssetTrack;
+	trackWithTrackID(trackID: number): AVFragmentedAssetTrack | null;
 }
 
 /**
@@ -8621,9 +9160,9 @@ declare class AVFragmentedMovie extends AVMovie implements AVFragmentMinding {
 	/**
 	 * @since 13.0
 	 */
-	static movieWithDataOptions(data: NSData, options: NSDictionary<string, any>): AVFragmentedMovie; // inherited from AVMovie
+	static movieWithDataOptions(data: NSData, options: NSDictionary<string, any> | null): AVFragmentedMovie; // inherited from AVMovie
 
-	static movieWithURLOptions(URL: NSURL, options: NSDictionary<string, any>): AVFragmentedMovie; // inherited from AVMovie
+	static movieWithURLOptions(URL: NSURL, options: NSDictionary<string, any> | null): AVFragmentedMovie; // inherited from AVMovie
 
 	static new(): AVFragmentedMovie; // inherited from NSObject
 
@@ -8635,13 +9174,13 @@ declare class AVFragmentedMovie extends AVMovie implements AVFragmentMinding {
 	/**
 	 * @since 15.0
 	 */
-	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVFragmentedMovieTrack, p2: NSError) => void): void;
+	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVFragmentedMovieTrack, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 4.0
 	 * @deprecated 18.0
 	 */
-	trackWithTrackID(trackID: number): AVFragmentedMovieTrack;
+	trackWithTrackID(trackID: number): AVFragmentedMovieTrack | null;
 }
 
 /**
@@ -8888,11 +9427,11 @@ declare class AVMediaDataStorage extends NSObject {
 
 	static new(): AVMediaDataStorage; // inherited from NSObject
 
-	constructor(o: { URL: NSURL; options: NSDictionary<string, any>; });
+	constructor(o: { URL: NSURL; options: NSDictionary<string, any> | null; });
 
-	URL(): NSURL;
+	URL(): NSURL | null;
 
-	initWithURLOptions(URL: NSURL, options: NSDictionary<string, any>): this;
+	initWithURLOptions(URL: NSURL, options: NSDictionary<string, any> | null): this;
 }
 
 /**
@@ -8908,7 +9447,7 @@ declare class AVMediaPresentationSelector extends NSObject implements NSCopying 
 
 	readonly settings: NSArray<AVMediaPresentationSetting>;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	displayNameForLocaleIdentifier(localeIdentifier: string): string;
 }
@@ -8924,7 +9463,7 @@ declare class AVMediaPresentationSetting extends NSObject implements NSCopying {
 
 	readonly mediaCharacteristic: string;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	displayNameForLocaleIdentifier(localeIdentifier: string): string;
 }
@@ -8938,15 +9477,15 @@ declare class AVMediaSelection extends NSObject implements NSCopying, NSMutableC
 
 	static new(): AVMediaSelection; // inherited from NSObject
 
-	readonly asset: AVAsset;
+	readonly asset: AVAsset | null;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	mediaSelectionCriteriaCanBeAppliedAutomaticallyToMediaSelectionGroup(mediaSelectionGroup: AVMediaSelectionGroup): boolean;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
-	selectedMediaOptionInMediaSelectionGroup(mediaSelectionGroup: AVMediaSelectionGroup): AVMediaSelectionOption;
+	selectedMediaOptionInMediaSelectionGroup(mediaSelectionGroup: AVMediaSelectionGroup): AVMediaSelectionOption | null;
 }
 
 /**
@@ -8976,20 +9515,20 @@ declare class AVMediaSelectionGroup extends NSObject implements NSCopying {
 	/**
 	 * @since 26.0
 	 */
-	readonly customMediaSelectionScheme: AVCustomMediaSelectionScheme;
+	readonly customMediaSelectionScheme: AVCustomMediaSelectionScheme | null;
 
 	/**
 	 * @since 8.0
 	 */
-	readonly defaultOption: AVMediaSelectionOption;
+	readonly defaultOption: AVMediaSelectionOption | null;
 
 	readonly options: NSArray<AVMediaSelectionOption>;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	makeNowPlayingInfoLanguageOptionGroup(): MPNowPlayingInfoLanguageOptionGroup;
 
-	mediaSelectionOptionWithPropertyList(plist: any): AVMediaSelectionOption;
+	mediaSelectionOptionWithPropertyList(plist: any): AVMediaSelectionOption | null;
 }
 
 /**
@@ -9013,9 +9552,9 @@ declare class AVMediaSelectionOption extends NSObject implements NSCopying {
 	/**
 	 * @since 7.0
 	 */
-	readonly extendedLanguageTag: string;
+	readonly extendedLanguageTag: string | null;
 
-	readonly locale: NSLocale;
+	readonly locale: NSLocale | null;
 
 	readonly mediaSubTypes: NSArray<number>;
 
@@ -9023,9 +9562,9 @@ declare class AVMediaSelectionOption extends NSObject implements NSCopying {
 
 	readonly playable: boolean;
 
-	associatedMediaSelectionOptionInMediaSelectionGroup(mediaSelectionGroup: AVMediaSelectionGroup): AVMediaSelectionOption;
+	associatedMediaSelectionOptionInMediaSelectionGroup(mediaSelectionGroup: AVMediaSelectionGroup): AVMediaSelectionOption | null;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	/**
 	 * @since 7.0
@@ -9034,7 +9573,7 @@ declare class AVMediaSelectionOption extends NSObject implements NSCopying {
 
 	hasMediaCharacteristic(mediaCharacteristic: string): boolean;
 
-	makeNowPlayingInfoLanguageOption(): MPNowPlayingInfoLanguageOption;
+	makeNowPlayingInfoLanguageOption(): MPNowPlayingInfoLanguageOption | null;
 
 	metadataForFormat(format: string): NSArray<AVMetadataItem>;
 
@@ -9187,7 +9726,7 @@ declare class AVMetadataBodyObject extends AVMetadataObject implements NSCopying
 
 	readonly bodyID: number;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -9199,7 +9738,7 @@ declare class AVMetadataCatBodyObject extends AVMetadataBodyObject implements NS
 
 	static new(): AVMetadataCatBodyObject; // inherited from NSObject
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -9211,7 +9750,23 @@ declare class AVMetadataCatHeadObject extends AVMetadataObject implements NSCopy
 
 	static new(): AVMetadataCatHeadObject; // inherited from NSObject
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+}
+
+/**
+ * @since 27.0
+ */
+declare class AVMetadataCinematicVideoMetadataObject extends AVMetadataObject implements NSCopying {
+
+	static alloc(): AVMetadataCinematicVideoMetadataObject; // inherited from NSObject
+
+	static new(): AVMetadataCinematicVideoMetadataObject; // inherited from NSObject
+
+	readonly timedMetadataGroup: AVTimedMetadataGroup | null;
+
+	static readonly cinematicVideoMetadataFormatDescription: any | null;
+
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -9463,7 +10018,7 @@ declare class AVMetadataDogBodyObject extends AVMetadataBodyObject implements NS
 
 	static new(): AVMetadataDogBodyObject; // inherited from NSObject
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -9475,7 +10030,7 @@ declare class AVMetadataDogHeadObject extends AVMetadataObject implements NSCopy
 
 	static new(): AVMetadataDogHeadObject; // inherited from NSObject
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -9512,7 +10067,19 @@ declare class AVMetadataFaceObject extends AVMetadataObject implements NSCopying
 
 	readonly yawAngle: number;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
+}
+
+/**
+ * @since 27.0
+ */
+declare class AVMetadataFocusTrackedObject extends AVMetadataObject implements NSCopying {
+
+	static alloc(): AVMetadataFocusTrackedObject; // inherited from NSObject
+
+	static new(): AVMetadataFocusTrackedObject; // inherited from NSObject
+
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -9562,14 +10129,14 @@ declare class AVMetadataGroup extends NSObject {
 	/**
 	 * @since 9.3
 	 */
-	readonly classifyingLabel: string;
+	readonly classifyingLabel: string | null;
 
 	readonly items: NSArray<AVMetadataItem>;
 
 	/**
 	 * @since 9.3
 	 */
-	readonly uniqueID: string;
+	readonly uniqueID: string | null;
 }
 
 /**
@@ -9581,7 +10148,7 @@ declare class AVMetadataHumanBodyObject extends AVMetadataBodyObject implements 
 
 	static new(): AVMetadataHumanBodyObject; // inherited from NSObject
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -9593,7 +10160,7 @@ declare class AVMetadataHumanFullBodyObject extends AVMetadataBodyObject impleme
 
 	static new(): AVMetadataHumanFullBodyObject; // inherited from NSObject
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -10664,6 +11231,11 @@ declare var AVMetadataIdentifierIcyMetadataStreamTitle: string;
 declare var AVMetadataIdentifierIcyMetadataStreamURL: string;
 
 /**
+ * @since 26.0
+ */
+declare var AVMetadataIdentifierQuickTimeMetadataAIMEData: string;
+
+/**
  * @since 14.0
  */
 declare var AVMetadataIdentifierQuickTimeMetadataAccessibilityDescription: string;
@@ -10937,6 +11509,11 @@ declare var AVMetadataIdentifierQuickTimeMetadataPhonogramRights: string;
  * @since 8.0
  */
 declare var AVMetadataIdentifierQuickTimeMetadataPreferredAffineTransform: string;
+
+/**
+ * @since 26.0
+ */
+declare var AVMetadataIdentifierQuickTimeMetadataPresentationImmersiveMedia: string;
 
 /**
  * @since 8.0
@@ -11443,17 +12020,17 @@ declare class AVMetadataItem extends NSObject implements AVAsynchronousKeyValueL
 	/**
 	 * @since 8.0
 	 */
-	static identifierForKeyKeySpace(key: any, keySpace: string): string;
+	static identifierForKeyKeySpace(key: any, keySpace: string): string | null;
 
 	/**
 	 * @since 8.0
 	 */
-	static keyForIdentifier(identifier: string): any;
+	static keyForIdentifier(identifier: string): any | null;
 
 	/**
 	 * @since 8.0
 	 */
-	static keySpaceForIdentifier(identifier: string): string;
+	static keySpaceForIdentifier(identifier: string): string | null;
 
 	/**
 	 * @since 9.0
@@ -11475,22 +12052,22 @@ declare class AVMetadataItem extends NSObject implements AVAsynchronousKeyValueL
 	 */
 	static metadataItemsFromArrayFilteredByMetadataItemFilter(metadataItems: NSArray<AVMetadataItem> | AVMetadataItem[], metadataItemFilter: AVMetadataItemFilter): NSArray<AVMetadataItem>;
 
-	static metadataItemsFromArrayWithKeyKeySpace(metadataItems: NSArray<AVMetadataItem> | AVMetadataItem[], key: any, keySpace: string): NSArray<AVMetadataItem>;
+	static metadataItemsFromArrayWithKeyKeySpace(metadataItems: NSArray<AVMetadataItem> | AVMetadataItem[], key: any | null, keySpace: string | null): NSArray<AVMetadataItem>;
 
 	static metadataItemsFromArrayWithLocale(metadataItems: NSArray<AVMetadataItem> | AVMetadataItem[], locale: NSLocale): NSArray<AVMetadataItem>;
 
 	static new(): AVMetadataItem; // inherited from NSObject
 
-	readonly commonKey: string;
+	readonly commonKey: string | null;
 
 	/**
 	 * @since 8.0
 	 */
-	readonly dataType: string;
+	readonly dataType: string | null;
 
-	readonly dataValue: NSData;
+	readonly dataValue: NSData | null;
 
-	readonly dateValue: Date;
+	readonly dateValue: Date | null;
 
 	/**
 	 * @since 4.2
@@ -11500,39 +12077,39 @@ declare class AVMetadataItem extends NSObject implements AVAsynchronousKeyValueL
 	/**
 	 * @since 8.0
 	 */
-	readonly extendedLanguageTag: string;
+	readonly extendedLanguageTag: string | null;
 
-	readonly extraAttributes: NSDictionary<string, any>;
+	readonly extraAttributes: NSDictionary<string, any> | null;
 
 	/**
 	 * @since 8.0
 	 */
-	readonly identifier: string;
+	readonly identifier: string | null;
 
-	readonly key: any;
+	readonly key: any | null;
 
-	readonly keySpace: string;
+	readonly keySpace: string | null;
 
-	readonly locale: NSLocale;
+	readonly locale: NSLocale | null;
 
-	readonly numberValue: number;
+	readonly numberValue: number | null;
 
 	/**
 	 * @since 9.0
 	 */
-	readonly startDate: Date;
+	readonly startDate: Date | null;
 
-	readonly stringValue: string;
+	readonly stringValue: string | null;
 
 	readonly time: CMTime;
 
-	readonly value: any;
+	readonly value: any | null;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
-	loadValuesAsynchronouslyForKeysCompletionHandler(keys: NSArray<string> | string[], handler: () => void): void;
+	loadValuesAsynchronouslyForKeysCompletionHandler(keys: NSArray<string> | string[], handler: () => void | null): void;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	statusOfValueForKeyError(key: string, error?: interop.Reference<NSError>): AVKeyValueStatus;
 }
@@ -11558,7 +12135,7 @@ declare class AVMetadataItemValueRequest extends NSObject {
 
 	static new(): AVMetadataItemValueRequest; // inherited from NSObject
 
-	readonly metadataItem: AVMetadataItem;
+	readonly metadataItem: AVMetadataItem | null;
 
 	respondWithError(error: NSError): void;
 
@@ -11624,9 +12201,9 @@ declare class AVMetadataMachineReadableCodeObject extends AVMetadataObject {
 	/**
 	 * @since 11.0
 	 */
-	readonly descriptor: CIBarcodeDescriptor;
+	readonly descriptor: CIBarcodeDescriptor | null;
 
-	readonly stringValue: string;
+	readonly stringValue: string | null;
 }
 
 /**
@@ -11683,6 +12260,11 @@ declare var AVMetadataObjectTypeCatBody: string;
 declare var AVMetadataObjectTypeCatHead: string;
 
 /**
+ * @since 27.0
+ */
+declare var AVMetadataObjectTypeCinematicVideoMetadata: string;
+
+/**
  * @since 15.4
  */
 declare var AVMetadataObjectTypeCodabarCode: string;
@@ -11736,6 +12318,11 @@ declare var AVMetadataObjectTypeEAN8Code: string;
  * @since 6.0
  */
 declare var AVMetadataObjectTypeFace: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVMetadataObjectTypeFocusTrackedObject: string;
 
 /**
  * @since 15.4
@@ -12276,7 +12863,7 @@ declare class AVMetadataSalientObject extends AVMetadataObject implements NSCopy
 
 	static new(): AVMetadataSalientObject; // inherited from NSObject
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -12532,13 +13119,13 @@ declare class AVMetricContentKeyRequestEvent extends AVMetricEvent {
 
 	readonly isClientInitiated: boolean;
 
-	readonly mediaResourceRequestEvent: AVMetricMediaResourceRequestEvent;
+	readonly mediaResourceRequestEvent: AVMetricMediaResourceRequestEvent | null;
 
 	readonly mediaType: string;
 }
 
 /**
- * @since 18
+ * @since 26
  */
 declare class AVMetricDownloadSummaryEvent extends AVMetricEvent {
 
@@ -12550,7 +13137,7 @@ declare class AVMetricDownloadSummaryEvent extends AVMetricEvent {
 
 	readonly downloadDuration: number;
 
-	readonly errorEvent: AVMetricErrorEvent;
+	readonly errorEvent: AVMetricErrorEvent | null;
 
 	readonly mediaResourceRequestCount: number;
 
@@ -12586,7 +13173,7 @@ declare class AVMetricEvent extends NSObject implements NSSecureCoding {
 
 	readonly mediaTime: CMTime;
 
-	readonly sessionID: string;
+	readonly sessionID: string | null;
 
 	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
 
@@ -12610,7 +13197,7 @@ declare class AVMetricEventStream extends NSObject {
 
 	addPublisher(publisher: AVMetricEventStreamPublisher): boolean;
 
-	setSubscriberQueue(subscriber: AVMetricEventStreamSubscriber, queue: NSObject & OS_dispatch_queue): boolean;
+	setSubscriberQueue(subscriber: AVMetricEventStreamSubscriber, queue: NSObject & OS_dispatch_queue | null): boolean;
 
 	subscribeToAllMetricEvents(): void;
 
@@ -12656,13 +13243,13 @@ declare class AVMetricHLSMediaSegmentRequestEvent extends AVMetricEvent {
 
 	readonly isMapSegment: boolean;
 
-	readonly mediaResourceRequestEvent: AVMetricMediaResourceRequestEvent;
+	readonly mediaResourceRequestEvent: AVMetricMediaResourceRequestEvent | null;
 
 	readonly mediaType: string;
 
 	readonly segmentDuration: number;
 
-	readonly url: NSURL;
+	readonly url: NSURL | null;
 }
 
 /**
@@ -12676,11 +13263,11 @@ declare class AVMetricHLSPlaylistRequestEvent extends AVMetricEvent {
 
 	readonly isMultivariantPlaylist: boolean;
 
-	readonly mediaResourceRequestEvent: AVMetricMediaResourceRequestEvent;
+	readonly mediaResourceRequestEvent: AVMetricMediaResourceRequestEvent | null;
 
 	readonly mediaType: string;
 
-	readonly url: NSURL;
+	readonly url: NSURL | null;
 }
 
 /**
@@ -12692,9 +13279,9 @@ declare class AVMetricMediaRendition extends NSObject implements NSSecureCoding 
 
 	static new(): AVMetricMediaRendition; // inherited from NSObject
 
-	readonly URL: NSURL;
+	readonly URL: NSURL | null;
 
-	readonly stableID: string;
+	readonly stableID: string | null;
 
 	static readonly supportsSecureCoding: boolean; // inherited from NSSecureCoding
 
@@ -12716,9 +13303,9 @@ declare class AVMetricMediaResourceRequestEvent extends AVMetricEvent {
 
 	readonly byteRange: NSRange;
 
-	readonly errorEvent: AVMetricErrorEvent;
+	readonly errorEvent: AVMetricErrorEvent | null;
 
-	readonly networkTransactionMetrics: NSURLSessionTaskMetrics;
+	readonly networkTransactionMetrics: NSURLSessionTaskMetrics | null;
 
 	readonly readFromCache: boolean;
 
@@ -12730,9 +13317,28 @@ declare class AVMetricMediaResourceRequestEvent extends AVMetricEvent {
 
 	readonly responseStartTime: Date;
 
-	readonly serverAddress: string;
+	readonly serverAddress: string | null;
 
-	readonly url: NSURL;
+	readonly url: NSURL | null;
+}
+
+declare const enum AVMetricPlaybackMode {
+
+	Local = 0,
+
+	AirPlayVideo = 1
+}
+
+/**
+ * @since 27.0
+ */
+declare class AVMetricPlaybackModeSwitchEvent extends AVMetricEvent {
+
+	static alloc(): AVMetricPlaybackModeSwitchEvent; // inherited from NSObject
+
+	static new(): AVMetricPlaybackModeSwitchEvent; // inherited from NSObject
+
+	readonly mode: AVMetricPlaybackMode;
 }
 
 /**
@@ -12764,7 +13370,7 @@ declare class AVMetricPlayerItemLikelyToKeepUpEvent extends AVMetricEvent {
 
 	readonly timeTaken: number;
 
-	readonly variant: AVAssetVariant;
+	readonly variant: AVAssetVariant | null;
 }
 
 /**
@@ -12776,7 +13382,7 @@ declare class AVMetricPlayerItemPlaybackSummaryEvent extends AVMetricEvent {
 
 	static new(): AVMetricPlayerItemPlaybackSummaryEvent; // inherited from NSObject
 
-	readonly errorEvent: AVMetricErrorEvent;
+	readonly errorEvent: AVMetricErrorEvent | null;
 
 	readonly mediaResourceRequestCount: number;
 
@@ -12810,7 +13416,7 @@ declare class AVMetricPlayerItemRateChangeEvent extends AVMetricEvent {
 
 	readonly rate: number;
 
-	readonly variant: AVAssetVariant;
+	readonly variant: AVAssetVariant | null;
 }
 
 /**
@@ -12861,7 +13467,7 @@ declare class AVMetricPlayerItemVariantSwitchEvent extends AVMetricEvent {
 
 	readonly didSucceed: boolean;
 
-	readonly fromVariant: AVAssetVariant;
+	readonly fromVariant: AVAssetVariant | null;
 
 	readonly loadedTimeRanges: NSArray<NSValue>;
 
@@ -12892,7 +13498,7 @@ declare class AVMetricPlayerItemVariantSwitchStartEvent extends AVMetricEvent {
 	 */
 	readonly audioRendition: AVMetricMediaRendition;
 
-	readonly fromVariant: AVAssetVariant;
+	readonly fromVariant: AVAssetVariant | null;
 
 	readonly loadedTimeRanges: NSArray<NSValue>;
 
@@ -12923,13 +13529,13 @@ declare class AVMovie extends AVAsset implements NSCopying, NSMutableCopying {
 	/**
 	 * @since 13.0
 	 */
-	static movieWithDataOptions(data: NSData, options: NSDictionary<string, any>): AVMovie;
+	static movieWithDataOptions(data: NSData, options: NSDictionary<string, any> | null): AVMovie;
 
-	static movieWithURLOptions(URL: NSURL, options: NSDictionary<string, any>): AVMovie;
+	static movieWithURLOptions(URL: NSURL, options: NSDictionary<string, any> | null): AVMovie;
 
 	static new(): AVMovie; // inherited from NSObject
 
-	readonly URL: NSURL;
+	readonly URL: NSURL | null;
 
 	readonly canContainMovieFragments: boolean;
 
@@ -12941,28 +13547,28 @@ declare class AVMovie extends AVAsset implements NSCopying, NSMutableCopying {
 	/**
 	 * @since 13.0
 	 */
-	readonly data: NSData;
+	readonly data: NSData | null;
 
 	/**
 	 * @since 13.0
 	 */
-	readonly defaultMediaDataStorage: AVMediaDataStorage;
+	readonly defaultMediaDataStorage: AVMediaDataStorage | null;
 
 	/**
 	 * @since 13.0
 	 */
-	constructor(o: { data: NSData; options: NSDictionary<string, any>; });
+	constructor(o: { data: NSData; options: NSDictionary<string, any> | null; });
 
-	constructor(o: { URL: NSURL; options: NSDictionary<string, any>; });
+	constructor(o: { URL: NSURL; options: NSDictionary<string, any> | null; });
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	/**
 	 * @since 13.0
 	 */
-	initWithDataOptions(data: NSData, options: NSDictionary<string, any>): this;
+	initWithDataOptions(data: NSData, options: NSDictionary<string, any> | null): this;
 
-	initWithURLOptions(URL: NSURL, options: NSDictionary<string, any>): this;
+	initWithURLOptions(URL: NSURL, options: NSDictionary<string, any> | null): this;
 
 	/**
 	 * @since 13.0
@@ -12972,20 +13578,20 @@ declare class AVMovie extends AVAsset implements NSCopying, NSMutableCopying {
 	/**
 	 * @since 15.0
 	 */
-	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVMovieTrack, p2: NSError) => void): void;
+	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVMovieTrack, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 13.0
 	 */
-	movieHeaderWithFileTypeError(fileType: string, error?: interop.Reference<NSError>): NSData;
+	movieHeaderWithFileTypeError(fileType: string, error?: interop.Reference<NSError>): NSData | null;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	/**
 	 * @since 4.0
 	 * @deprecated 18.0
 	 */
-	trackWithTrackID(trackID: number): AVMovieTrack;
+	trackWithTrackID(trackID: number): AVMovieTrack | null;
 
 	/**
 	 * @since 13.0
@@ -13000,6 +13606,7 @@ declare var AVMovieReferenceRestrictionsKey: string;
 
 /**
  * @since 13.0
+ * @deprecated 27.0
  */
 declare var AVMovieShouldSupportAliasDataReferencesKey: string;
 
@@ -13020,7 +13627,7 @@ declare class AVMovieTrack extends AVAssetTrack {
 	/**
 	 * @since 13.0
 	 */
-	readonly mediaDataStorage: AVMediaDataStorage;
+	readonly mediaDataStorage: AVMediaDataStorage | null;
 
 	/**
 	 * @since 13.0
@@ -13080,19 +13687,19 @@ declare class AVMutableAudioMixInputParameters extends AVAudioMixInputParameters
 
 	static audioMixInputParameters(): AVMutableAudioMixInputParameters;
 
-	static audioMixInputParametersWithTrack(track: AVAssetTrack): AVMutableAudioMixInputParameters;
+	static audioMixInputParametersWithTrack(track: AVAssetTrack | null): AVMutableAudioMixInputParameters;
 
 	static new(): AVMutableAudioMixInputParameters; // inherited from NSObject
 
 	/**
 	 * @since 6.0
 	 */
-	audioTapProcessor: any;
+	audioTapProcessor: any | null;
 
 	/**
 	 * @since 7.0
 	 */
-	audioTimePitchAlgorithm: string;
+	audioTimePitchAlgorithm: string | null;
 
 	trackID: number;
 
@@ -13193,17 +13800,17 @@ declare class AVMutableComposition extends AVComposition {
 	/**
 	 * @since 9.0
 	 */
-	static compositionWithURLAssetInitializationOptions(URLAssetInitializationOptions: NSDictionary<string, any>): AVMutableComposition;
+	static compositionWithURLAssetInitializationOptions(URLAssetInitializationOptions: NSDictionary<string, any> | null): AVMutableComposition;
 
 	static new(): AVMutableComposition; // inherited from NSObject
 
 	naturalSize: CGSize;
 
-	addMutableTrackWithMediaTypePreferredTrackID(mediaType: string, preferredTrackID: number): AVMutableCompositionTrack;
+	addMutableTrackWithMediaTypePreferredTrackID(mediaType: string, preferredTrackID: number): AVMutableCompositionTrack | null;
 
 	insertEmptyTimeRange(timeRange: CMTimeRange): void;
 
-	insertTimeRangeOfAssetAtTimeCompletionHandler(timeRange: CMTimeRange, asset: AVAsset, startTime: CMTime, completionHandler: (p1: NSError) => void): void;
+	insertTimeRangeOfAssetAtTimeCompletionHandler(timeRange: CMTimeRange, asset: AVAsset, startTime: CMTime, completionHandler: (p1: NSError | null) => void): void;
 
 	/**
 	 * @since 4.0
@@ -13214,9 +13821,9 @@ declare class AVMutableComposition extends AVComposition {
 	/**
 	 * @since 15.0
 	 */
-	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVMutableCompositionTrack, p2: NSError) => void): void;
+	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVMutableCompositionTrack, p2: NSError | null) => void): void;
 
-	mutableTrackCompatibleWithTrack(track: AVAssetTrack): AVMutableCompositionTrack;
+	mutableTrackCompatibleWithTrack(track: AVAssetTrack): AVMutableCompositionTrack | null;
 
 	removeTimeRange(timeRange: CMTimeRange): void;
 
@@ -13224,7 +13831,7 @@ declare class AVMutableComposition extends AVComposition {
 
 	scaleTimeRangeToDuration(timeRange: CMTimeRange, duration: CMTime): void;
 
-	trackWithTrackID(trackID: number): AVMutableCompositionTrack;
+	trackWithTrackID(trackID: number): AVMutableCompositionTrack | null;
 }
 
 /**
@@ -13241,9 +13848,9 @@ declare class AVMutableCompositionTrack extends AVCompositionTrack {
 	 */
 	enabled: boolean;
 
-	extendedLanguageTag: string;
+	extendedLanguageTag: string | null;
 
-	languageCode: string;
+	languageCode: string | null;
 
 	naturalTimeScale: number;
 
@@ -13277,7 +13884,7 @@ declare class AVMutableCompositionTrack extends AVCompositionTrack {
 	/**
 	 * @since 13.0
 	 */
-	replaceFormatDescriptionWithFormatDescription(originalFormatDescription: any, replacementFormatDescription: any): void;
+	replaceFormatDescriptionWithFormatDescription(originalFormatDescription: any, replacementFormatDescription: any | null): void;
 
 	scaleTimeRangeToDuration(timeRange: CMTimeRange, duration: CMTime): void;
 
@@ -13293,7 +13900,7 @@ declare class AVMutableDateRangeMetadataGroup extends AVDateRangeMetadataGroup {
 
 	static new(): AVMutableDateRangeMetadataGroup; // inherited from NSObject
 
-	endDate: Date;
+	endDate: Date | null;
 
 	items: NSArray<AVMetadataItem>;
 
@@ -13309,7 +13916,7 @@ declare class AVMutableMediaSelection extends AVMediaSelection {
 
 	static new(): AVMutableMediaSelection; // inherited from NSObject
 
-	selectMediaOptionInMediaSelectionGroup(mediaSelectionOption: AVMediaSelectionOption, mediaSelectionGroup: AVMediaSelectionGroup): void;
+	selectMediaOptionInMediaSelectionGroup(mediaSelectionOption: AVMediaSelectionOption | null, mediaSelectionGroup: AVMediaSelectionGroup): void;
 }
 
 /**
@@ -13326,7 +13933,7 @@ declare class AVMutableMetadataItem extends AVMetadataItem {
 	/**
 	 * @since 8.0
 	 */
-	dataType: string;
+	dataType: string | null;
 
 	/**
 	 * @since 4.2
@@ -13336,29 +13943,29 @@ declare class AVMutableMetadataItem extends AVMetadataItem {
 	/**
 	 * @since 8.0
 	 */
-	extendedLanguageTag: string;
+	extendedLanguageTag: string | null;
 
-	extraAttributes: NSDictionary<string, any>;
+	extraAttributes: NSDictionary<string, any> | null;
 
 	/**
 	 * @since 8.0
 	 */
-	identifier: string;
+	identifier: string | null;
 
-	key: any;
+	key: any | null;
 
-	keySpace: string;
+	keySpace: string | null;
 
-	locale: NSLocale;
+	locale: NSLocale | null;
 
 	/**
 	 * @since 9.0
 	 */
-	startDate: Date;
+	startDate: Date | null;
 
 	time: CMTime;
 
-	value: any;
+	value: any | null;
 }
 
 /**
@@ -13373,22 +13980,22 @@ declare class AVMutableMovie extends AVMovie {
 	/**
 	 * @since 13.0
 	 */
-	static movieWithDataOptions(data: NSData, options: NSDictionary<string, any>): AVMutableMovie; // inherited from AVMovie
+	static movieWithDataOptions(data: NSData, options: NSDictionary<string, any> | null): AVMutableMovie; // inherited from AVMovie
 
 	/**
 	 * @since 13.0
 	 */
-	static movieWithDataOptionsError(data: NSData, options: NSDictionary<string, any>, error?: interop.Reference<NSError>): AVMutableMovie;
+	static movieWithDataOptionsError(data: NSData, options: NSDictionary<string, any> | null, error?: interop.Reference<NSError>): AVMutableMovie;
 
-	static movieWithSettingsFromMovieOptionsError(movie: AVMovie, options: NSDictionary<string, any>, error?: interop.Reference<NSError>): AVMutableMovie;
+	static movieWithSettingsFromMovieOptionsError(movie: AVMovie | null, options: NSDictionary<string, any> | null, error?: interop.Reference<NSError>): AVMutableMovie;
 
-	static movieWithURLOptions(URL: NSURL, options: NSDictionary<string, any>): AVMutableMovie; // inherited from AVMovie
+	static movieWithURLOptions(URL: NSURL, options: NSDictionary<string, any> | null): AVMutableMovie; // inherited from AVMovie
 
-	static movieWithURLOptionsError(URL: NSURL, options: NSDictionary<string, any>, error?: interop.Reference<NSError>): AVMutableMovie;
+	static movieWithURLOptionsError(URL: NSURL, options: NSDictionary<string, any> | null, error?: interop.Reference<NSError>): AVMutableMovie;
 
 	static new(): AVMutableMovie; // inherited from NSObject
 
-	defaultMediaDataStorage: AVMediaDataStorage;
+	defaultMediaDataStorage: AVMediaDataStorage | null;
 
 	interleavingPeriod: CMTime;
 
@@ -13404,21 +14011,21 @@ declare class AVMutableMovie extends AVMovie {
 
 	timescale: number;
 
-	constructor(o: { data: NSData; options: NSDictionary<string, any>; });
+	constructor(o: { data: NSData; options: NSDictionary<string, any> | null; });
 
-	constructor(o: { settingsFromMovie: AVMovie; options: NSDictionary<string, any>; });
+	constructor(o: { settingsFromMovie: AVMovie | null; options: NSDictionary<string, any> | null; });
 
-	constructor(o: { URL: NSURL; options: NSDictionary<string, any>; });
+	constructor(o: { URL: NSURL; options: NSDictionary<string, any> | null; });
 
-	addMutableTrackWithMediaTypeCopySettingsFromTrackOptions(mediaType: string, track: AVAssetTrack, options: NSDictionary<string, any>): AVMutableMovieTrack;
+	addMutableTrackWithMediaTypeCopySettingsFromTrackOptions(mediaType: string, track: AVAssetTrack | null, options: NSDictionary<string, any> | null): AVMutableMovieTrack | null;
 
-	addMutableTracksCopyingSettingsFromTracksOptions(existingTracks: NSArray<AVAssetTrack> | AVAssetTrack[], options: NSDictionary<string, any>): NSArray<AVMutableMovieTrack>;
+	addMutableTracksCopyingSettingsFromTracksOptions(existingTracks: NSArray<AVAssetTrack> | AVAssetTrack[], options: NSDictionary<string, any> | null): NSArray<AVMutableMovieTrack>;
 
-	initWithDataOptionsError(data: NSData, options: NSDictionary<string, any>, error?: interop.Reference<NSError>): this;
+	initWithDataOptionsError(data: NSData, options: NSDictionary<string, any> | null, error?: interop.Reference<NSError>): this;
 
-	initWithSettingsFromMovieOptionsError(movie: AVMovie, options: NSDictionary<string, any>, error?: interop.Reference<NSError>): this;
+	initWithSettingsFromMovieOptionsError(movie: AVMovie | null, options: NSDictionary<string, any> | null, error?: interop.Reference<NSError>): this;
 
-	initWithURLOptionsError(URL: NSURL, options: NSDictionary<string, any>, error?: interop.Reference<NSError>): this;
+	initWithURLOptionsError(URL: NSURL, options: NSDictionary<string, any> | null, error?: interop.Reference<NSError>): this;
 
 	insertEmptyTimeRange(timeRange: CMTimeRange): void;
 
@@ -13427,9 +14034,9 @@ declare class AVMutableMovie extends AVMovie {
 	/**
 	 * @since 15.0
 	 */
-	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVMutableMovieTrack, p2: NSError) => void): void;
+	loadTrackWithTrackIDCompletionHandler(trackID: number, completionHandler: (p1: AVMutableMovieTrack, p2: NSError | null) => void): void;
 
-	mutableTrackCompatibleWithTrack(track: AVAssetTrack): AVMutableMovieTrack;
+	mutableTrackCompatibleWithTrack(track: AVAssetTrack): AVMutableMovieTrack | null;
 
 	removeTimeRange(timeRange: CMTimeRange): void;
 
@@ -13437,7 +14044,7 @@ declare class AVMutableMovie extends AVMovie {
 
 	scaleTimeRangeToDuration(timeRange: CMTimeRange, duration: CMTime): void;
 
-	trackWithTrackID(trackID: number): AVMutableMovieTrack;
+	trackWithTrackID(trackID: number): AVMutableMovieTrack | null;
 }
 
 /**
@@ -13457,15 +14064,15 @@ declare class AVMutableMovieTrack extends AVMovieTrack {
 
 	encodedPixelsDimensions: CGSize;
 
-	extendedLanguageTag: string;
+	extendedLanguageTag: string | null;
 
 	readonly hasProtectedContent: boolean;
 
-	languageCode: string;
+	languageCode: string | null;
 
 	layer: number;
 
-	mediaDataStorage: AVMediaDataStorage;
+	mediaDataStorage: AVMediaDataStorage | null;
 
 	metadata: NSArray<AVMetadataItem>;
 
@@ -13485,7 +14092,7 @@ declare class AVMutableMovieTrack extends AVMovieTrack {
 
 	productionApertureDimensions: CGSize;
 
-	sampleReferenceBaseURL: NSURL;
+	sampleReferenceBaseURL: NSURL | null;
 
 	timescale: number;
 
@@ -13494,7 +14101,7 @@ declare class AVMutableMovieTrack extends AVMovieTrack {
 	/**
 	 * @since 13.0
 	 */
-	appendSampleBufferDecodeTimePresentationTimeError(sampleBuffer: any, outDecodeTime: interop.Pointer | interop.Reference<CMTime>, outPresentationTime: interop.Pointer | interop.Reference<CMTime>, error?: interop.Reference<NSError>): boolean;
+	appendSampleBufferDecodeTimePresentationTimeError(sampleBuffer: any, outDecodeTime: interop.Pointer | interop.Reference<CMTime> | ArrayBufferLike | ArrayBufferView | null, outPresentationTime: interop.Pointer | interop.Reference<CMTime> | ArrayBufferLike | ArrayBufferView | null, error?: interop.Reference<NSError>): boolean;
 
 	insertEmptyTimeRange(timeRange: CMTimeRange): void;
 
@@ -13551,7 +14158,7 @@ declare class AVMutableVideoComposition extends AVVideoComposition {
 	/**
 	 * @since 16.0
 	 */
-	static videoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandler(asset: AVAsset, applier: (p1: AVAsynchronousCIImageFilteringRequest) => void, completionHandler: (p1: AVMutableVideoComposition, p2: NSError) => void): void;
+	static videoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandler(asset: AVAsset, applier: (p1: AVAsynchronousCIImageFilteringRequest) => void, completionHandler: (p1: AVMutableVideoComposition | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 13.0
@@ -13562,29 +14169,29 @@ declare class AVMutableVideoComposition extends AVVideoComposition {
 	/**
 	 * @since 16.0
 	 */
-	static videoCompositionWithPropertiesOfAssetPrototypeInstructionCompletionHandler(asset: AVAsset, prototypeInstruction: AVVideoCompositionInstruction, completionHandler: (p1: AVMutableVideoComposition, p2: NSError) => void): void;
+	static videoCompositionWithPropertiesOfAssetPrototypeInstructionCompletionHandler(asset: AVAsset, prototypeInstruction: AVVideoCompositionInstruction, completionHandler: (p1: AVMutableVideoComposition | null, p2: NSError | null) => void): void;
 
-	animationTool: AVVideoCompositionCoreAnimationTool;
-
-	/**
-	 * @since 10.0
-	 */
-	colorPrimaries: string;
+	animationTool: AVVideoCompositionCoreAnimationTool | null;
 
 	/**
 	 * @since 10.0
 	 */
-	colorTransferFunction: string;
+	colorPrimaries: string | null;
 
 	/**
 	 * @since 10.0
 	 */
-	colorYCbCrMatrix: string;
+	colorTransferFunction: string | null;
+
+	/**
+	 * @since 10.0
+	 */
+	colorYCbCrMatrix: string | null;
 
 	/**
 	 * @since 7.0
 	 */
-	customVideoCompositorClass: typeof NSObject;
+	customVideoCompositorClass: typeof NSObject | null;
 
 	frameDuration: CMTime;
 
@@ -13593,7 +14200,7 @@ declare class AVMutableVideoComposition extends AVVideoComposition {
 	/**
 	 * @since 26.0
 	 */
-	outputBufferDescription: NSArray<any>;
+	outputBufferDescription: NSArray<any> | null;
 
 	/**
 	 * @since 17.0
@@ -13629,7 +14236,7 @@ declare class AVMutableVideoCompositionInstruction extends AVVideoCompositionIns
 
 	static videoCompositionInstruction(): AVMutableVideoCompositionInstruction;
 
-	backgroundColor: any;
+	backgroundColor: any | null;
 
 	enablePostProcessing: boolean;
 
@@ -13693,22 +14300,22 @@ declare class AVOutputSettingsAssistant extends NSObject {
 
 	static outputSettingsAssistantWithPreset(presetIdentifier: string): AVOutputSettingsAssistant;
 
-	readonly audioSettings: NSDictionary<string, any>;
+	readonly audioSettings: NSDictionary<string, any> | null;
 
 	readonly outputFileType: string;
 
-	sourceAudioFormat: any;
+	sourceAudioFormat: any | null;
 
 	sourceVideoAverageFrameDuration: CMTime;
 
-	sourceVideoFormat: any;
+	sourceVideoFormat: any | null;
 
 	/**
 	 * @since 7.0
 	 */
 	sourceVideoMinFrameDuration: CMTime;
 
-	readonly videoSettings: NSDictionary<string, any>;
+	readonly videoSettings: NSDictionary<string, any> | null;
 }
 
 /**
@@ -13795,7 +14402,7 @@ declare class AVPersistableContentKeyRequest extends AVContentKeyRequest {
 
 	static new(): AVPersistableContentKeyRequest; // inherited from NSObject
 
-	persistableContentKeyFromKeyVendorResponseOptionsError(keyVendorResponse: NSData, options: NSDictionary<string, any>, error?: interop.Reference<NSError>): NSData;
+	persistableContentKeyFromKeyVendorResponseOptionsError(keyVendorResponse: NSData, options: NSDictionary<string, any> | null, error?: interop.Reference<NSError>): NSData | null;
 }
 
 interface AVPixelAspectRatio {
@@ -13804,6 +14411,91 @@ interface AVPixelAspectRatio {
 }
 declare var AVPixelAspectRatio: interop.StructType<AVPixelAspectRatio>;
 
+/**
+ * @since 27.0
+ */
+declare class AVPlannedSegmentConfiguration extends NSObject {
+
+	static alloc(): AVPlannedSegmentConfiguration; // inherited from NSObject
+
+	static new(): AVPlannedSegmentConfiguration; // inherited from NSObject
+
+	readonly duration: CMTime;
+
+	constructor(o: { duration: CMTime; });
+
+	initWithDuration(duration: CMTime): this;
+}
+
+/**
+ * @since 27.0
+ */
+declare class AVPlannedSegmentWritingRequest extends NSObject {
+
+	static alloc(): AVPlannedSegmentWritingRequest; // inherited from NSObject
+
+	static new(): AVPlannedSegmentWritingRequest; // inherited from NSObject
+
+	readonly assemblyTrackID: number;
+
+	readonly clientStateToRestore: NSData | null;
+
+	readonly progress: number;
+
+	readonly segmentFileOutputURL: NSURL;
+
+	readonly timeRange: CMTimeRange;
+
+	cancel(): void;
+
+	finish(): void;
+
+	finishWithClientState(segmentEndingClientState: NSData | null): void;
+
+	finishWithError(error: NSError | null): void;
+}
+
+interface AVPlannedVideoSegmentBoundaryGuidelines {
+	minimumFrameCount: number;
+	minimumDuration: CMTime;
+}
+declare var AVPlannedVideoSegmentBoundaryGuidelines: interop.StructType<AVPlannedVideoSegmentBoundaryGuidelines>;
+
+/**
+ * @since 27.0
+ */
+declare class AVPlannedVideoSegmentConfiguration extends AVPlannedSegmentConfiguration {
+
+	static alloc(): AVPlannedVideoSegmentConfiguration; // inherited from NSObject
+
+	static new(): AVPlannedVideoSegmentConfiguration; // inherited from NSObject
+
+	readonly frameCount: number;
+
+	constructor(o: { numberOfFrames: number; duration: CMTime; });
+
+	initWithNumberOfFramesDuration(frameCount: number, duration: CMTime): this;
+}
+
+/**
+ * @since 27.0
+ */
+declare class AVPlannedVideoSegmentWritingRequest extends AVPlannedSegmentWritingRequest {
+
+	static alloc(): AVPlannedVideoSegmentWritingRequest; // inherited from NSObject
+
+	static new(): AVPlannedVideoSegmentWritingRequest; // inherited from NSObject
+
+	readonly frameCount: number;
+
+	createResumableCompressionSessionWithAllocatorWidthHeightCodecTypeEncoderSpecificationSourceImageBufferAttributesCompressedDataAllocatorOutputCallbackOutputCallbackRefConReturningError(allocator: any | null, width: number, height: number, codecType: number, encoderSpecification: NSDictionary<any, any> | null, sourceImageBufferAttributes: NSDictionary<any, any> | null, compressedDataAllocator: any | null, outputCallback: interop.FunctionReference<(p1: interop.Pointer | interop.Reference<any> | null, p2: interop.Pointer | interop.Reference<any> | null, p3: number, p4: VTEncodeInfoFlags, p5: any | null) => void> | null, outputCallbackRefCon: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null, error?: interop.Reference<NSError>): any | null;
+
+	resumableAssetWriterInputWithMediaTypeOutputSettingsSourceFormatHintReturningError(mediaType: string, outputSettings: NSDictionary<string, any> | null, sourceFormatHint: any | null, error?: interop.Reference<NSError>): AVAssetWriterInput | null;
+}
+
+/**
+ * @since 26.0
+ */
 declare class AVPlaybackCoordinationMedium extends NSObject {
 
 	static alloc(): AVPlaybackCoordinationMedium; // inherited from NSObject
@@ -13876,7 +14568,7 @@ declare class AVPlayer extends NSObject implements AVRoutingPlaybackParticipant 
 
 	static new(): AVPlayer; // inherited from NSObject
 
-	static playerWithPlayerItem(item: AVPlayerItem): AVPlayer;
+	static playerWithPlayerItem(item: AVPlayerItem | null): AVPlayer;
 
 	static playerWithURL(URL: NSURL): AVPlayer;
 
@@ -13893,6 +14585,11 @@ declare class AVPlayer extends NSObject implements AVRoutingPlaybackParticipant 
 	 * @deprecated 6.0
 	 */
 	allowsAirPlayVideo: boolean;
+
+	/**
+	 * @since 26.4
+	 */
+	allowsCaptureOfClearKeyVideo: boolean;
 
 	/**
 	 * @since 6.0
@@ -13925,14 +14622,19 @@ declare class AVPlayer extends NSObject implements AVRoutingPlaybackParticipant 
 	 */
 	closedCaptionDisplayEnabled: boolean;
 
-	readonly currentItem: AVPlayerItem;
+	readonly currentItem: AVPlayerItem | null;
 
 	/**
 	 * @since 16.0
 	 */
 	defaultRate: number;
 
-	readonly error: NSError;
+	/**
+	 * @since 27.0
+	 */
+	readonly disconnectedFromSystemAudio: boolean;
+
+	readonly error: NSError | null;
 
 	/**
 	 * @since 6.0
@@ -13948,7 +14650,7 @@ declare class AVPlayer extends NSObject implements AVRoutingPlaybackParticipant 
 	 * @since 6.0
 	 * @deprecated 18.0
 	 */
-	masterClock: any;
+	masterClock: any | null;
 
 	/**
 	 * @since 7.0
@@ -13980,12 +14682,12 @@ declare class AVPlayer extends NSObject implements AVRoutingPlaybackParticipant 
 	/**
 	 * @since 10.0
 	 */
-	readonly reasonForWaitingToPlay: string;
+	readonly reasonForWaitingToPlay: string | null;
 
 	/**
 	 * @since 15.0
 	 */
-	sourceClock: any;
+	sourceClock: any | null;
 
 	readonly status: AVPlayerStatus;
 
@@ -14005,7 +14707,7 @@ declare class AVPlayer extends NSObject implements AVRoutingPlaybackParticipant 
 	 */
 	usesExternalPlaybackWhileExternalScreenIsActive: boolean;
 
-	videoOutput: AVPlayerVideoOutput;
+	videoOutput: AVPlayerVideoOutput | null;
 
 	/**
 	 * @since 7.0
@@ -14028,13 +14730,13 @@ declare class AVPlayer extends NSObject implements AVRoutingPlaybackParticipant 
 	 */
 	static observationEnabled: boolean;
 
-	constructor(o: { playerItem: AVPlayerItem; });
+	constructor(o: { playerItem: AVPlayerItem | null; });
 
 	constructor(o: { URL: NSURL; });
 
-	addBoundaryTimeObserverForTimesQueueUsingBlock(times: NSArray<NSValue> | NSValue[], queue: NSObject & OS_dispatch_queue, block: () => void): any;
+	addBoundaryTimeObserverForTimesQueueUsingBlock(times: NSArray<NSValue> | NSValue[], queue: NSObject & OS_dispatch_queue | null, block: () => void): any;
 
-	addPeriodicTimeObserverForIntervalQueueUsingBlock(interval: CMTime, queue: NSObject & OS_dispatch_queue, block: (p1: CMTime) => void): any;
+	addPeriodicTimeObserverForIntervalQueueUsingBlock(interval: CMTime, queue: NSObject & OS_dispatch_queue | null, block: (p1: CMTime) => void): any;
 
 	/**
 	 * @since 6.0
@@ -14043,14 +14745,14 @@ declare class AVPlayer extends NSObject implements AVRoutingPlaybackParticipant 
 
 	currentTime(): CMTime;
 
-	initWithPlayerItem(item: AVPlayerItem): this;
+	initWithPlayerItem(item: AVPlayerItem | null): this;
 
 	initWithURL(URL: NSURL): this;
 
 	/**
 	 * @since 7.0
 	 */
-	mediaSelectionCriteriaForMediaCharacteristic(mediaCharacteristic: string): AVPlayerMediaSelectionCriteria;
+	mediaSelectionCriteriaForMediaCharacteristic(mediaCharacteristic: string): AVPlayerMediaSelectionCriteria | null;
 
 	pause(): void;
 
@@ -14064,11 +14766,11 @@ declare class AVPlayer extends NSObject implements AVRoutingPlaybackParticipant 
 	/**
 	 * @since 6.0
 	 */
-	prerollAtRateCompletionHandler(rate: number, completionHandler: (p1: boolean) => void): void;
+	prerollAtRateCompletionHandler(rate: number, completionHandler: (p1: boolean) => void | null): void;
 
 	removeTimeObserver(observer: any): void;
 
-	replaceCurrentItemWithPlayerItem(item: AVPlayerItem): void;
+	replaceCurrentItemWithPlayerItem(item: AVPlayerItem | null): void;
 
 	seekToDate(date: Date): void;
 
@@ -14092,9 +14794,14 @@ declare class AVPlayer extends NSObject implements AVRoutingPlaybackParticipant 
 	seekToTimeToleranceBeforeToleranceAfterCompletionHandler(time: CMTime, toleranceBefore: CMTime, toleranceAfter: CMTime, completionHandler: (p1: boolean) => void): void;
 
 	/**
+	 * @since 27.0
+	 */
+	setDisconnectedFromSystemAudioCompletionHandler(disconnected: boolean, completionHandler: () => void | null): void;
+
+	/**
 	 * @since 7.0
 	 */
-	setMediaSelectionCriteriaForMediaCharacteristic(criteria: AVPlayerMediaSelectionCriteria, mediaCharacteristic: string): void;
+	setMediaSelectionCriteriaForMediaCharacteristic(criteria: AVPlayerMediaSelectionCriteria | null, mediaCharacteristic: string): void;
 
 	/**
 	 * @since 6.0
@@ -14188,13 +14895,13 @@ declare class AVPlayerInterstitialEvent extends NSObject implements NSCopying {
 	 * @since 15.0
 	 * @deprecated 18.0
 	 */
-	static interstitialEventWithPrimaryItemIdentifierDateTemplateItemsRestrictionsResumptionOffsetPlayoutLimitUserDefinedAttributes(primaryItem: AVPlayerItem, identifier: string, date: Date, templateItems: NSArray<AVPlayerItem> | AVPlayerItem[], restrictions: AVPlayerInterstitialEventRestrictions, resumptionOffset: CMTime, playoutLimit: CMTime, userDefinedAttributes: NSDictionary<any, any>): AVPlayerInterstitialEvent;
+	static interstitialEventWithPrimaryItemIdentifierDateTemplateItemsRestrictionsResumptionOffsetPlayoutLimitUserDefinedAttributes(primaryItem: AVPlayerItem, identifier: string | null, date: Date, templateItems: NSArray<AVPlayerItem> | AVPlayerItem[], restrictions: AVPlayerInterstitialEventRestrictions, resumptionOffset: CMTime, playoutLimit: CMTime, userDefinedAttributes: NSDictionary<any, any> | null): AVPlayerInterstitialEvent;
 
 	/**
 	 * @since 15.0
 	 * @deprecated 18.0
 	 */
-	static interstitialEventWithPrimaryItemIdentifierTimeTemplateItemsRestrictionsResumptionOffsetPlayoutLimitUserDefinedAttributes(primaryItem: AVPlayerItem, identifier: string, time: CMTime, templateItems: NSArray<AVPlayerItem> | AVPlayerItem[], restrictions: AVPlayerInterstitialEventRestrictions, resumptionOffset: CMTime, playoutLimit: CMTime, userDefinedAttributes: NSDictionary<any, any>): AVPlayerInterstitialEvent;
+	static interstitialEventWithPrimaryItemIdentifierTimeTemplateItemsRestrictionsResumptionOffsetPlayoutLimitUserDefinedAttributes(primaryItem: AVPlayerItem, identifier: string | null, time: CMTime, templateItems: NSArray<AVPlayerItem> | AVPlayerItem[], restrictions: AVPlayerInterstitialEventRestrictions, resumptionOffset: CMTime, playoutLimit: CMTime, userDefinedAttributes: NSDictionary<any, any> | null): AVPlayerInterstitialEvent;
 
 	/**
 	 * @since 16.0
@@ -14216,7 +14923,7 @@ declare class AVPlayerInterstitialEvent extends NSObject implements NSCopying {
 	/**
 	 * @since 16.4
 	 */
-	readonly assetListResponse: NSDictionary<any, any>;
+	readonly assetListResponse: NSDictionary<any, any> | null;
 
 	/**
 	 * @since 18.0
@@ -14231,7 +14938,7 @@ declare class AVPlayerInterstitialEvent extends NSObject implements NSCopying {
 	/**
 	 * @since 16.0
 	 */
-	date: Date;
+	date: Date | null;
 
 	/**
 	 * @since 16.0
@@ -14251,7 +14958,7 @@ declare class AVPlayerInterstitialEvent extends NSObject implements NSCopying {
 	/**
 	 * @since 16.0
 	 */
-	primaryItem: AVPlayerItem;
+	primaryItem: AVPlayerItem | null;
 
 	/**
 	 * @since 16.0
@@ -14264,9 +14971,14 @@ declare class AVPlayerInterstitialEvent extends NSObject implements NSCopying {
 	resumptionOffset: CMTime;
 
 	/**
+	 * @since 26.4
+	 */
+	readonly scheduleIdentifier: string | null;
+
+	/**
 	 * @since 26.0
 	 */
-	skipControlLocalizedLabelBundleKey: string;
+	skipControlLocalizedLabelBundleKey: string | null;
 
 	/**
 	 * @since 26.0
@@ -14303,7 +15015,7 @@ declare class AVPlayerInterstitialEvent extends NSObject implements NSCopying {
 	 */
 	willPlayOnce: boolean;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -14336,12 +15048,12 @@ declare class AVPlayerInterstitialEventController extends AVPlayerInterstitialEv
 	/**
 	 * @since 26.0
 	 */
-	localizedStringsBundle: NSBundle;
+	localizedStringsBundle: NSBundle | null;
 
 	/**
 	 * @since 26.0
 	 */
-	localizedStringsTableName: string;
+	localizedStringsTableName: string | null;
 
 	cancelCurrentEventWithResumptionOffset(resumptionOffset: CMTime): void;
 
@@ -14372,12 +15084,12 @@ declare class AVPlayerInterstitialEventMonitor extends NSObject {
 
 	static new(): AVPlayerInterstitialEventMonitor; // inherited from NSObject
 
-	readonly currentEvent: AVPlayerInterstitialEvent;
+	readonly currentEvent: AVPlayerInterstitialEvent | null;
 
 	/**
 	 * @since 26.0
 	 */
-	readonly currentEventSkipControlLabel: string;
+	readonly currentEventSkipControlLabel: string | null;
 
 	/**
 	 * @since 26.0
@@ -14388,7 +15100,7 @@ declare class AVPlayerInterstitialEventMonitor extends NSObject {
 
 	readonly interstitialPlayer: AVQueuePlayer;
 
-	readonly primaryPlayer: AVPlayer;
+	readonly primaryPlayer: AVPlayer | null;
 
 	constructor(o: { primaryPlayer: AVPlayer; });
 
@@ -14491,6 +15203,26 @@ declare var AVPlayerInterstitialEventMonitorInterstitialEventWasUnscheduledEvent
 declare var AVPlayerInterstitialEventMonitorInterstitialEventWasUnscheduledNotification: string;
 
 /**
+ * @since 26.4
+ */
+declare var AVPlayerInterstitialEventMonitorScheduleRequestCompletedNotification: string;
+
+/**
+ * @since 26.4
+ */
+declare var AVPlayerInterstitialEventMonitorScheduleRequestErrorKey: string;
+
+/**
+ * @since 26.4
+ */
+declare var AVPlayerInterstitialEventMonitorScheduleRequestIdentifierKey: string;
+
+/**
+ * @since 26.4
+ */
+declare var AVPlayerInterstitialEventMonitorScheduleRequestResponseKey: string;
+
+/**
  * @since 16.0
  */
 declare var AVPlayerInterstitialEventNoCue: string;
@@ -14547,7 +15279,7 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 	/**
 	 * @since 7.0
 	 */
-	static playerItemWithAssetAutomaticallyLoadedAssetKeys(asset: AVAsset, automaticallyLoadedAssetKeys: NSArray<string> | string[]): AVPlayerItem;
+	static playerItemWithAssetAutomaticallyLoadedAssetKeys(asset: AVAsset, automaticallyLoadedAssetKeys: NSArray<string> | string[] | null): AVPlayerItem;
 
 	static playerItemWithURL(URL: NSURL): AVPlayerItem;
 
@@ -14563,7 +15295,7 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 
 	readonly asset: AVAsset;
 
-	audioMix: AVAudioMix;
+	audioMix: AVAudioMix | null;
 
 	/**
 	 * @since 13.0
@@ -14644,14 +15376,14 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 	/**
 	 * @since 7.0
 	 */
-	readonly customVideoCompositor: AVVideoCompositing;
+	readonly customVideoCompositor: AVVideoCompositing | null;
 
 	/**
 	 * @since 4.3
 	 */
 	readonly duration: CMTime;
 
-	readonly error: NSError;
+	readonly error: NSError | null;
 
 	/**
 	 * @since 12.2
@@ -14664,6 +15396,11 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 	 * @since 18.0
 	 */
 	readonly integratedTimeline: AVPlayerItemIntegratedTimeline;
+
+	/**
+	 * @since 26.4
+	 */
+	readonly interstitialEventIdentifier: string | null;
 
 	/**
 	 * @since 16.0
@@ -14680,7 +15417,7 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 	/**
 	 * @since 16.0
 	 */
-	nowPlayingInfo: NSDictionary<string, any>;
+	nowPlayingInfo: NSDictionary<string, any> | null;
 
 	/**
 	 * @since 6.0
@@ -14749,23 +15486,23 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 	/**
 	 * @since 15.0
 	 */
-	readonly templatePlayerItem: AVPlayerItem;
+	readonly templatePlayerItem: AVPlayerItem | null;
 
 	/**
 	 * @since 6.0
 	 */
-	textStyleRules: NSArray<AVTextStyleRule>;
+	textStyleRules: NSArray<AVTextStyleRule> | null;
 
 	/**
 	 * @since 6.0
 	 */
-	readonly timebase: any;
+	readonly timebase: any | null;
 
 	/**
 	 * @since 4.0
 	 * @deprecated 13.0
 	 */
-	readonly timedMetadata: NSArray<AVMetadataItem>;
+	readonly timedMetadata: NSArray<AVMetadataItem> | null;
 
 	readonly tracks: NSArray<AVPlayerItemTrack>;
 
@@ -14782,21 +15519,22 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 	/**
 	 * @since 4.0
 	 */
-	videoComposition: AVVideoComposition;
+	videoComposition: AVVideoComposition | null;
 
 	constructor(o: { asset: AVAsset; });
 
 	/**
 	 * @since 7.0
 	 */
-	constructor(o: { asset: AVAsset; automaticallyLoadedAssetKeys: NSArray<string> | string[]; });
+	constructor(o: { asset: AVAsset; automaticallyLoadedAssetKeys: NSArray<string> | string[] | null; });
 
 	constructor(o: { URL: NSURL; });
 
 	/**
 	 * @since 4.3
+	 * @deprecated 27.0
 	 */
-	accessLog(): AVPlayerItemAccessLog;
+	accessLog(): AVPlayerItemAccessLog | null;
 
 	/**
 	 * @since 9.3
@@ -14813,9 +15551,9 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 	 */
 	cancelPendingSeeks(): void;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
-	currentDate(): Date;
+	currentDate(): Date | null;
 
 	currentTime(): CMTime;
 
@@ -14826,15 +15564,26 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 
 	/**
 	 * @since 4.3
+	 * @deprecated 27.0
 	 */
-	errorLog(): AVPlayerItemErrorLog;
+	errorLog(): AVPlayerItemErrorLog | null;
+
+	/**
+	 * @since 27
+	 */
+	fetchAccessLogWithCompletionHandler(completionHandler: (p1: AVPlayerItemAccessLog | null) => void): void;
+
+	/**
+	 * @since 27
+	 */
+	fetchErrorLogWithCompletionHandler(completionHandler: (p1: AVPlayerItemErrorLog | null) => void): void;
 
 	initWithAsset(asset: AVAsset): this;
 
 	/**
 	 * @since 7.0
 	 */
-	initWithAssetAutomaticallyLoadedAssetKeys(asset: AVAsset, automaticallyLoadedAssetKeys: NSArray<string> | string[]): this;
+	initWithAssetAutomaticallyLoadedAssetKeys(asset: AVAsset, automaticallyLoadedAssetKeys: NSArray<string> | string[] | null): this;
 
 	initWithURL(URL: NSURL): this;
 
@@ -14857,7 +15606,7 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 	/**
 	 * @since 6.0
 	 */
-	seekToDateCompletionHandler(date: Date, completionHandler: (p1: boolean) => void): boolean;
+	seekToDateCompletionHandler(date: Date, completionHandler: (p1: boolean) => void | null): boolean;
 
 	/**
 	 * @since 4.0
@@ -14868,7 +15617,7 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 	/**
 	 * @since 5.0
 	 */
-	seekToTimeCompletionHandler(time: CMTime, completionHandler: (p1: boolean) => void): void;
+	seekToTimeCompletionHandler(time: CMTime, completionHandler: (p1: boolean) => void | null): void;
 
 	/**
 	 * @since 4.0
@@ -14879,7 +15628,7 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 	/**
 	 * @since 5.0
 	 */
-	seekToTimeToleranceBeforeToleranceAfterCompletionHandler(time: CMTime, toleranceBefore: CMTime, toleranceAfter: CMTime, completionHandler: (p1: boolean) => void): void;
+	seekToTimeToleranceBeforeToleranceAfterCompletionHandler(time: CMTime, toleranceBefore: CMTime, toleranceAfter: CMTime, completionHandler: (p1: boolean) => void | null): void;
 
 	/**
 	 * @since 7.0
@@ -14889,7 +15638,7 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 	/**
 	 * @since 5.0
 	 */
-	selectMediaOptionInMediaSelectionGroup(mediaSelectionOption: AVMediaSelectionOption, mediaSelectionGroup: AVMediaSelectionGroup): void;
+	selectMediaOptionInMediaSelectionGroup(mediaSelectionOption: AVMediaSelectionOption | null, mediaSelectionGroup: AVMediaSelectionGroup): void;
 
 	/**
 	 * @since 26.0
@@ -14902,15 +15651,20 @@ declare class AVPlayerItem extends NSObject implements AVMetricEventStreamPublis
 	selectMediaPresentationSettingForMediaSelectionGroup(mediaPresentationSetting: AVMediaPresentationSetting, mediaSelectionGroup: AVMediaSelectionGroup): void;
 
 	/**
+	 * @since 27.0
+	 */
+	selectableMediaSelectionOptionsInMediaSelectionGroup(mediaSelectionGroup: AVMediaSelectionGroup): NSArray<AVMediaSelectionOption>;
+
+	/**
 	 * @since 5.0
 	 * @deprecated 11.0
 	 */
-	selectedMediaOptionInMediaSelectionGroup(mediaSelectionGroup: AVMediaSelectionGroup): AVMediaSelectionOption;
+	selectedMediaOptionInMediaSelectionGroup(mediaSelectionGroup: AVMediaSelectionGroup): AVMediaSelectionOption | null;
 
 	/**
 	 * @since 26.0
 	 */
-	selectedMediaPresentationLanguageForMediaSelectionGroup(mediaSelectionGroup: AVMediaSelectionGroup): string;
+	selectedMediaPresentationLanguageForMediaSelectionGroup(mediaSelectionGroup: AVMediaSelectionGroup): string | null;
 
 	/**
 	 * @since 26.0
@@ -14933,9 +15687,9 @@ declare class AVPlayerItemAccessLog extends NSObject implements NSCopying {
 
 	readonly extendedLogDataStringEncoding: number;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
-	extendedLogData(): NSData;
+	extendedLogData(): NSData | null;
 }
 
 /**
@@ -14947,7 +15701,7 @@ declare class AVPlayerItemAccessLogEvent extends NSObject implements NSCopying {
 
 	static new(): AVPlayerItemAccessLogEvent; // inherited from NSObject
 
-	readonly URI: string;
+	readonly URI: string | null;
 
 	/**
 	 * @since 10.0
@@ -15016,20 +15770,20 @@ declare class AVPlayerItemAccessLogEvent extends NSObject implements NSCopying {
 	 */
 	readonly observedMinBitrate: number;
 
-	readonly playbackSessionID: string;
+	readonly playbackSessionID: string | null;
 
-	readonly playbackStartDate: Date;
+	readonly playbackStartDate: Date | null;
 
 	readonly playbackStartOffset: number;
 
 	/**
 	 * @since 7.0
 	 */
-	readonly playbackType: string;
+	readonly playbackType: string | null;
 
 	readonly segmentsDownloadedDuration: number;
 
-	readonly serverAddress: string;
+	readonly serverAddress: string | null;
 
 	/**
 	 * @since 7.0
@@ -15046,7 +15800,7 @@ declare class AVPlayerItemAccessLogEvent extends NSObject implements NSCopying {
 	 */
 	readonly transferDuration: number;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -15067,9 +15821,9 @@ declare class AVPlayerItemErrorLog extends NSObject implements NSCopying {
 
 	readonly extendedLogDataStringEncoding: number;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
-	extendedLogData(): NSData;
+	extendedLogData(): NSData | null;
 }
 
 /**
@@ -15081,26 +15835,26 @@ declare class AVPlayerItemErrorLogEvent extends NSObject implements NSCopying {
 
 	static new(): AVPlayerItemErrorLogEvent; // inherited from NSObject
 
-	readonly URI: string;
+	readonly URI: string | null;
 
 	/**
 	 * @since 17.5
 	 */
-	readonly allHTTPResponseHeaderFields: NSDictionary<string, string>;
+	readonly allHTTPResponseHeaderFields: NSDictionary<string, string> | null;
 
-	readonly date: Date;
+	readonly date: Date | null;
 
-	readonly errorComment: string;
+	readonly errorComment: string | null;
 
 	readonly errorDomain: string;
 
 	readonly errorStatusCode: number;
 
-	readonly playbackSessionID: string;
+	readonly playbackSessionID: string | null;
 
-	readonly serverAddress: string;
+	readonly serverAddress: string | null;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -15122,21 +15876,21 @@ declare class AVPlayerItemIntegratedTimeline extends NSObject {
 
 	static new(): AVPlayerItemIntegratedTimeline; // inherited from NSObject
 
-	readonly currentDate: Date;
+	readonly currentDate: Date | null;
 
 	readonly currentSnapshot: AVPlayerItemIntegratedTimelineSnapshot;
 
 	readonly currentTime: CMTime;
 
-	addBoundaryTimeObserverForSegmentOffsetsIntoSegmentQueueUsingBlock(segment: AVPlayerItemSegment, offsetsIntoSegment: NSArray<any> | any[], queue: NSObject & OS_dispatch_queue, block: (p1: boolean) => void): AVPlayerItemIntegratedTimelineObserver;
+	addBoundaryTimeObserverForSegmentOffsetsIntoSegmentQueueUsingBlock(segment: AVPlayerItemSegment, offsetsIntoSegment: NSArray<any> | any[], queue: NSObject & OS_dispatch_queue | null, block: (p1: boolean) => void): AVPlayerItemIntegratedTimelineObserver;
 
-	addPeriodicTimeObserverForIntervalQueueUsingBlock(interval: CMTime, queue: NSObject & OS_dispatch_queue, block: (p1: CMTime) => void): AVPlayerItemIntegratedTimelineObserver;
+	addPeriodicTimeObserverForIntervalQueueUsingBlock(interval: CMTime, queue: NSObject & OS_dispatch_queue | null, block: (p1: CMTime) => void): AVPlayerItemIntegratedTimelineObserver;
 
 	removeTimeObserver(observer: AVPlayerItemIntegratedTimelineObserver): void;
 
-	seekToDateCompletionHandler(date: Date, completionHandler: (p1: boolean) => void): void;
+	seekToDateCompletionHandler(date: Date, completionHandler: (p1: boolean) => void | null): void;
 
-	seekToTimeToleranceBeforeToleranceAfterCompletionHandler(time: CMTime, toleranceBefore: CMTime, toleranceAfter: CMTime, completionHandler: (p1: boolean) => void): void;
+	seekToTimeToleranceBeforeToleranceAfterCompletionHandler(time: CMTime, toleranceBefore: CMTime, toleranceAfter: CMTime, completionHandler: (p1: boolean) => void | null): void;
 }
 
 interface AVPlayerItemIntegratedTimelineObserver extends NSObjectProtocol {
@@ -15155,9 +15909,9 @@ declare class AVPlayerItemIntegratedTimelineSnapshot extends NSObject {
 
 	static new(): AVPlayerItemIntegratedTimelineSnapshot; // inherited from NSObject
 
-	readonly currentDate: Date;
+	readonly currentDate: Date | null;
 
-	readonly currentSegment: AVPlayerItemSegment;
+	readonly currentSegment: AVPlayerItemSegment | null;
 
 	readonly currentTime: CMTime;
 
@@ -15165,7 +15919,7 @@ declare class AVPlayerItemIntegratedTimelineSnapshot extends NSObject {
 
 	readonly segments: NSArray<AVPlayerItemSegment>;
 
-	mapTimeToSegmentAtSegmentOffset(time: CMTime, timeSegmentOut: interop.Pointer | interop.Reference<AVPlayerItemSegment>, segmentOffsetOut: interop.Pointer | interop.Reference<CMTime>): void;
+	mapTimeToSegmentAtSegmentOffset(time: CMTime, timeSegmentOut: interop.Pointer | interop.Reference<AVPlayerItemSegment> | ArrayBufferLike | ArrayBufferView | null, segmentOffsetOut: interop.Pointer | interop.Reference<CMTime> | ArrayBufferLike | ArrayBufferView): void;
 }
 
 /**
@@ -15179,9 +15933,9 @@ declare class AVPlayerItemLegibleOutput extends AVPlayerItemOutput {
 
 	advanceIntervalForDelegateInvocation: number;
 
-	readonly delegate: AVPlayerItemLegibleOutputPushDelegate;
+	readonly delegate: AVPlayerItemLegibleOutputPushDelegate | null;
 
-	readonly delegateQueue: NSObject & OS_dispatch_queue;
+	readonly delegateQueue: NSObject & OS_dispatch_queue | null;
 
 	textStylingResolution: string;
 
@@ -15189,7 +15943,7 @@ declare class AVPlayerItemLegibleOutput extends AVPlayerItemOutput {
 
 	initWithMediaSubtypesForNativeRepresentation(subtypes: NSArray<number> | number[]): this;
 
-	setDelegateQueue(delegate: AVPlayerItemLegibleOutputPushDelegate, delegateQueue: NSObject & OS_dispatch_queue): void;
+	setDelegateQueue(delegate: AVPlayerItemLegibleOutputPushDelegate | null, delegateQueue: NSObject & OS_dispatch_queue | null): void;
 }
 
 interface AVPlayerItemLegibleOutputPushDelegate extends AVPlayerItemOutputPushDelegate {
@@ -15238,15 +15992,15 @@ declare class AVPlayerItemMetadataCollector extends AVPlayerItemMediaDataCollect
 
 	static new(): AVPlayerItemMetadataCollector; // inherited from NSObject
 
-	readonly delegate: AVPlayerItemMetadataCollectorPushDelegate;
+	readonly delegate: AVPlayerItemMetadataCollectorPushDelegate | null;
 
-	readonly delegateQueue: NSObject & OS_dispatch_queue;
+	readonly delegateQueue: NSObject & OS_dispatch_queue | null;
 
-	constructor(o: { identifiers: NSArray<string> | string[]; classifyingLabels: NSArray<string> | string[]; });
+	constructor(o: { identifiers: NSArray<string> | string[] | null; classifyingLabels: NSArray<string> | string[] | null; });
 
-	initWithIdentifiersClassifyingLabels(identifiers: NSArray<string> | string[], classifyingLabels: NSArray<string> | string[]): this;
+	initWithIdentifiersClassifyingLabels(identifiers: NSArray<string> | string[] | null, classifyingLabels: NSArray<string> | string[] | null): this;
 
-	setDelegateQueue(delegate: AVPlayerItemMetadataCollectorPushDelegate, delegateQueue: NSObject & OS_dispatch_queue): void;
+	setDelegateQueue(delegate: AVPlayerItemMetadataCollectorPushDelegate | null, delegateQueue: NSObject & OS_dispatch_queue | null): void;
 }
 
 interface AVPlayerItemMetadataCollectorPushDelegate extends NSObjectProtocol {
@@ -15269,15 +16023,15 @@ declare class AVPlayerItemMetadataOutput extends AVPlayerItemOutput {
 
 	advanceIntervalForDelegateInvocation: number;
 
-	readonly delegate: AVPlayerItemMetadataOutputPushDelegate;
+	readonly delegate: AVPlayerItemMetadataOutputPushDelegate | null;
 
-	readonly delegateQueue: NSObject & OS_dispatch_queue;
+	readonly delegateQueue: NSObject & OS_dispatch_queue | null;
 
-	constructor(o: { identifiers: NSArray<string> | string[]; });
+	constructor(o: { identifiers: NSArray<string> | string[] | null; });
 
-	initWithIdentifiers(identifiers: NSArray<string> | string[]): this;
+	initWithIdentifiers(identifiers: NSArray<string> | string[] | null): this;
 
-	setDelegateQueue(delegate: AVPlayerItemMetadataOutputPushDelegate, delegateQueue: NSObject & OS_dispatch_queue): void;
+	setDelegateQueue(delegate: AVPlayerItemMetadataOutputPushDelegate | null, delegateQueue: NSObject & OS_dispatch_queue | null): void;
 }
 
 interface AVPlayerItemMetadataOutputPushDelegate extends AVPlayerItemOutputPushDelegate {
@@ -15285,7 +16039,7 @@ interface AVPlayerItemMetadataOutputPushDelegate extends AVPlayerItemOutputPushD
 	/**
 	 * @since 8.0
 	 */
-	metadataOutputDidOutputTimedMetadataGroupsFromPlayerItemTrack?(output: AVPlayerItemMetadataOutput, groups: NSArray<AVTimedMetadataGroup> | AVTimedMetadataGroup[], track: AVPlayerItemTrack): void;
+	metadataOutputDidOutputTimedMetadataGroupsFromPlayerItemTrack?(output: AVPlayerItemMetadataOutput, groups: NSArray<AVTimedMetadataGroup> | AVTimedMetadataGroup[], track: AVPlayerItemTrack | null): void;
 }
 declare var AVPlayerItemMetadataOutputPushDelegate: {
 
@@ -15368,9 +16122,9 @@ declare class AVPlayerItemRenderedLegibleOutput extends AVPlayerItemOutput {
 
 	advanceIntervalForDelegateInvocation: number;
 
-	readonly delegate: AVPlayerItemRenderedLegibleOutputPushDelegate;
+	readonly delegate: AVPlayerItemRenderedLegibleOutputPushDelegate | null;
 
-	readonly delegateQueue: NSObject & OS_dispatch_queue;
+	readonly delegateQueue: NSObject & OS_dispatch_queue | null;
 
 	videoDisplaySize: CGSize;
 
@@ -15378,7 +16132,7 @@ declare class AVPlayerItemRenderedLegibleOutput extends AVPlayerItemOutput {
 
 	initWithVideoDisplaySize(videoDisplaySize: CGSize): this;
 
-	setDelegateQueue(delegate: AVPlayerItemRenderedLegibleOutputPushDelegate, delegateQueue: NSObject & OS_dispatch_queue): void;
+	setDelegateQueue(delegate: AVPlayerItemRenderedLegibleOutputPushDelegate | null, delegateQueue: NSObject & OS_dispatch_queue | null): void;
 }
 
 /**
@@ -15397,6 +16151,64 @@ declare var AVPlayerItemRenderedLegibleOutputPushDelegate: {
 };
 
 /**
+ * @since 27
+ */
+declare class AVPlayerItemSampleBufferOutput extends AVPlayerItemOutput {
+
+	static alloc(): AVPlayerItemSampleBufferOutput; // inherited from NSObject
+
+	static new(): AVPlayerItemSampleBufferOutput; // inherited from NSObject
+
+	readonly delegate: AVPlayerItemSampleBufferOutputDelegate | null;
+
+	readonly delegateQueue: NSObject & OS_dispatch_queue | null;
+
+	constructor(o: { configuration: AVPlayerItemSampleBufferOutputConfiguration | null; });
+
+	copyNextSampleBuffer(): any | null;
+
+	initWithConfiguration(configuration: AVPlayerItemSampleBufferOutputConfiguration | null): this;
+
+	setDelegateQueue(delegate: AVPlayerItemSampleBufferOutputDelegate | null, delegateQueue: NSObject & OS_dispatch_queue | null): void;
+}
+
+/**
+ * @since 27
+ */
+declare class AVPlayerItemSampleBufferOutputAudioConfiguration extends AVPlayerItemSampleBufferOutputConfiguration {
+
+	static alloc(): AVPlayerItemSampleBufferOutputAudioConfiguration; // inherited from NSObject
+
+	static new(): AVPlayerItemSampleBufferOutputAudioConfiguration; // inherited from NSObject
+
+	requestedAudioFormat: any | null;
+}
+
+/**
+ * @since 27
+ */
+declare class AVPlayerItemSampleBufferOutputConfiguration extends NSObject {
+
+	static alloc(): AVPlayerItemSampleBufferOutputConfiguration; // inherited from NSObject
+
+	static new(): AVPlayerItemSampleBufferOutputConfiguration; // inherited from NSObject
+}
+
+/**
+ * @since 27
+ */
+interface AVPlayerItemSampleBufferOutputDelegate extends NSObjectProtocol {
+
+	outputMediaDataAvailable?(output: AVPlayerItemSampleBufferOutput): void;
+
+	outputSequenceWasRestarted?(output: AVPlayerItemSampleBufferOutput): void;
+}
+declare var AVPlayerItemSampleBufferOutputDelegate: {
+
+	prototype: AVPlayerItemSampleBufferOutputDelegate;
+};
+
+/**
  * @since 18.0
  */
 declare class AVPlayerItemSegment extends NSObject {
@@ -15405,13 +16217,13 @@ declare class AVPlayerItemSegment extends NSObject {
 
 	static new(): AVPlayerItemSegment; // inherited from NSObject
 
-	readonly interstitialEvent: AVPlayerInterstitialEvent;
+	readonly interstitialEvent: AVPlayerInterstitialEvent | null;
 
 	readonly loadedTimeRanges: NSArray<NSValue>;
 
 	readonly segmentType: AVPlayerItemSegmentType;
 
-	readonly startDate: Date;
+	readonly startDate: Date | null;
 
 	readonly timeMapping: CMTimeMapping;
 }
@@ -15454,7 +16266,7 @@ declare class AVPlayerItemTrack extends NSObject {
 
 	static new(): AVPlayerItemTrack; // inherited from NSObject
 
-	readonly assetTrack: AVAssetTrack;
+	readonly assetTrack: AVAssetTrack | null;
 
 	/**
 	 * @since 7.0
@@ -15473,31 +16285,31 @@ declare class AVPlayerItemVideoOutput extends AVPlayerItemOutput {
 
 	static new(): AVPlayerItemVideoOutput; // inherited from NSObject
 
-	readonly delegate: AVPlayerItemOutputPullDelegate;
+	readonly delegate: AVPlayerItemOutputPullDelegate | null;
 
-	readonly delegateQueue: NSObject & OS_dispatch_queue;
+	readonly delegateQueue: NSObject & OS_dispatch_queue | null;
 
 	/**
 	 * @since 10.0
 	 */
-	constructor(o: { outputSettings: NSDictionary<string, any>; });
+	constructor(o: { outputSettings: NSDictionary<string, any> | null; });
 
-	constructor(o: { pixelBufferAttributes: NSDictionary<string, any>; });
+	constructor(o: { pixelBufferAttributes: NSDictionary<string, any> | null; });
 
-	copyPixelBufferForItemTimeItemTimeForDisplay(itemTime: CMTime, outItemTimeForDisplay: interop.Pointer | interop.Reference<CMTime>): any;
+	copyPixelBufferForItemTimeItemTimeForDisplay(itemTime: CMTime, outItemTimeForDisplay: interop.Pointer | interop.Reference<CMTime> | ArrayBufferLike | ArrayBufferView | null): any | null;
 
 	hasNewPixelBufferForItemTime(itemTime: CMTime): boolean;
 
 	/**
 	 * @since 10.0
 	 */
-	initWithOutputSettings(outputSettings: NSDictionary<string, any>): this;
+	initWithOutputSettings(outputSettings: NSDictionary<string, any> | null): this;
 
-	initWithPixelBufferAttributes(pixelBufferAttributes: NSDictionary<string, any>): this;
+	initWithPixelBufferAttributes(pixelBufferAttributes: NSDictionary<string, any> | null): this;
 
 	requestNotificationOfMediaDataChangeWithAdvanceInterval(interval: number): void;
 
-	setDelegateQueue(delegate: AVPlayerItemOutputPullDelegate, delegateQueue: NSObject & OS_dispatch_queue): void;
+	setDelegateQueue(delegate: AVPlayerItemOutputPullDelegate | null, delegateQueue: NSObject & OS_dispatch_queue | null): void;
 }
 
 /**
@@ -15511,14 +16323,14 @@ declare class AVPlayerLayer extends CALayer {
 
 	static new(): AVPlayerLayer; // inherited from NSObject
 
-	static playerLayerWithPlayer(player: AVPlayer): AVPlayerLayer;
+	static playerLayerWithPlayer(player: AVPlayer | null): AVPlayerLayer;
 
 	/**
 	 * @since 9.0
 	 */
-	pixelBufferAttributes: NSDictionary<string, any>;
+	pixelBufferAttributes: NSDictionary<string, any> | null;
 
-	player: AVPlayer;
+	player: AVPlayer | null;
 
 	readonly readyForDisplay: boolean;
 
@@ -15532,7 +16344,17 @@ declare class AVPlayerLayer extends CALayer {
 	/**
 	 * @since 16.0
 	 */
-	copyDisplayedPixelBuffer(): any;
+	copyDisplayedPixelBuffer(): any | null;
+
+	/**
+	 * @since 26.4
+	 */
+	setCaptionPreviewProfileIDPositionText(profileID: string, position: CGPoint, text: string | null): void;
+
+	/**
+	 * @since 26.4
+	 */
+	stopShowingCaptionPreview(): void;
 }
 
 /**
@@ -15548,7 +16370,7 @@ declare class AVPlayerLooper extends NSObject {
 
 	static playerLooperWithPlayerTemplateItemTimeRange(player: AVQueuePlayer, itemToLoop: AVPlayerItem, loopRange: CMTimeRange): AVPlayerLooper;
 
-	readonly error: NSError;
+	readonly error: NSError | null;
 
 	readonly loopCount: number;
 
@@ -15603,28 +16425,28 @@ declare class AVPlayerMediaSelectionCriteria extends NSObject {
 
 	static new(): AVPlayerMediaSelectionCriteria; // inherited from NSObject
 
-	readonly preferredLanguages: NSArray<string>;
+	readonly preferredLanguages: NSArray<string> | null;
 
-	readonly preferredMediaCharacteristics: NSArray<string>;
-
-	/**
-	 * @since 12.0
-	 */
-	readonly principalMediaCharacteristics: NSArray<string>;
-
-	constructor(o: { preferredLanguages: NSArray<string> | string[]; preferredMediaCharacteristics: NSArray<string> | string[]; });
+	readonly preferredMediaCharacteristics: NSArray<string> | null;
 
 	/**
 	 * @since 12.0
 	 */
-	constructor(o: { principalMediaCharacteristics: NSArray<string> | string[]; preferredLanguages: NSArray<string> | string[]; preferredMediaCharacteristics: NSArray<string> | string[]; });
+	readonly principalMediaCharacteristics: NSArray<string> | null;
 
-	initWithPreferredLanguagesPreferredMediaCharacteristics(preferredLanguages: NSArray<string> | string[], preferredMediaCharacteristics: NSArray<string> | string[]): this;
+	constructor(o: { preferredLanguages: NSArray<string> | string[] | null; preferredMediaCharacteristics: NSArray<string> | string[] | null; });
 
 	/**
 	 * @since 12.0
 	 */
-	initWithPrincipalMediaCharacteristicsPreferredLanguagesPreferredMediaCharacteristics(principalMediaCharacteristics: NSArray<string> | string[], preferredLanguages: NSArray<string> | string[], preferredMediaCharacteristics: NSArray<string> | string[]): this;
+	constructor(o: { principalMediaCharacteristics: NSArray<string> | string[] | null; preferredLanguages: NSArray<string> | string[] | null; preferredMediaCharacteristics: NSArray<string> | string[] | null; });
+
+	initWithPreferredLanguagesPreferredMediaCharacteristics(preferredLanguages: NSArray<string> | string[] | null, preferredMediaCharacteristics: NSArray<string> | string[] | null): this;
+
+	/**
+	 * @since 12.0
+	 */
+	initWithPrincipalMediaCharacteristicsPreferredLanguagesPreferredMediaCharacteristics(principalMediaCharacteristics: NSArray<string> | string[] | null, preferredLanguages: NSArray<string> | string[] | null, preferredMediaCharacteristics: NSArray<string> | string[] | null): this;
 }
 
 /**
@@ -15648,19 +16470,19 @@ declare class AVPlayerPlaybackCoordinator extends AVPlaybackCoordinator {
 
 	static new(): AVPlayerPlaybackCoordinator; // inherited from NSObject
 
-	delegate: AVPlayerPlaybackCoordinatorDelegate;
+	delegate: AVPlayerPlaybackCoordinatorDelegate | null;
 
 	/**
 	 * @since 26.0
 	 */
-	readonly playbackCoordinationMedium: AVPlaybackCoordinationMedium;
+	readonly playbackCoordinationMedium: AVPlaybackCoordinationMedium | null;
 
-	readonly player: AVPlayer;
+	readonly player: AVPlayer | null;
 
 	/**
 	 * @since 26.0
 	 */
-	coordinateUsingCoordinationMediumError(coordinationMedium: AVPlaybackCoordinationMedium, error?: interop.Reference<NSError>): boolean;
+	coordinateUsingCoordinationMediumError(coordinationMedium: AVPlaybackCoordinationMedium | null, error?: interop.Reference<NSError>): boolean;
 }
 
 /**
@@ -15706,6 +16528,16 @@ declare var AVPlayerRateDidChangeReasonAudioSessionInterrupted: string;
 declare var AVPlayerRateDidChangeReasonKey: string;
 
 /**
+ * @since 26.4
+ */
+declare var AVPlayerRateDidChangeReasonPlayheadReachedLiveEdge: string;
+
+/**
+ * @since 26.4
+ */
+declare var AVPlayerRateDidChangeReasonReversePlaybackReachedStartOfSeekableRange: string;
+
+/**
  * @since 15.0
  */
 declare var AVPlayerRateDidChangeReasonSetRateCalled: string;
@@ -15747,7 +16579,7 @@ declare class AVPlayerVideoOutput extends NSObject {
 
 	constructor(o: { specification: AVVideoOutputSpecification; });
 
-	copyTaggedBufferGroupForHostTimePresentationTimeStampActiveConfiguration(hostTime: CMTime, presentationTimeStampOut: interop.Pointer | interop.Reference<CMTime>, activeConfigurationOut: interop.Pointer | interop.Reference<AVPlayerVideoOutputConfiguration>): any;
+	copyTaggedBufferGroupForHostTimePresentationTimeStampActiveConfiguration(hostTime: CMTime, presentationTimeStampOut: interop.Pointer | interop.Reference<CMTime> | ArrayBufferLike | ArrayBufferView | null, activeConfigurationOut: interop.Pointer | interop.Reference<AVPlayerVideoOutputConfiguration | null> | ArrayBufferLike | ArrayBufferView | null): any | null;
 
 	initWithSpecification(specification: AVVideoOutputSpecification): this;
 }
@@ -15770,7 +16602,7 @@ declare class AVPlayerVideoOutputConfiguration extends NSObject {
 	 */
 	readonly preferredTransform: CGAffineTransform;
 
-	readonly sourcePlayerItem: AVPlayerItem;
+	readonly sourcePlayerItem: AVPlayerItem | null;
 }
 
 /**
@@ -15813,12 +16645,51 @@ declare class AVPortraitEffectsMatte extends NSObject {
 
 	readonly pixelFormatType: number;
 
-	dictionaryRepresentationForAuxiliaryDataType(outAuxDataType: interop.Pointer | interop.Reference<string>): NSDictionary<any, any>;
+	dictionaryRepresentationForAuxiliaryDataType(outAuxDataType: interop.Pointer | interop.Reference<string | null> | ArrayBufferLike | ArrayBufferView | null): NSDictionary<any, any> | null;
 
 	portraitEffectsMatteByApplyingExifOrientation(exifOrientation: CGImagePropertyOrientation): this;
 
 	portraitEffectsMatteByReplacingPortraitEffectsMatteWithPixelBufferError(pixelBuffer: any, error?: interop.Reference<NSError>): this;
 }
+
+/**
+ * @since 27.0
+ */
+declare class AVProVideoStorage extends NSObject {
+
+	static alloc(): AVProVideoStorage; // inherited from NSObject
+
+	static new(): AVProVideoStorage; // inherited from NSObject
+
+	readonly busyReasons: NSSet<string>;
+
+	readonly initialCapacity: number;
+
+	readonly remainingCapacity: number;
+
+	static readonly sharedStorage: AVProVideoStorage | null;
+
+	static readonly supported: boolean;
+
+	openSettings(): void;
+
+	replenishCapacityWithCompletionHandler(completionHandler: (p1: number, p2: NSError | null) => void | null): void;
+}
+
+/**
+ * @since 27.0
+ */
+declare var AVProVideoStorageBusyReasonAdjustingCapacity: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVProVideoStorageBusyReasonCapturing: string;
+
+/**
+ * @since 27.0
+ */
+declare var AVProVideoStorageBusyReasonReplenishing: string;
 
 /**
  * @since 4.1
@@ -15829,7 +16700,7 @@ declare class AVQueuePlayer extends AVPlayer {
 
 	static new(): AVQueuePlayer; // inherited from NSObject
 
-	static playerWithPlayerItem(item: AVPlayerItem): AVQueuePlayer; // inherited from AVPlayer
+	static playerWithPlayerItem(item: AVPlayerItem | null): AVQueuePlayer; // inherited from AVPlayer
 
 	static playerWithURL(URL: NSURL): AVQueuePlayer; // inherited from AVPlayer
 
@@ -15839,11 +16710,11 @@ declare class AVQueuePlayer extends AVPlayer {
 
 	advanceToNextItem(): void;
 
-	canInsertItemAfterItem(item: AVPlayerItem, afterItem: AVPlayerItem): boolean;
+	canInsertItemAfterItem(item: AVPlayerItem, afterItem: AVPlayerItem | null): boolean;
 
 	initWithItems(items: NSArray<AVPlayerItem> | AVPlayerItem[]): this;
 
-	insertItemAfterItem(item: AVPlayerItem, afterItem: AVPlayerItem): void;
+	insertItemAfterItem(item: AVPlayerItem, afterItem: AVPlayerItem | null): void;
 
 	items(): NSArray<AVPlayerItem>;
 
@@ -15862,16 +16733,31 @@ interface AVQueuedSampleBufferRendering extends NSObjectProtocol {
 	 */
 	hasSufficientMediaDataForReliablePlaybackStart: boolean;
 
+	/**
+	 * @since 11.0
+	 */
 	readyForMoreMediaData: boolean;
 
 	timebase: any;
 
+	/**
+	 * @since 11.0
+	 */
 	enqueueSampleBuffer(sampleBuffer: any): void;
 
+	/**
+	 * @since 11.0
+	 */
 	flush(): void;
 
+	/**
+	 * @since 11.0
+	 */
 	requestMediaDataWhenReadyOnQueueUsingBlock(queue: NSObject & OS_dispatch_queue, block: () => void): void;
 
+	/**
+	 * @since 11.0
+	 */
 	stopRequestingMediaData(): void;
 }
 declare var AVQueuedSampleBufferRendering: {
@@ -15932,7 +16818,7 @@ declare var AVRouteDetectorMultipleRoutesDetectedDidChangeNotification: string;
 /**
  * @since 14.5
  */
-declare function AVSampleBufferAttachContentKey(sbuf: any, contentKey: AVContentKey, outError: interop.Pointer | interop.Reference<NSError>): boolean;
+declare function AVSampleBufferAttachContentKey(sbuf: any, contentKey: AVContentKey, outError: interop.Pointer | interop.Reference<NSError | null> | ArrayBufferLike | ArrayBufferView | null): boolean;
 
 /**
  * @since 11.0
@@ -15950,10 +16836,16 @@ declare class AVSampleBufferAudioRenderer extends NSObject implements AVQueuedSa
 
 	audioTimePitchAlgorithm: string;
 
-	readonly error: NSError;
+	/**
+	 * @since 11.0
+	 */
+	readonly error: NSError | null;
 
 	muted: boolean;
 
+	/**
+	 * @since 11.0
+	 */
 	readonly status: AVQueuedSampleBufferRenderingStatus;
 
 	volume: number;
@@ -15971,6 +16863,9 @@ declare class AVSampleBufferAudioRenderer extends NSObject implements AVQueuedSa
 
 	readonly isProxy: boolean; // inherited from NSObjectProtocol
 
+	/**
+	 * @since 11.0
+	 */
 	readonly readyForMoreMediaData: boolean; // inherited from AVQueuedSampleBufferRendering
 
 	readonly superclass: typeof NSObject; // inherited from NSObjectProtocol
@@ -15983,10 +16878,19 @@ declare class AVSampleBufferAudioRenderer extends NSObject implements AVQueuedSa
 
 	conformsToProtocol(aProtocol: any /* Protocol */): boolean;
 
+	/**
+	 * @since 11.0
+	 */
 	enqueueSampleBuffer(sampleBuffer: any): void;
 
+	/**
+	 * @since 11.0
+	 */
 	flush(): void;
 
+	/**
+	 * @since 11.0
+	 */
 	flushFromSourceTimeCompletionHandler(time: CMTime, completionHandler: (p1: boolean) => void): void;
 
 	isEqual(object: any): boolean;
@@ -16001,6 +16905,9 @@ declare class AVSampleBufferAudioRenderer extends NSObject implements AVQueuedSa
 
 	performSelectorWithObjectWithObject(aSelector: string, object1: any, object2: any): any;
 
+	/**
+	 * @since 11.0
+	 */
 	requestMediaDataWhenReadyOnQueueUsingBlock(queue: NSObject & OS_dispatch_queue, block: () => void): void;
 
 	respondsToSelector(aSelector: string): boolean;
@@ -16009,6 +16916,9 @@ declare class AVSampleBufferAudioRenderer extends NSObject implements AVQueuedSa
 
 	self(): this;
 
+	/**
+	 * @since 11.0
+	 */
 	stopRequestingMediaData(): void;
 }
 
@@ -16038,13 +16948,13 @@ declare class AVSampleBufferDisplayLayer extends CALayer implements AVQueuedSamp
 
 	static new(): AVSampleBufferDisplayLayer; // inherited from NSObject
 
-	controlTimebase: any;
+	controlTimebase: any | null;
 
 	/**
 	 * @since 8.0
 	 * @deprecated 18.0
 	 */
-	readonly error: NSError;
+	readonly error: NSError | null;
 
 	/**
 	 * @since 14.5
@@ -16098,6 +17008,9 @@ declare class AVSampleBufferDisplayLayer extends CALayer implements AVQueuedSamp
 
 	readonly isProxy: boolean; // inherited from NSObjectProtocol
 
+	/**
+	 * @since 11.0
+	 */
 	readonly readyForMoreMediaData: boolean; // inherited from AVQueuedSampleBufferRendering
 
 	readonly superclass: typeof NSObject; // inherited from NSObjectProtocol
@@ -16110,8 +17023,14 @@ declare class AVSampleBufferDisplayLayer extends CALayer implements AVQueuedSamp
 
 	conformsToProtocol(aProtocol: any /* Protocol */): boolean;
 
+	/**
+	 * @since 11.0
+	 */
 	enqueueSampleBuffer(sampleBuffer: any): void;
 
+	/**
+	 * @since 11.0
+	 */
 	flush(): void;
 
 	/**
@@ -16132,6 +17051,9 @@ declare class AVSampleBufferDisplayLayer extends CALayer implements AVQueuedSamp
 
 	performSelectorWithObjectWithObject(aSelector: string, object1: any, object2: any): any;
 
+	/**
+	 * @since 11.0
+	 */
 	requestMediaDataWhenReadyOnQueueUsingBlock(queue: NSObject & OS_dispatch_queue, block: () => void): void;
 
 	respondsToSelector(aSelector: string): boolean;
@@ -16140,6 +17062,9 @@ declare class AVSampleBufferDisplayLayer extends CALayer implements AVQueuedSamp
 
 	self(): this;
 
+	/**
+	 * @since 11.0
+	 */
 	stopRequestingMediaData(): void;
 }
 
@@ -16177,21 +17102,21 @@ declare class AVSampleBufferGenerator extends NSObject {
 
 	static new(): AVSampleBufferGenerator; // inherited from NSObject
 
-	static notifyOfDataReadyForSampleBufferCompletionHandler(sbuf: any, completionHandler: (p1: boolean, p2: NSError) => void): void;
+	static notifyOfDataReadyForSampleBufferCompletionHandler(sbuf: any, completionHandler: (p1: boolean, p2: NSError | null) => void): void;
 
-	constructor(o: { asset: AVAsset; timebase: any; });
-
-	/**
-	 * @since 16.0
-	 */
-	createSampleBufferForRequestAddingToBatchError(request: AVSampleBufferRequest, batch: AVSampleBufferGeneratorBatch, error?: interop.Reference<NSError>): any;
+	constructor(o: { asset: AVAsset; timebase: any | null; });
 
 	/**
 	 * @since 16.0
 	 */
-	createSampleBufferForRequestError(request: AVSampleBufferRequest, error?: interop.Reference<NSError>): any;
+	createSampleBufferForRequestAddingToBatchError(request: AVSampleBufferRequest, batch: AVSampleBufferGeneratorBatch, error?: interop.Reference<NSError>): any | null;
 
-	initWithAssetTimebase(asset: AVAsset, timebase: any): this;
+	/**
+	 * @since 16.0
+	 */
+	createSampleBufferForRequestError(request: AVSampleBufferRequest, error?: interop.Reference<NSError>): any | null;
+
+	initWithAssetTimebase(asset: AVAsset, timebase: any | null): this;
 
 	/**
 	 * @since 16.0
@@ -16210,7 +17135,7 @@ declare class AVSampleBufferGeneratorBatch extends NSObject {
 
 	cancel(): void;
 
-	makeDataReadyWithCompletionHandler(completionHandler: (p1: NSError) => void): void;
+	makeDataReadyWithCompletionHandler(completionHandler: (p1: NSError | null) => void): void;
 }
 
 /**
@@ -16233,9 +17158,9 @@ declare class AVSampleBufferRenderSynchronizer extends NSObject {
 
 	readonly timebase: any;
 
-	addBoundaryTimeObserverForTimesQueueUsingBlock(times: NSArray<NSValue> | NSValue[], queue: NSObject & OS_dispatch_queue, block: () => void): any;
+	addBoundaryTimeObserverForTimesQueueUsingBlock(times: NSArray<NSValue> | NSValue[], queue: NSObject & OS_dispatch_queue | null, block: () => void): any;
 
-	addPeriodicTimeObserverForIntervalQueueUsingBlock(interval: CMTime, queue: NSObject & OS_dispatch_queue, block: (p1: CMTime) => void): any;
+	addPeriodicTimeObserverForIntervalQueueUsingBlock(interval: CMTime, queue: NSObject & OS_dispatch_queue | null, block: (p1: CMTime) => void): any;
 
 	addRenderer(renderer: AVQueuedSampleBufferRendering): void;
 
@@ -16244,7 +17169,7 @@ declare class AVSampleBufferRenderSynchronizer extends NSObject {
 	 */
 	currentTime(): CMTime;
 
-	removeRendererAtTimeCompletionHandler(renderer: AVQueuedSampleBufferRendering, time: CMTime, completionHandler: (p1: boolean) => void): void;
+	removeRendererAtTimeCompletionHandler(renderer: AVQueuedSampleBufferRendering, time: CMTime, completionHandler: (p1: boolean) => void | null): void;
 
 	removeTimeObserver(observer: any): void;
 
@@ -16272,7 +17197,7 @@ declare class AVSampleBufferRequest extends NSObject {
 
 	direction: AVSampleBufferRequestDirection;
 
-	limitCursor: AVSampleCursor;
+	limitCursor: AVSampleCursor | null;
 
 	maxSampleCount: number;
 
@@ -16316,15 +17241,24 @@ declare class AVSampleBufferVideoRenderer extends NSObject implements AVQueuedSa
 
 	static new(): AVSampleBufferVideoRenderer; // inherited from NSObject
 
-	readonly error: NSError;
+	/**
+	 * @since 17.0
+	 */
+	readonly error: NSError | null;
 
 	/**
 	 * @since 26.0
 	 */
 	readonly recommendedPixelBufferAttributes: NSDictionary<string, any>;
 
+	/**
+	 * @since 17.0
+	 */
 	readonly requiresFlushToResumeDecoding: boolean;
 
+	/**
+	 * @since 17.0
+	 */
 	readonly status: AVQueuedSampleBufferRenderingStatus;
 
 	readonly debugDescription: string; // inherited from NSObjectProtocol
@@ -16340,6 +17274,9 @@ declare class AVSampleBufferVideoRenderer extends NSObject implements AVQueuedSa
 
 	readonly isProxy: boolean; // inherited from NSObjectProtocol
 
+	/**
+	 * @since 11.0
+	 */
 	readonly readyForMoreMediaData: boolean; // inherited from AVQueuedSampleBufferRendering
 
 	readonly superclass: typeof NSObject; // inherited from NSObjectProtocol
@@ -16355,8 +17292,11 @@ declare class AVSampleBufferVideoRenderer extends NSObject implements AVQueuedSa
 	/**
 	 * @since 17.4
 	 */
-	copyDisplayedPixelBuffer(): any;
+	copyDisplayedPixelBuffer(): any | null;
 
+	/**
+	 * @since 11.0
+	 */
 	enqueueSampleBuffer(sampleBuffer: any): void;
 
 	/**
@@ -16369,9 +17309,15 @@ declare class AVSampleBufferVideoRenderer extends NSObject implements AVQueuedSa
 	 */
 	expectMonotonicallyIncreasingUpcomingSampleBufferPresentationTimes(): void;
 
+	/**
+	 * @since 11.0
+	 */
 	flush(): void;
 
-	flushWithRemovalOfDisplayedImageCompletionHandler(removeDisplayedImage: boolean, handler: () => void): void;
+	/**
+	 * @since 17.0
+	 */
+	flushWithRemovalOfDisplayedImageCompletionHandler(removeDisplayedImage: boolean, handler: () => void | null): void;
 
 	isEqual(object: any): boolean;
 
@@ -16390,6 +17336,9 @@ declare class AVSampleBufferVideoRenderer extends NSObject implements AVQueuedSa
 
 	performSelectorWithObjectWithObject(aSelector: string, object1: any, object2: any): any;
 
+	/**
+	 * @since 11.0
+	 */
 	requestMediaDataWhenReadyOnQueueUsingBlock(queue: NSObject & OS_dispatch_queue, block: () => void): void;
 
 	/**
@@ -16403,6 +17352,9 @@ declare class AVSampleBufferVideoRenderer extends NSObject implements AVQueuedSa
 
 	self(): this;
 
+	/**
+	 * @since 11.0
+	 */
 	stopRequestingMediaData(): void;
 }
 
@@ -16422,6 +17374,11 @@ declare var AVSampleBufferVideoRendererDidFailToDecodeNotificationErrorKey: stri
 declare var AVSampleBufferVideoRendererRequiresFlushToResumeDecodingDidChangeNotification: string;
 
 /**
+ * @since 27.0
+ */
+declare var AVSampleBufferVideoRendererRequiresFlushToResumeDecodingDidChangeNotificationRequiresFlushKey: string;
+
+/**
  * @since 16.0
  */
 declare class AVSampleCursor extends NSObject implements NSCopying {
@@ -16434,7 +17391,7 @@ declare class AVSampleCursor extends NSObject implements NSCopying {
 
 	readonly currentChunkStorageRange: AVSampleCursorStorageRange;
 
-	readonly currentChunkStorageURL: NSURL;
+	readonly currentChunkStorageURL: NSURL | null;
 
 	/**
 	 * @since 16.0
@@ -16444,7 +17401,7 @@ declare class AVSampleCursor extends NSObject implements NSCopying {
 	/**
 	 * @since 16.0
 	 */
-	readonly currentSampleDependencyAttachments: NSDictionary<any, any>;
+	readonly currentSampleDependencyAttachments: NSDictionary<any, any> | null;
 
 	readonly currentSampleDependencyInfo: AVSampleCursorDependencyInfo;
 
@@ -16469,15 +17426,15 @@ declare class AVSampleCursor extends NSObject implements NSCopying {
 
 	copyCurrentSampleFormatDescription(): any;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	samplesWithEarlierDecodeTimeStampsMayHaveLaterPresentationTimeStampsThanCursor(cursor: AVSampleCursor): boolean;
 
 	samplesWithLaterDecodeTimeStampsMayHaveEarlierPresentationTimeStampsThanCursor(cursor: AVSampleCursor): boolean;
 
-	stepByDecodeTimeWasPinned(deltaDecodeTime: CMTime, outWasPinned: interop.Pointer | interop.Reference<boolean>): CMTime;
+	stepByDecodeTimeWasPinned(deltaDecodeTime: CMTime, outWasPinned: interop.Pointer | interop.Reference<boolean> | ArrayBufferLike | ArrayBufferView | null): CMTime;
 
-	stepByPresentationTimeWasPinned(deltaPresentationTime: CMTime, outWasPinned: interop.Pointer | interop.Reference<boolean>): CMTime;
+	stepByPresentationTimeWasPinned(deltaPresentationTime: CMTime, outWasPinned: interop.Pointer | interop.Reference<boolean> | ArrayBufferLike | ArrayBufferView | null): CMTime;
 
 	stepInDecodeOrderByCount(stepCount: number): number;
 
@@ -16538,7 +17495,7 @@ declare class AVSemanticSegmentationMatte extends NSObject {
 
 	readonly pixelFormatType: number;
 
-	dictionaryRepresentationForAuxiliaryDataType(outAuxDataType: interop.Pointer | interop.Reference<string>): NSDictionary<any, any>;
+	dictionaryRepresentationForAuxiliaryDataType(outAuxDataType: interop.Pointer | interop.Reference<string | null> | ArrayBufferLike | ArrayBufferView | null): NSDictionary<any, any> | null;
 
 	semanticSegmentationMatteByApplyingExifOrientation(exifOrientation: CGImagePropertyOrientation): this;
 
@@ -16584,13 +17541,13 @@ declare class AVSpatialVideoConfiguration extends NSObject {
 
 	static new(): AVSpatialVideoConfiguration; // inherited from NSObject
 
-	cameraCalibrationDataLensCollection: NSArray<NSDictionary<string, any>>;
+	cameraCalibrationDataLensCollection: NSArray<NSDictionary<string, any>> | null;
 
-	cameraSystemBaseline: number;
+	cameraSystemBaseline: number | null;
 
-	disparityAdjustment: number;
+	disparityAdjustment: number | null;
 
-	horizontalFieldOfView: number;
+	horizontalFieldOfView: number | null;
 
 	constructor(o: { formatDescription: any; });
 
@@ -16620,7 +17577,7 @@ declare class AVSynchronizedLayer extends CALayer {
 
 	static synchronizedLayerWithPlayerItem(playerItem: AVPlayerItem): AVSynchronizedLayer;
 
-	playerItem: AVPlayerItem;
+	playerItem: AVPlayerItem | null;
 }
 
 /**
@@ -16634,25 +17591,25 @@ declare class AVTextStyleRule extends NSObject implements NSCopying {
 
 	static propertyListForTextStyleRules(textStyleRules: NSArray<AVTextStyleRule> | AVTextStyleRule[]): any;
 
-	static textStyleRuleWithTextMarkupAttributes(textMarkupAttributes: NSDictionary<string, any>): AVTextStyleRule;
+	static textStyleRuleWithTextMarkupAttributes(textMarkupAttributes: NSDictionary<string, any>): AVTextStyleRule | null;
 
-	static textStyleRuleWithTextMarkupAttributesTextSelector(textMarkupAttributes: NSDictionary<string, any>, textSelector: string): AVTextStyleRule;
+	static textStyleRuleWithTextMarkupAttributesTextSelector(textMarkupAttributes: NSDictionary<string, any>, textSelector: string | null): AVTextStyleRule | null;
 
-	static textStyleRulesFromPropertyList(plist: any): NSArray<AVTextStyleRule>;
+	static textStyleRulesFromPropertyList(plist: any): NSArray<AVTextStyleRule> | null;
 
 	readonly textMarkupAttributes: NSDictionary<string, any>;
 
-	readonly textSelector: string;
+	readonly textSelector: string | null;
 
 	constructor(o: { textMarkupAttributes: NSDictionary<string, any>; });
 
-	constructor(o: { textMarkupAttributes: NSDictionary<string, any>; textSelector: string; });
+	constructor(o: { textMarkupAttributes: NSDictionary<string, any>; textSelector: string | null; });
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	initWithTextMarkupAttributes(textMarkupAttributes: NSDictionary<string, any>): this;
 
-	initWithTextMarkupAttributesTextSelector(textMarkupAttributes: NSDictionary<string, any>, textSelector: string): this;
+	initWithTextMarkupAttributesTextSelector(textMarkupAttributes: NSDictionary<string, any>, textSelector: string | null): this;
 }
 
 /**
@@ -16676,9 +17633,9 @@ declare class AVTimedMetadataGroup extends AVMetadataGroup implements NSCopying,
 	/**
 	 * @since 8.0
 	 */
-	copyFormatDescription(): any;
+	copyFormatDescription(): any | null;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	initWithItemsTimeRange(items: NSArray<AVMetadataItem> | AVMetadataItem[], timeRange: CMTimeRange): this;
 
@@ -16687,7 +17644,7 @@ declare class AVTimedMetadataGroup extends AVMetadataGroup implements NSCopying,
 	 */
 	initWithSampleBuffer(sampleBuffer: any): this;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -16730,7 +17687,7 @@ declare var AVTrackAssociationTypeTimecode: string;
  */
 declare class AVURLAsset extends AVAsset implements AVContentKeyRecipient, NSItemProviderReading, NSItemProviderWriting {
 
-	static URLAssetWithURLOptions(URL: NSURL, options: NSDictionary<string, any>): AVURLAsset;
+	static URLAssetWithURLOptions(URL: NSURL, options: NSDictionary<string, any> | null): AVURLAsset;
 
 	static alloc(): AVURLAsset; // inherited from NSObject
 
@@ -16743,7 +17700,7 @@ declare class AVURLAsset extends AVAsset implements AVContentKeyRecipient, NSIte
 
 	/**
 	 * @since 5.0
-	 * @deprecated 100000
+	 * @deprecated 27.0
 	 */
 	static audiovisualTypes(): NSArray<string>;
 
@@ -16763,7 +17720,7 @@ declare class AVURLAsset extends AVAsset implements AVContentKeyRecipient, NSIte
 	/**
 	 * @since 10.0
 	 */
-	readonly assetCache: AVAssetCache;
+	readonly assetCache: AVAssetCache | null;
 
 	/**
 	 * @since 16.0
@@ -16805,7 +17762,7 @@ declare class AVURLAsset extends AVAsset implements AVContentKeyRecipient, NSIte
 
 	static readonly writableTypeIdentifiersForItemProvider: NSArray<string>; // inherited from NSItemProviderWriting
 
-	constructor(o: { URL: NSURL; options: NSDictionary<string, any>; });
+	constructor(o: { URL: NSURL; options: NSDictionary<string, any> | null; });
 
 	class(): typeof NSObject;
 
@@ -16813,7 +17770,7 @@ declare class AVURLAsset extends AVAsset implements AVContentKeyRecipient, NSIte
 	 * @since 4.0
 	 * @deprecated 18.0
 	 */
-	compatibleTrackForCompositionTrack(compositionTrack: AVCompositionTrack): AVAssetTrack;
+	compatibleTrackForCompositionTrack(compositionTrack: AVCompositionTrack): AVAssetTrack | null;
 
 	conformsToProtocol(aProtocol: any /* Protocol */): boolean;
 
@@ -16825,9 +17782,9 @@ declare class AVURLAsset extends AVAsset implements AVContentKeyRecipient, NSIte
 	/**
 	 * @since 15.0
 	 */
-	findCompatibleTrackForCompositionTrackCompletionHandler(compositionTrack: AVCompositionTrack, completionHandler: (p1: AVAssetTrack, p2: NSError) => void): void;
+	findCompatibleTrackForCompositionTrackCompletionHandler(compositionTrack: AVCompositionTrack, completionHandler: (p1: AVAssetTrack, p2: NSError | null) => void): void;
 
-	initWithURLOptions(URL: NSURL, options: NSDictionary<string, any>): this;
+	initWithURLOptions(URL: NSURL, options: NSDictionary<string, any> | null): this;
 
 	isEqual(object: any): boolean;
 
@@ -16837,7 +17794,7 @@ declare class AVURLAsset extends AVAsset implements AVContentKeyRecipient, NSIte
 
 	itemProviderVisibilityForRepresentationWithTypeIdentifier(typeIdentifier: string): NSItemProviderRepresentationVisibility;
 
-	loadDataWithTypeIdentifierForItemProviderCompletionHandler(typeIdentifier: string, completionHandler: (p1: NSData, p2: NSError) => void): NSProgress;
+	loadDataWithTypeIdentifierForItemProviderCompletionHandler(typeIdentifier: string, completionHandler: (p1: NSData | null, p2: NSError | null) => void): NSProgress | null;
 
 	performSelector(aSelector: string): any;
 
@@ -17112,7 +18069,7 @@ interface AVVideoCompositing extends NSObjectProtocol {
 
 	requiredPixelBufferAttributesForRenderContext: NSDictionary<string, any>;
 
-	sourcePixelBufferAttributes: NSDictionary<string, any>;
+	sourcePixelBufferAttributes: NSDictionary<string, any> | null;
 
 	/**
 	 * @since 14.0
@@ -17168,7 +18125,7 @@ declare class AVVideoComposition extends NSObject implements NSCopying, NSMutabl
 	/**
 	 * @since 16.0
 	 */
-	static videoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandler(asset: AVAsset, applier: (p1: AVAsynchronousCIImageFilteringRequest) => void, completionHandler: (p1: AVVideoComposition, p2: NSError) => void): void;
+	static videoCompositionWithAssetApplyingCIFiltersWithHandlerCompletionHandler(asset: AVAsset, applier: (p1: AVAsynchronousCIImageFilteringRequest) => void, completionHandler: (p1: AVVideoComposition | null, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 6.0
@@ -17179,29 +18136,29 @@ declare class AVVideoComposition extends NSObject implements NSCopying, NSMutabl
 	/**
 	 * @since 16.0
 	 */
-	static videoCompositionWithPropertiesOfAssetCompletionHandler(asset: AVAsset, completionHandler: (p1: AVVideoComposition, p2: NSError) => void): void;
+	static videoCompositionWithPropertiesOfAssetCompletionHandler(asset: AVAsset, completionHandler: (p1: AVVideoComposition | null, p2: NSError | null) => void): void;
 
-	readonly animationTool: AVVideoCompositionCoreAnimationTool;
-
-	/**
-	 * @since 10.0
-	 */
-	readonly colorPrimaries: string;
+	readonly animationTool: AVVideoCompositionCoreAnimationTool | null;
 
 	/**
 	 * @since 10.0
 	 */
-	readonly colorTransferFunction: string;
+	readonly colorPrimaries: string | null;
 
 	/**
 	 * @since 10.0
 	 */
-	readonly colorYCbCrMatrix: string;
+	readonly colorTransferFunction: string | null;
+
+	/**
+	 * @since 10.0
+	 */
+	readonly colorYCbCrMatrix: string | null;
 
 	/**
 	 * @since 7.0
 	 */
-	readonly customVideoCompositorClass: typeof NSObject;
+	readonly customVideoCompositorClass: typeof NSObject | null;
 
 	readonly frameDuration: CMTime;
 
@@ -17210,7 +18167,7 @@ declare class AVVideoComposition extends NSObject implements NSCopying, NSMutabl
 	/**
 	 * @since 26.0
 	 */
-	readonly outputBufferDescription: NSArray<any>;
+	readonly outputBufferDescription: NSArray<any> | null;
 
 	/**
 	 * @since 17.0
@@ -17239,26 +18196,26 @@ declare class AVVideoComposition extends NSObject implements NSCopying, NSMutabl
 	 */
 	readonly spatialVideoConfigurations: NSArray<AVSpatialVideoConfiguration>;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	/**
 	 * @since 16.0
 	 * @deprecated 18.0
 	 */
-	determineValidityForAssetTimeRangeValidationDelegateCompletionHandler(asset: AVAsset, timeRange: CMTimeRange, validationDelegate: AVVideoCompositionValidationHandling, completionHandler: (p1: boolean, p2: NSError) => void): void;
+	determineValidityForAssetTimeRangeValidationDelegateCompletionHandler(asset: AVAsset | null, timeRange: CMTimeRange, validationDelegate: AVVideoCompositionValidationHandling | null, completionHandler: (p1: boolean, p2: NSError | null) => void): void;
 
 	/**
 	 * @since 5.0
 	 * @deprecated 18.0
 	 */
-	isValidForAssetTimeRangeValidationDelegate(asset: AVAsset, timeRange: CMTimeRange, validationDelegate: AVVideoCompositionValidationHandling): boolean;
+	isValidForAssetTimeRangeValidationDelegate(asset: AVAsset | null, timeRange: CMTimeRange, validationDelegate: AVVideoCompositionValidationHandling | null): boolean;
 
 	/**
 	 * @since 18.0
 	 */
-	isValidForTracksAssetDurationTimeRangeValidationDelegate(tracks: NSArray<AVAssetTrack> | AVAssetTrack[], duration: CMTime, timeRange: CMTimeRange, validationDelegate: AVVideoCompositionValidationHandling): boolean;
+	isValidForTracksAssetDurationTimeRangeValidationDelegate(tracks: NSArray<AVAssetTrack> | AVAssetTrack[], duration: CMTime, timeRange: CMTimeRange, validationDelegate: AVVideoCompositionValidationHandling | null): boolean;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -17289,7 +18246,7 @@ declare class AVVideoCompositionInstruction extends NSObject implements AVVideoC
 
 	static new(): AVVideoCompositionInstruction; // inherited from NSObject
 
-	readonly backgroundColor: any;
+	readonly backgroundColor: any | null;
 
 	readonly layerInstructions: NSArray<AVVideoCompositionLayerInstruction>;
 
@@ -17312,7 +18269,7 @@ declare class AVVideoCompositionInstruction extends NSObject implements AVVideoC
 	 */
 	readonly requiredSourceSampleDataTrackIDs: NSArray<number>; // inherited from AVVideoCompositionInstructionProtocol
 
-	readonly requiredSourceTrackIDs: NSArray<NSValue>; // inherited from AVVideoCompositionInstructionProtocol
+	readonly requiredSourceTrackIDs: NSArray<NSValue> | null; // inherited from AVVideoCompositionInstructionProtocol
 
 	readonly superclass: typeof NSObject; // inherited from NSObjectProtocol
 
@@ -17328,7 +18285,7 @@ declare class AVVideoCompositionInstruction extends NSObject implements AVVideoC
 
 	conformsToProtocol(aProtocol: any /* Protocol */): boolean;
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
@@ -17340,7 +18297,7 @@ declare class AVVideoCompositionInstruction extends NSObject implements AVVideoC
 
 	isMemberOfClass(aClass: typeof NSObject): boolean;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	performSelector(aSelector: string): any;
 
@@ -17371,7 +18328,7 @@ interface AVVideoCompositionInstructionProtocol extends NSObjectProtocol {
 	 */
 	requiredSourceSampleDataTrackIDs?: NSArray<number>;
 
-	requiredSourceTrackIDs: NSArray<NSValue>;
+	requiredSourceTrackIDs: NSArray<NSValue> | null;
 
 	timeRange: CMTimeRange;
 }
@@ -17395,22 +18352,22 @@ declare class AVVideoCompositionLayerInstruction extends NSObject implements NSC
 
 	constructor(o: { coder: NSCoder; }); // inherited from NSCoding
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	encodeWithCoder(coder: NSCoder): void;
 
 	/**
 	 * @since 7.0
 	 */
-	getCropRectangleRampForTimeStartCropRectangleEndCropRectangleTimeRange(time: CMTime, startCropRectangle: interop.Pointer | interop.Reference<CGRect>, endCropRectangle: interop.Pointer | interop.Reference<CGRect>, timeRange: interop.Pointer | interop.Reference<CMTimeRange>): boolean;
+	getCropRectangleRampForTimeStartCropRectangleEndCropRectangleTimeRange(time: CMTime, startCropRectangle: interop.Pointer | interop.Reference<CGRect> | ArrayBufferLike | ArrayBufferView | null, endCropRectangle: interop.Pointer | interop.Reference<CGRect> | ArrayBufferLike | ArrayBufferView | null, timeRange: interop.Pointer | interop.Reference<CMTimeRange> | ArrayBufferLike | ArrayBufferView | null): boolean;
 
-	getOpacityRampForTimeStartOpacityEndOpacityTimeRange(time: CMTime, startOpacity: interop.Pointer | interop.Reference<number>, endOpacity: interop.Pointer | interop.Reference<number>, timeRange: interop.Pointer | interop.Reference<CMTimeRange>): boolean;
+	getOpacityRampForTimeStartOpacityEndOpacityTimeRange(time: CMTime, startOpacity: interop.Pointer | interop.Reference<number> | ArrayBufferLike | ArrayBufferView | null, endOpacity: interop.Pointer | interop.Reference<number> | ArrayBufferLike | ArrayBufferView | null, timeRange: interop.Pointer | interop.Reference<CMTimeRange> | ArrayBufferLike | ArrayBufferView | null): boolean;
 
-	getTransformRampForTimeStartTransformEndTransformTimeRange(time: CMTime, startTransform: interop.Pointer | interop.Reference<CGAffineTransform>, endTransform: interop.Pointer | interop.Reference<CGAffineTransform>, timeRange: interop.Pointer | interop.Reference<CMTimeRange>): boolean;
+	getTransformRampForTimeStartTransformEndTransformTimeRange(time: CMTime, startTransform: interop.Pointer | interop.Reference<CGAffineTransform> | ArrayBufferLike | ArrayBufferView | null, endTransform: interop.Pointer | interop.Reference<CGAffineTransform> | ArrayBufferLike | ArrayBufferView | null, timeRange: interop.Pointer | interop.Reference<CMTimeRange> | ArrayBufferLike | ArrayBufferView | null): boolean;
 
 	initWithCoder(coder: NSCoder): this;
 
-	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	mutableCopyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 }
 
 /**
@@ -17446,7 +18403,7 @@ declare class AVVideoCompositionRenderContext extends NSObject {
 
 	readonly videoComposition: AVVideoComposition;
 
-	newPixelBuffer(): any;
+	newPixelBuffer(): any | null;
 }
 
 /**
@@ -17529,6 +18486,21 @@ declare var AVVideoH264EntropyModeKey: string;
 declare var AVVideoHeightKey: string;
 
 /**
+ * @since 27
+ */
+declare var AVVideoLogTransferFunctionKey: string;
+
+/**
+ * @since 27
+ */
+declare var AVVideoLogTransferFunction_AppleLog: string;
+
+/**
+ * @since 27
+ */
+declare var AVVideoLogTransferFunction_AppleLog2: string;
+
+/**
  * @since 7.0
  */
 declare var AVVideoMaxKeyFrameIntervalDurationKey: string;
@@ -17550,32 +18522,32 @@ declare class AVVideoOutputSpecification extends NSObject implements NSCopying {
 	/**
 	 * @since 18.0
 	 */
-	defaultOutputSettings: NSDictionary<string, any>;
+	defaultOutputSettings: NSDictionary<string, any> | null;
 
 	/**
 	 * @since 17.2
-	 * @deprecated 100000
+	 * @deprecated 27.0
 	 */
-	defaultPixelBufferAttributes: NSDictionary<string, any>;
+	defaultPixelBufferAttributes: NSDictionary<string, any> | null;
 
 	readonly preferredTagCollections: NSArray<any>;
 
 	constructor(o: { tagCollections: NSArray<any> | any[]; });
 
-	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
+	copyWithZone(zone: interop.Pointer | interop.Reference<any> | ArrayBufferLike | ArrayBufferView | null): any;
 
 	initWithTagCollections(tagCollections: NSArray<any> | any[]): this;
 
 	/**
 	 * @since 17.2
-	 * @deprecated 100000
+	 * @deprecated 27.0
 	 */
-	setOutputPixelBufferAttributesForTagCollection(pixelBufferAttributes: NSDictionary<string, any>, tagCollection: any): void;
+	setOutputPixelBufferAttributesForTagCollection(pixelBufferAttributes: NSDictionary<string, any> | null, tagCollection: any): void;
 
 	/**
 	 * @since 18.0
 	 */
-	setOutputSettingsForTagCollection(outputSettings: NSDictionary<string, any>, tagCollection: any): void;
+	setOutputSettingsForTagCollection(outputSettings: NSDictionary<string, any> | null, tagCollection: any): void;
 }
 
 /**
@@ -17797,7 +18769,7 @@ declare class AVZoomRange extends NSObject {
 /**
  * @since 17.2
  */
-declare function CMTagCollectionCreateWithVideoOutputPreset(allocator: any, preset: CMTagCollectionVideoOutputPreset, newCollectionOut: interop.Pointer | interop.Reference<any>): number;
+declare function CMTagCollectionCreateWithVideoOutputPreset(allocator: any | null, preset: CMTagCollectionVideoOutputPreset, newCollectionOut: interop.Pointer | interop.Reference<any | null> | ArrayBufferLike | ArrayBufferView): number;
 
 /**
  * @since 17.2

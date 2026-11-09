@@ -1,6 +1,6 @@
 import type { NativeScriptUIView } from '../../utils';
 import { supportsGlass } from '../../../utils/constants';
-import { type GlassEffectType, type GlassEffectVariant, iosGlassEffectProperty, View } from '../../core/view';
+import { type GlassEffectType, type GlassEffectVariant, iosGlassEffectProperty, IOSHelper, View } from '../../core/view';
 import { LiquidGlassCommon } from './liquid-glass-common';
 
 export class LiquidGlass extends LiquidGlassCommon {
@@ -35,11 +35,7 @@ export class LiquidGlass extends LiquidGlassCommon {
 		const childNativeView: NativeScriptUIView = <NativeScriptUIView>child.nativeViewProtected;
 
 		if (parentNativeView && childNativeView) {
-			if (typeof atIndex !== 'number' || atIndex >= parentNativeView.subviews.count) {
-				parentNativeView.addSubview(childNativeView);
-			} else {
-				parentNativeView.insertSubviewAtIndex(childNativeView, atIndex);
-			}
+			IOSHelper.insertNativeSubview(parentNativeView, childNativeView, atIndex);
 
 			// If the child has an outer shadow layer, ensure it is attached under the child's layer
 			if (childNativeView.outerShadowContainerLayer && !childNativeView.outerShadowContainerLayer.superlayer) {
@@ -50,44 +46,6 @@ export class LiquidGlass extends LiquidGlassCommon {
 		}
 
 		return false;
-	}
-
-	public onMeasure(widthMeasureSpec: number, heightMeasureSpec: number): void {
-		// When LiquidGlass is a child of FlexboxLayout (or any layout that passes a child
-		// measure spec already reduced by the child's padding), GridLayout.onMeasure would
-		// subtract our padding a second time. To prevent this double-deduction we temporarily
-		// zero the effective padding/border values before delegating to the GridLayout
-		// measurement, then restore them immediately after.
-		const pl = this.effectivePaddingLeft;
-		const pr = this.effectivePaddingRight;
-		const pt = this.effectivePaddingTop;
-		const pb = this.effectivePaddingBottom;
-		const bl = this.effectiveBorderLeftWidth;
-		const br = this.effectiveBorderRightWidth;
-		const bt = this.effectiveBorderTopWidth;
-		const bb = this.effectiveBorderBottomWidth;
-
-		this.effectivePaddingLeft = 0;
-		this.effectivePaddingRight = 0;
-		this.effectivePaddingTop = 0;
-		this.effectivePaddingBottom = 0;
-		this.effectiveBorderLeftWidth = 0;
-		this.effectiveBorderRightWidth = 0;
-		this.effectiveBorderTopWidth = 0;
-		this.effectiveBorderBottomWidth = 0;
-
-		try {
-			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		} finally {
-			this.effectivePaddingLeft = pl;
-			this.effectivePaddingRight = pr;
-			this.effectivePaddingTop = pt;
-			this.effectivePaddingBottom = pb;
-			this.effectiveBorderLeftWidth = bl;
-			this.effectiveBorderRightWidth = br;
-			this.effectiveBorderTopWidth = bt;
-			this.effectiveBorderBottomWidth = bb;
-		}
 	}
 
 	public onLayout(left: number, top: number, right: number, bottom: number): void {

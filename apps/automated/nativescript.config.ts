@@ -5,6 +5,7 @@ export default {
 	appPath: 'src',
 	appResourcesPath: '../../tools/assets/App_Resources',
 	android: {
+		runtimePackageName: '@nativescript/android-quickjs-ng',
 		v8Flags: '--expose_gc',
 	},
 	cli: {
