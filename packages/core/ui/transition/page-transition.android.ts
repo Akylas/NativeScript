@@ -3,13 +3,16 @@ import type { ViewBase } from '../core/view-base';
 import type { BackstackEntry } from '../frame';
 import { isNumber } from '../../utils/types';
 import { Transition } from '.';
-import { getRectFromProps, SharedTransition, SharedTransitionAnimationType, SharedTransitionEventData } from './shared-transition';
+import { getRectFromProps, SharedTransition, SharedTransitionAnimationType, SharedTransitionEventData, SharedTransitionState } from './shared-transition';
+import type { SharedElementTransitionContext } from './shared-transition';
 import { ImageSource } from '../../image-source';
 import { ContentView } from '../content-view';
 import { GridLayout } from '../layouts/grid-layout';
 import { Screen } from '../../platform/screen';
 import { ExpandedEntry } from '../frame/fragment.transitions.android';
 import { android as androidUtils } from '../../utils/native-helper';
+import { _resolveAnimationCurve } from '../animation';
+import lazy from '../../utils/lazy';
 // import { Image } from '../image';
 
 @NativeClass
@@ -31,37 +34,138 @@ class ContentViewSnapshot extends ContentView {
 	}
 }
 
-@NativeClass
-class CustomSpringInterpolator extends android.view.animation.AnticipateOvershootInterpolator {
-	getInterpolation(input: number) {
-		// Note: we speed up the interpolation by 10% to fix the issue with the transition not being finished
-		// and the views shifting from their intended final position...
-		// this is really just a workaround and should be fixed properly once we
-		// can figure out the root cause of the issue.
-		const res = super.getInterpolation(input) * 1.1;
+// Material "standard" easing (FastOutSlowIn). Overridable with the `curve` of the PageTransition or of pageEnd/pageReturn.
+const defaultCurve = lazy(() => (<any>androidx).core.view.animation.PathInterpolatorCompat.create(0.4, 0, 0.2, 1) as android.view.animation.Interpolator);
 
-		if (res > 1) {
-			return float(1);
+// Views we gave a transition name to. They are reset when a transition ends, whatever the transition instance:
+// the instance used to go back is a different one than the one used to go forward and the views of the page
+// we return to (eg pager/list cells which are recycled) must not keep a stale name, or the next transition
+// would pick the wrong view (wrong start/end frame).
+const namedViews = new Set<ViewBase>();
+// What we changed on views for the duration of a transition (scale type, outline...), to undo when it ends
+const transitionRestores: Array<() => void> = [];
+
+/**
+ * Progress (0 at the bounds of the view we leave, 1 at the own bounds of the view we enter) of the shared element,
+ * deduced from its current size. Following the real size (instead of running our own animator) keeps whatever we animate
+ * in sync with the transition, whatever its duration, interpolator or spring.
+ */
+function createProgress(fromView: android.view.View, toView: android.view.View) {
+	const startW = fromView.getWidth();
+	const startH = fromView.getHeight();
+	const dw = toView.getWidth() - startW;
+	const dh = toView.getHeight() - startH;
+	return (w: number, h: number) => {
+		if (Math.abs(dw) < 2 && Math.abs(dh) < 2) {
+			return 1;
 		}
+		return Math.abs(dw) >= Math.abs(dh) ? (w - startW) / dw : (h - startH) / dh;
+	};
+}
 
-		return float(res);
+function getCornerRadius(view: ViewBase) {
+	const v = view as any;
+	// in dip. Uniform radius only: an outline can't do more
+	const radius = Math.max(
+		v.effectiveBorderTopLeftRadius || 0,
+		v.effectiveBorderTopRightRadius || 0,
+		v.effectiveBorderBottomRightRadius || 0,
+		v.effectiveBorderBottomLeftRadius || 0,
+		v.roundTopLeftRadius || 0,
+		v.roundTopRightRadius || 0,
+		v.roundBottomRightRadius || 0,
+		v.roundBottomLeftRadius || 0,
+	);
+	return radius * Screen.mainScreen.scale;
+}
+
+/**
+ * The entering view gets the size of the view we leave then animates to its own: animate its corner radius the same way
+ * (eg a rounded thumbnail <-> a fullscreen image) instead of jumping to the radius of the entering view on the first frame.
+ */
+function animateCornerRadius(from: ViewBase, to: ViewBase, progress: (w: number, h: number) => number) {
+	const nativeView = to.nativeViewProtected as android.view.View;
+	if (!nativeView) {
+		return;
+	}
+	const fromRadius = getCornerRadius(from);
+	const toRadius = getCornerRadius(to);
+	if (Math.abs(fromRadius - toRadius) < 1) {
+		return;
+	}
+	const previousProvider = nativeView.getOutlineProvider();
+	const previousClip = nativeView.getClipToOutline();
+	nativeView.setOutlineProvider(
+		new (android.view.ViewOutlineProvider as any)({
+			getOutline(view: android.view.View, outline: android.graphics.Outline) {
+				const w = view.getWidth();
+				const h = view.getHeight();
+				outline.setRoundRect(0, 0, w, h, Math.max(0, fromRadius + (toRadius - fromRadius) * progress(w, h)));
+			},
+		}),
+	);
+	nativeView.setClipToOutline(true);
+	transitionRestores.push(() => {
+		nativeView.setOutlineProvider(previousProvider);
+		nativeView.setClipToOutline(previousClip);
+		nativeView.invalidateOutline();
+	});
+}
+
+/**
+ * The entering view (eg a cropped thumbnail) gets the bounds of the view we leave (eg a fullscreen fit image). With its own
+ * scale type it shows a cropped, "zoomed in" image on the first frames, before the animation brings it down.
+ * Plain ImageViews are handled here, other image views through the handlers registered with SharedTransition.registerElementHandler.
+ */
+function animateScaleType(from: ViewBase, to: ViewBase, progress: (w: number, h: number) => number, isBack: boolean, imageTransform: androidx.transition.Transition) {
+	const fromNative = from?.nativeViewProtected;
+	const toNative = to?.nativeViewProtected;
+	if (!fromNative || !toNative) {
+		return;
+	}
+	// custom views (eg the image views of plugins with their own scale type handling) are handled by the plugins
+	const context: SharedElementTransitionContext = {
+		from: from as View,
+		to: to as View,
+		isBack,
+		progress,
+		onEnd: (restore) => transitionRestores.push(restore),
+		skipImageTransform: () => imageTransform?.excludeTarget(toNative, true),
+	};
+	for (const handler of SharedTransition.getElementHandlers()) {
+		try {
+			if (handler.handle(context)) {
+				return;
+			}
+		} catch (err) {
+			console.error('PageTransition: shared element handler failed', err);
+		}
+	}
+	if (fromNative instanceof android.widget.ImageView && toNative instanceof android.widget.ImageView) {
+		// ChangeImageTransform animates the matrix from the scale type of the view we leave. Only fix the way back
+		const fromType = fromNative.getScaleType();
+		const toType = toNative.getScaleType();
+		if (isBack && fromType !== toType && fromType !== android.widget.ImageView.ScaleType.MATRIX) {
+			toNative.setScaleType(fromType);
+			transitionRestores.push(() => toNative.setScaleType(toType));
+		}
+		return;
 	}
 }
 
-@NativeClass
-class CustomLinearInterpolator extends android.view.animation.LinearInterpolator {
-	getInterpolation(input: number) {
-		// Note: we speed up the interpolation by 10% to fix the issue with the transition not being finished
-		// and the views shifting from their intended final position...
-		// this is really just a workaround and should be fixed properly once we
-		// can figure out the root cause of the issue.
-		const res = super.getInterpolation(input) * 1.1;
-
-		if (res > 1) {
-			return float(1);
-		}
-
-		return float(res);
+function animateSharedElement(from: ViewBase, to: ViewBase, isBack: boolean, imageTransform: androidx.transition.Transition) {
+	const fromNative = from?.nativeViewProtected as android.view.View;
+	const toNative = to?.nativeViewProtected as android.view.View;
+	if (!fromNative || !toNative) {
+		return;
+	}
+	const progress = createProgress(fromNative, toNative);
+	try {
+		animateScaleType(from, to, progress, isBack, imageTransform);
+		animateCornerRadius(from, to, progress);
+	} catch (err) {
+		// never break the navigation for a cosmetic animation
+		console.error('PageTransition: failed to animate the shared element', err);
 	}
 }
 
@@ -71,8 +175,42 @@ function setTransitionName(view: ViewBase, value?) {
 	}
 	try {
 		androidx.core.view.ViewCompat.setTransitionName(view.nativeView, value !== undefined ? value : view.sharedTransitionTag);
+		if (value === null) {
+			namedViews.delete(view);
+		} else {
+			namedViews.add(view);
+		}
 	} catch (err) {
 		// ignore
+	}
+}
+
+function runTransitionRestores() {
+	const restores = transitionRestores.splice(0, transitionRestores.length);
+	for (const restore of restores) {
+		try {
+			restore();
+		} catch (err) {
+			// ignore
+		}
+	}
+}
+
+function resetNamedViews() {
+	runTransitionRestores();
+	const views = Array.from(namedViews);
+	namedViews.clear();
+	for (const view of views) {
+		const nativeView = view.nativeViewProtected as android.view.View;
+		if (!nativeView) {
+			continue;
+		}
+		try {
+			androidx.core.view.ViewCompat.setTransitionName(nativeView, null);
+			nativeView.setTransitionAlpha(1);
+		} catch (err) {
+			// ignore
+		}
 	}
 }
 
@@ -82,14 +220,19 @@ export class PageTransition extends Transition {
 		curve?: any,
 		private pageLoadedTimeout: number = 0,
 	) {
-		// disable custom curves until we can fix the issue with the animation not completing
-		if (curve) {
-			console.warn('PageTransition does not support custom curves at the moment. The passed in curve will be ignored.');
-		}
 		if (typeof duration !== 'number') {
 			duration = 500;
 		}
-		super(duration);
+		// curve: same values as Animation curves (string, CubicBezierAnimationCurve, android Interpolator)
+		super(duration, curve ?? defaultCurve());
+	}
+
+	/**
+	 * The curve of the pageEnd/pageReturn config (depending on the direction) or the one of the transition
+	 */
+	private resolveCurve(state: SharedTransitionState): android.view.animation.Interpolator {
+		const curve = state.activeType === SharedTransitionAnimationType.present ? state.pageEnd?.curve : state.pageReturn?.curve;
+		return curve ? _resolveAnimationCurve(curve) : this.getCurve();
 	}
 
 	createAndroidAnimator(transitionType: string) {
@@ -157,16 +300,12 @@ export class PageTransition extends Transition {
 			translationY: translationYValues,
 		};
 
+		const interpolator = this.resolveCurve(state);
 		const animations = new java.util.HashSet<any>();
 		for (const prop in properties) {
 			// console.log(prop, ' ', properties[prop][1]);
 			const animator = android.animation.ObjectAnimator.ofFloat(null, prop, properties[prop]);
-			if (customDuration) {
-				// duration always overrides default spring
-				animator.setInterpolator(new CustomLinearInterpolator());
-			} else {
-				animator.setInterpolator(new CustomSpringInterpolator());
-			}
+			animator.setInterpolator(interpolator);
 			animations.add(animator);
 		}
 
@@ -230,6 +369,9 @@ export class PageTransition extends Transition {
 		// 		independentView.opacity = 0;
 		// 	}
 		// }
+		const frame = toPage.frame as any;
+		const isBack = !!frame?.backStack?.includes?.(newEntry);
+		let imageTransform: androidx.transition.Transition;
 		const onPageLoaded = () => {
 			// add a timeout so that Views like ListView / CollectionView can have their children instantiated
 			setTimeout(() => {
@@ -239,7 +381,15 @@ export class PageTransition extends Transition {
 					presented = presented.filter((v) => keys.indexOf(v.sharedTransitionTag) !== -1);
 				}
 				// const sharedElementTags = sharedElements.map((v) => v.sharedTransitionTag);
-				presented.forEach((v) => setTransitionName(v));
+				presented.forEach((v) => {
+					setTransitionName(v);
+					animateSharedElement(
+						presenting.find((p) => p.sharedTransitionTag === v.sharedTransitionTag),
+						v,
+						isBack,
+						imageTransform,
+					);
+				});
 				newFragment.startPostponedEnterTransition();
 			}, this.pageLoadedTimeout);
 		};
@@ -258,15 +408,11 @@ export class PageTransition extends Transition {
 		transitionSet.addTransition(new androidx.transition.ChangeBounds());
 		transitionSet.addTransition(new androidx.transition.ChangeClipBounds());
 		transitionSet.addTransition(new androidx.transition.ChangeTransform());
-		transitionSet.addTransition(new androidx.transition.ChangeImageTransform());
+		imageTransform = new androidx.transition.ChangeImageTransform();
+		transitionSet.addTransition(imageTransform);
 		transitionSet.setOrdering(androidx.transition.TransitionSet.ORDERING_TOGETHER);
 
-		if (customDuration) {
-			// duration always overrides default spring
-			transitionSet.setInterpolator(new CustomLinearInterpolator());
-		} else {
-			transitionSet.setInterpolator(new CustomSpringInterpolator());
-		}
+		transitionSet.setInterpolator(this.resolveCurve(state));
 
 		// postpone enter until we call "loaded" on the new page
 		newFragment.postponeEnterTransition();
@@ -297,6 +443,7 @@ export class PageTransition extends Transition {
 		}
 	}
 	onTransitionEnd(entry) {
+		resetNamedViews();
 		// as we use hide on fragments instead of remove
 		// we need to reset setTransitionName after transition end
 		// otherwise it will break next transitions using the same transitionName

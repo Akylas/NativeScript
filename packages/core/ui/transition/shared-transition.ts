@@ -84,6 +84,12 @@ type SharedTransitionPageWithDurationProperties = SharedTransitionPageProperties
 	 * Note: When this is defined, it will override spring options and use only linear animation.
 	 */
 	duration?: number | undefined | null;
+	/**
+	 * (Android only) Easing used for the transition: 'linear', 'ease', 'easeIn', 'easeOut', 'easeInOut',
+	 * a CubicBezierAnimationCurve or an android Interpolator.
+	 * Defaults to the curve of the PageTransition (FastOutSlowIn when none is given).
+	 */
+	curve?: any;
 };
 export interface SharedTransitionInteractiveOptions {
 	/**
@@ -210,6 +216,53 @@ let currentStack: Array<SharedTransitionState>;
 // root doesn't pin its subtree; dead refs are pruned on query.
 let externalRoots: Array<WeakRef<ViewBase>>;
 /**
+ * Passed to a {@link SharedElementHandler} when a shared element is about to be transitioned.
+ */
+export interface SharedElementTransitionContext {
+	/**
+	 * The view of the page we leave: where the shared element starts from.
+	 */
+	from: View;
+	/**
+	 * The view of the page we enter: the one the transition moves/resizes from the bounds of `from` to its own bounds.
+	 */
+	to: View;
+	/**
+	 * Whether the shared element goes back to the page we came from.
+	 */
+	isBack: boolean;
+	/**
+	 * Progress of the shared element: 0 at the bounds of `from`, 1 at the own bounds of `to`. It can go out of [0, 1] with springs.
+	 * It is deduced from the current native size of `to` (in native pixels), so whatever is driven by it stays in sync with the transition
+	 * (duration, interpolator, spring...) without any animator of its own.
+	 * Call it from native draw/layout callbacks with the current native width/height of the view.
+	 */
+	progress(width: number, height: number): number;
+	/**
+	 * Register something to run when the transition ends (or is replaced), to restore anything changed on the views.
+	 */
+	onEnd(restore: () => void): void;
+	/**
+	 * Android: stop the platform from animating the image matrix of `to` (androidx ChangeImageTransform). Needed when the view
+	 * draws its image itself (eg through its own scale type) and animates it from the handler: both would stack up otherwise.
+	 */
+	skipImageTransform(): void;
+}
+
+/**
+ * Lets a plugin teach the shared element transitions how to animate its custom views (eg an image view which keeps its scale type
+ * in its own native hierarchy, so that the platform image transforms don't apply).
+ * Currently used on Android only.
+ */
+export interface SharedElementHandler {
+	/**
+	 * Called for each shared element pair, before the transition starts, when the views are laid out.
+	 * @returns true when the pair was handled: the default animation of the scale type is then skipped.
+	 */
+	handle(context: SharedElementTransitionContext): boolean | void;
+}
+
+/**
  * Shared Element Transitions (preview)
  * Allows you to auto animate between shared elements on two different screesn to create smooth navigational experiences.
  * View components can define sharedTransitionTag="name" alone with a transition through this API.
@@ -234,6 +287,34 @@ export class SharedTransition {
 			transition.setDuration(__APPLE__ ? pageEnd?.duration / 1000 : pageEnd?.duration);
 		}
 		return { instance: transition };
+	}
+	private static elementHandlers: SharedElementHandler[] = [];
+	/**
+	 * Register a handler which animates shared elements made of custom views.
+	 * Plugins supporting several versions of core should feature detect it:
+	 * `SharedTransition['registerElementHandler']?.(handler)`
+	 * @returns a function to unregister the handler
+	 */
+	static registerElementHandler(handler: SharedElementHandler): () => void {
+		if (SharedTransition.elementHandlers.indexOf(handler) === -1) {
+			SharedTransition.elementHandlers.push(handler);
+		}
+		return () => SharedTransition.unregisterElementHandler(handler);
+	}
+	/**
+	 * Unregister a handler previously registered with {@link registerElementHandler}.
+	 */
+	static unregisterElementHandler(handler: SharedElementHandler) {
+		const index = SharedTransition.elementHandlers.indexOf(handler);
+		if (index !== -1) {
+			SharedTransition.elementHandlers.splice(index, 1);
+		}
+	}
+	/**
+	 * The registered element handlers, in registration order.
+	 */
+	static getElementHandlers(): readonly SharedElementHandler[] {
+		return SharedTransition.elementHandlers;
 	}
 	/**
 	 * Whether a transition is in progress or not.

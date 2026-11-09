@@ -68,14 +68,21 @@ export class PageTransition extends Transition {
 
 	iosNavigatedController(navigationController: UINavigationController, operation: number, fromVC: UIViewController, toVC: UIViewController): UIViewControllerAnimatedTransitioning {
 		this.navigationController = navigationController;
-		if (!this.transitionController) {
-			this.presented = toVC;
-			this.presenting = fromVC;
-		}
+		// the roles come from the operation, not from the first call: a transition instance given at goBack
+		// is only ever used for a pop and the page we leave is then the "presented" one
+		const isPop = operation === UINavigationControllerOperation.Pop;
+		this.presented = isPop ? fromVC : toVC;
+		this.presenting = isPop ? toVC : fromVC;
 		this.transitionController = PageTransitionController.initWithOwner(new WeakRef(this));
 		// console.log('iosNavigatedController presenting:', this.presenting);
 
 		this.operation = operation;
+		// do not wait for the end of the present animation to know we are going back
+		if (SharedTransition.getState(this.id)) {
+			SharedTransition.updateState(this.id, {
+				activeType: isPop ? SharedTransitionAnimationType.dismiss : SharedTransitionAnimationType.present,
+			});
+		}
 		return this.transitionController;
 	}
 

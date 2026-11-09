@@ -5,6 +5,39 @@ import { Screen } from '../../platform';
 import { CORE_ANIMATION_DEFAULTS } from '../../utils/animation-helpers';
 import { ios as iOSUtils } from '../../utils/native-helper';
 import { Color } from '../../color';
+import { Trace } from '../../trace';
+import type { ViewBase } from '../core/view-base';
+import type { View } from '../core/view';
+
+function getControllerPage(controller: UIViewController): ViewBase {
+	return (controller as any)?.['_entry']?.resolvedPage ?? (controller as any)?._owner?.deref?.() ?? (controller as any)?.owner?.deref?.() ?? null;
+}
+
+/**
+ * Frame, in the container coordinates, of what the view really shows.
+ * An aspect fit image view has letterbox around its image: animating its bounds would stretch the image
+ * and make it jump to the right size at the end of the transition.
+ * Aspect fill (cropped) and non image views simply use their bounds.
+ */
+function getDisplayedFrame(view: UIView, container: UIView): CGRect {
+	let rect = view.bounds;
+	if (view instanceof UIImageView && view.image && view.contentMode === UIViewContentMode.ScaleAspectFit) {
+		const imageSize = view.image.size;
+		if (imageSize.width > 0 && imageSize.height > 0 && rect.size.width > 0 && rect.size.height > 0) {
+			const scale = Math.min(rect.size.width / imageSize.width, rect.size.height / imageSize.height);
+			const width = imageSize.width * scale;
+			const height = imageSize.height * scale;
+			rect = CGRectMake(rect.origin.x + (rect.size.width - width) / 2, rect.origin.y + (rect.size.height - height) / 2, width, height);
+		}
+	}
+	return view.convertRectToView(rect, container);
+}
+
+// when both sides are images, the snapshot is filled like the source one: both ends then show the exact same pixels
+// (the end frame of an aspect fit image has the aspect ratio of the image)
+function getSnapshotContentMode(from: UIView, to: UIView): UIViewContentMode {
+	return from instanceof UIImageView ? from.contentMode : to.contentMode;
+}
 
 interface PlatformTransitionInteractiveState extends TransitionInteractiveState {
 	transitionContext?: UIViewControllerContextTransitioning;
@@ -120,11 +153,23 @@ export function removeInteractiveDismissShadow(presentedView: any): void {
 
 export class SharedTransitionHelper {
 	static animate(state: SharedTransitionState, transitionContext: UIViewControllerContextTransitioning, type: TransitionNavigationType) {
-		const transition = state.instance;
 		setTimeout(async () => {
 			// Run on next tick
 			// ensures that existing UI state finishes before snapshotting
 			// (eg, button touch up state)
+			// Any exception thrown before the animation starts would leave `completeTransition` uncalled
+			// and UIKit stuck in the middle of the transition (blank page, dead back button, hidden shared views)
+			try {
+				await SharedTransitionHelper.run(state, transitionContext, type);
+			} catch (error) {
+				SharedTransitionHelper.recover(state, transitionContext, type, error);
+			}
+		});
+	}
+
+	private static async run(state: SharedTransitionState, transitionContext: UIViewControllerContextTransitioning, type: TransitionNavigationType) {
+		const transition = state.instance;
+		{
 			switch (state.activeType) {
 				case SharedTransitionAnimationType.present: {
 					// console.log('-- Transition present --');
@@ -141,7 +186,10 @@ export class SharedTransitionHelper {
 					}
 					transition.presented.view.layoutIfNeeded();
 
-					const { sharedElements, presented, presenting } = SharedTransition.getSharedElements(state.page, state.toPage);
+					const { sharedElements: allSharedElements, presented, presenting } = SharedTransition.getSharedElements(state.page, state.toPage);
+					// like on android, pageStart.sharedTransitionTags restricts the elements which are shared between both pages
+					const startTags = state.pageStart?.sharedTransitionTags ? Object.keys(state.pageStart.sharedTransitionTags) : null;
+					const sharedElements = startTags?.length ? allSharedElements.filter((v) => startTags.indexOf(v.sharedTransitionTag) !== -1) : allSharedElements;
 					const sharedElementTags = sharedElements.map((v) => v.sharedTransitionTag);
 					if (!transition.sharedElements) {
 						transition.sharedElements = {
@@ -212,7 +260,7 @@ export class SharedTransitionHelper {
 								presentedView.on('imageSourceChange', imageSourceChangeListener);
 
 								snapshot.tintColor = presentedSharedElement.tintColor;
-								snapshot.contentMode = presentedSharedElement.contentMode;
+								snapshot.contentMode = getSnapshotContentMode(presentingSharedElement, presentedSharedElement);
 								// Seed the snapshot with the source's already-loaded image so the very
 								// first frame of the animation isn't blank if the destination image is
 								// still loading.
@@ -225,8 +273,8 @@ export class SharedTransitionHelper {
 							snapshot.clipsToBounds = true;
 							// console.log('---> snapshot: ', snapshot);
 
-							const startFrame = presentingSharedElement.convertRectToView(presentingSharedElement.bounds, transitionContext.containerView);
-							const endFrame = presentedSharedElement.convertRectToView(presentedSharedElement.bounds, transitionContext.containerView);
+							const startFrame = getDisplayedFrame(presentingSharedElement, transitionContext.containerView);
+							const endFrame = getDisplayedFrame(presentedSharedElement, transitionContext.containerView);
 							snapshot.frame = startFrame;
 							if (SharedTransition.DEBUG) {
 								console.log('---> ', presentingView.sharedTransitionTag, ' frame:', iOSUtils.printCGRect(snapshot.frame));
@@ -434,11 +482,18 @@ export class SharedTransitionHelper {
 						}
 						for (const presenting of transition.sharedElements.presenting) {
 							presenting.snapshot.removeFromSuperview();
+							if (type === 'page') {
+								// the page we left is detached: give its views back so none stays hidden when it is shown again
+								// (the way back is not necessarily done with this transition instance nor with the same shared elements)
+								presenting.view.opacity = presenting.startOpacity;
+							}
 						}
 						for (const independent of transition.sharedElements.independent) {
 							independent.snapshot.removeFromSuperview();
 							if (independent.isPresented) {
 								independent.view.ios.alpha = independent.view.opacity;
+							} else if (type === 'page') {
+								independent.view.opacity = independent.startOpacity;
 							}
 						}
 						SharedTransition.updateState(transition.id, {
@@ -488,8 +543,11 @@ export class SharedTransitionHelper {
 
 						for (const presented of transition.sharedElements.presented) {
 							const presentingMatch = transition.sharedElements.presenting.find((v) => v.view.sharedTransitionTag === presented.view.sharedTransitionTag);
+							if (!presentingMatch) {
+								continue;
+							}
 							// Workaround wrong origin due ongoing layout process.
-							const updatedEndFrame = presented.view.ios.convertRectToView(presented.view.ios.bounds, transitionContext.containerView);
+							const updatedEndFrame = getDisplayedFrame(presented.view.ios, transitionContext.containerView);
 							const correctedEndFrame = CGRectMake(updatedEndFrame.origin.x, updatedEndFrame.origin.y, presentingMatch.endFrame.size.width, presentingMatch.endFrame.size.height);
 							presentingMatch.snapshot.frame = correctedEndFrame;
 
@@ -584,7 +642,7 @@ export class SharedTransitionHelper {
 						console.log(`  ${type}: Dismiss`);
 						console.log(
 							`1. Dismiss sharedTransitionTags to animate:`,
-							transition.sharedElements.presented.map((p) => p.view.sharedTransitionTag),
+							transition.sharedElements?.presented?.map((p) => p.view.sharedTransitionTag),
 						);
 
 						console.log(`2. Add back previously stored sharedElements to dismiss:`);
@@ -594,6 +652,13 @@ export class SharedTransitionHelper {
 					const pageEnd = state.pageEnd;
 					const pageEndTags = pageEnd?.sharedTransitionTags || {};
 					const pageReturn = state.pageReturn;
+
+					if (type === 'page') {
+						// rebuild from what is currently shown instead of replaying what was recorded on the way in
+						SharedTransitionHelper.rebuildDismissElements(state, transitionContext);
+					} else if (!transition.sharedElements) {
+						transition.sharedElements = { presented: [], presenting: [], independent: [] };
+					}
 
 					for (const p of transition.sharedElements.presented) {
 						// Use native alpha (not NS opacity) so we don't pollute the NS-side
@@ -634,6 +699,11 @@ export class SharedTransitionHelper {
 
 					// now that all the callbacks had their chance to run, we can take the snapshots
 					for (const data of snapshotData) {
+						if ((data as any).rebuilt) {
+							// snapshot of the popped view already taken and positioned
+							transitionContext.containerView.addSubview(data.snapshot);
+							continue;
+						}
 						const view = data.view.ios;
 						const currentAlpha = view.alpha;
 						if (pageReturn?.useStartOpacity) {
@@ -786,7 +856,150 @@ export class SharedTransitionHelper {
 					break;
 				}
 			}
+		}
+	}
+
+	/**
+	 * Called when the animation setup threw: put everything back in a sane state and always complete the transition,
+	 * otherwise UIKit stays in the middle of the navigation transition.
+	 */
+	private static recover(state: SharedTransitionState, transitionContext: UIViewControllerContextTransitioning, type: TransitionNavigationType, error: any) {
+		const transition = state.instance;
+		console.error(`SharedTransition (${state.activeType === SharedTransitionAnimationType.present ? 'present' : 'dismiss'}) failed, completing the transition without animation:`, error);
+		const isPresent = state.activeType === SharedTransitionAnimationType.present;
+		try {
+			const elements = transition?.sharedElements;
+			if (elements) {
+				for (const p of elements.presented || []) {
+					p.view.opacity = isNumber(p.startOpacity) ? p.startOpacity : 1;
+				}
+				for (const p of elements.presenting || []) {
+					p.view.opacity = isNumber(p.startOpacity) ? p.startOpacity : 1;
+					p.snapshot?.removeFromSuperview();
+				}
+				for (const p of elements.independent || []) {
+					p.view.opacity = isNumber(p.startOpacity) ? p.startOpacity : 1;
+					p.snapshot?.removeFromSuperview();
+				}
+			}
+			if (type === 'page') {
+				const shown = isPresent ? transition.presented : transition.presenting;
+				if (shown?.view) {
+					shown.view.alpha = 1;
+					const frame = getRectFromProps(isPresent ? state.pageEnd : null);
+					shown.view.frame = CGRectMake(frame.x, frame.y, frame.width, frame.height);
+				}
+			}
+		} catch (err) {
+			if (Trace.isEnabled()) {
+				Trace.write(`SharedTransition recover failed: ${err}`, Trace.categories.Transition, Trace.messageType.error);
+			}
+		}
+		if (isPresent) {
+			SharedTransition.updateState(transition.id, { activeType: SharedTransitionAnimationType.dismiss });
+		} else {
+			SharedTransition.finishState(transition.id);
+			transition.sharedElements = null;
+		}
+		// when the user cancelled (interactive pop) we must report it, otherwise the navigation controller is left inconsistent
+		transitionContext.completeTransition(!transitionContext.transitionWasCancelled);
+		SharedTransition.notifyEvent(SharedTransition.finishedEvent, {
+			id: transition.id,
+			type,
+			action: isPresent ? 'present' : 'dismiss',
 		});
+	}
+
+	/**
+	 * Rebuilds the shared elements to animate on the way back from the pages that are currently shown.
+	 * The elements recorded on the way in can not be reused: the popped page might now show another photo (same tag
+	 * pattern, other value) or its views might have been recycled, and the transition passed to goBack can be a new instance.
+	 */
+	private static rebuildDismissElements(state: SharedTransitionState, transitionContext: UIViewControllerContextTransitioning) {
+		const transition = state.instance;
+		// roles are set from the navigation operation (see PageTransition.iosNavigatedController)
+		const poppedPage = getControllerPage(transition.presented);
+		const returnPage = state.page ?? getControllerPage(transition.presenting);
+		const previous = transition.sharedElements;
+		const presenting: typeof transition.sharedElements.presenting = [];
+		const presented: typeof transition.sharedElements.presented = [];
+		const pageEndTags = state.pageEnd?.sharedTransitionTags || {};
+		const containerView = transitionContext.containerView;
+
+		// the page we go back to was removed from the container during the present
+		transition.presenting?.view?.layoutIfNeeded();
+
+		if (SharedTransition.DEBUG) {
+			console.log(`Dismiss: popped page ${poppedPage}, return page ${returnPage}`);
+		}
+		if (poppedPage && returnPage) {
+			const { sharedElements, presented: poppedViews } = SharedTransition.getSharedElements(returnPage, poppedPage);
+			if (SharedTransition.DEBUG) {
+				console.log(`Dismiss: tags on return page ${sharedElements.map((v) => v.sharedTransitionTag)}, on popped page ${poppedViews.map((v) => v.sharedTransitionTag)}`);
+			}
+			const tagFilter = state.pageStart?.sharedTransitionTags ? Object.keys(state.pageStart.sharedTransitionTags) : null;
+			for (const returnView of sharedElements) {
+				const tag = returnView.sharedTransitionTag;
+				if (tagFilter?.length && tagFilter.indexOf(tag) === -1) {
+					continue;
+				}
+				const poppedView = poppedViews.find((v) => v.sharedTransitionTag === tag);
+				const returnNative = returnView.ios as UIView;
+				const poppedNative = poppedView?.ios as UIView;
+				if (!returnNative || !poppedNative || !poppedNative.window) {
+					continue;
+				}
+				const pageEndProps = pageEndTags[tag];
+				const recorded = previous?.presenting?.find((p) => p.view === returnView);
+				// the view was hidden on the way in
+				const startOpacity = recorded ? recorded.startOpacity : returnView.opacity > 0 ? returnView.opacity : 1;
+				const poppedFrame = getDisplayedFrame(poppedNative, containerView);
+				const returnFrame = getDisplayedFrame(returnNative, containerView);
+
+				const snapshot = UIImageView.alloc().init();
+				if (poppedNative instanceof UIImageView) {
+					snapshot.tintColor = poppedNative.tintColor;
+					snapshot.contentMode = getSnapshotContentMode(returnNative, poppedNative);
+				}
+				snapshot.image = iOSUtils.snapshotView(poppedNative, Screen.mainScreen.scale);
+				iOSUtils.copyLayerProperties(snapshot, poppedNative, pageEndProps?.propertiesToMatch as any);
+				snapshot.clipsToBounds = true;
+				snapshot.frame = poppedFrame;
+				snapshot.alpha = poppedView.opacity;
+
+				presenting.push({
+					view: returnView,
+					startFrame: returnFrame,
+					endFrame: poppedFrame,
+					snapshot,
+					startOpacity,
+					endOpacity: poppedView.opacity,
+					propertiesToMatch: pageEndProps?.propertiesToMatch,
+					zIndex: isNumber(pageEndProps?.zIndex) ? pageEndProps.zIndex : 0,
+					rebuilt: true,
+				} as any);
+				presented.push({
+					view: poppedView,
+					startFrame: poppedFrame,
+					endFrame: returnFrame,
+					startOpacity: poppedView.opacity,
+					endOpacity: startOpacity,
+					propertiesToMatch: pageEndProps?.propertiesToMatch,
+				});
+				// hide both while animating within the transition context
+				returnView.opacity = 0;
+				poppedView.opacity = 0;
+			}
+		}
+		// independent elements are only recorded on the way in
+		transition.sharedElements = {
+			presented,
+			presenting,
+			independent: previous?.independent || [],
+		};
+		for (const independent of transition.sharedElements.independent) {
+			independent.view.opacity = 0;
+		}
 	}
 
 	static interactiveStart(state: SharedTransitionState, interactiveState: PlatformTransitionInteractiveState, type: TransitionNavigationType) {
@@ -807,6 +1020,7 @@ export class SharedTransitionHelper {
 					const sourceDefaults = getRectFromProps(null);
 					state.instance.presenting.view.frame = CGRectMake(0, 0, sourceDefaults.width, sourceDefaults.height);
 				}
+				SharedTransitionHelper.rebuildDismissElements(state, interactiveState.transitionContext);
 				break;
 		}
 		// Apply the dismiss shadow here, not from the gesture handler. UIKit

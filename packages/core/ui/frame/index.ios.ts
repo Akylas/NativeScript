@@ -260,6 +260,13 @@ export class Frame extends FrameBase {
 		const controller = backstackEntry.resolvedPage.ios;
 		const animated = this._currentEntry ? this._getIsAnimatedNavigation(this._currentEntry.entry) : false;
 
+		// the transition given on goBack (on the backstack entry) overrides the one used to push the page we leave
+		const backTransition = backstackEntry.transitioniOS !== undefined ? backstackEntry.transitioniOS : backstackEntry.transition;
+		const currentController: UIViewController = this.currentPage?.ios;
+		if (animated && backTransition && currentController) {
+			currentController[TRANSITION] = backTransition;
+		}
+
 		this._updateActionBar(backstackEntry.resolvedPage);
 
 		if (Trace.isEnabled()) {
@@ -433,6 +440,24 @@ class TransitionDelegate extends NSObject {
 	};
 }
 
+function isInteractivePopGestureActive(navigationController: UINavigationController): boolean {
+	const recognizers = [navigationController.interactivePopGestureRecognizer, (navigationController as any).interactiveContentPopGestureRecognizer as UIGestureRecognizer];
+	return recognizers.some((recognizer) => recognizer && (recognizer.state === UIGestureRecognizerState.Began || recognizer.state === UIGestureRecognizerState.Changed));
+}
+
+// views of the page we go back to were hidden when the shared elements were taken over by their snapshots
+function restoreSharedElementsOpacity(transition: Transition) {
+	const elements = transition.sharedElements;
+	if (!elements) {
+		return;
+	}
+	for (const element of [...(elements.presenting || []), ...(elements.presented || []), ...(elements.independent || [])]) {
+		element.view.opacity = typeof element.startOpacity === 'number' ? element.startOpacity : 1;
+		element.snapshot?.removeFromSuperview();
+	}
+	transition.sharedElements = null;
+}
+
 @NativeClass
 class UINavigationControllerDelegateImpl extends NSObject implements UINavigationControllerDelegate {
 	public static ObjCProtocols = [UINavigationControllerDelegate];
@@ -455,6 +480,18 @@ class UINavigationControllerDelegateImpl extends NSObject implements UINavigatio
 		const navigationTransition = <NavigationTransition>viewController[TRANSITION];
 		if (!navigationTransition) {
 			return null;
+		}
+
+		if (operation === UINavigationControllerOperation.Pop && navigationTransition.instance && isInteractivePopGestureActive(navigationController)) {
+			// The system swipe back drives the pop. A custom animator without an interactive controller can not follow the finger
+			// and leaves the navigation controller stuck, so let UIKit do its own interactive pop.
+			// Interactive shared transitions are driven by the pan gesture of `interactive.dismiss` instead (interactiveBegan).
+			const state = SharedTransition.getState(navigationTransition.instance.id);
+			if (!state?.interactiveBegan) {
+				restoreSharedElementsOpacity(navigationTransition.instance);
+				SharedTransition.finishState(navigationTransition.instance.id);
+				return null;
+			}
 		}
 
 		const layoutDirection: CoreTypes.LayoutDirectionType = navigationController.owner?.direction;
