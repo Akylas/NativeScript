@@ -7,7 +7,9 @@
 #
 # Source repository: https://github.com/actions/dependency-review-action
 name: 'Dependency Review'
-on: [pull_request]
+# Disabled in the fork: only runs when triggered manually (was: on pull_request).
+on:
+  workflow_dispatch:
 
 permissions:
   contents: read
