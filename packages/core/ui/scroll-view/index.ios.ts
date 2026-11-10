@@ -31,6 +31,10 @@ class UIScrollViewDelegateImpl extends NSObject implements UIScrollViewDelegate 
 		}
 	}
 
+	public scrollViewDidChangeAdjustedContentInset(sv: UIScrollView): void {
+		this._owner?.deref()?.onAdjustedContentInsetChanged();
+	}
+
 	public static ObjCProtocols = [UIScrollViewDelegate];
 }
 
@@ -39,6 +43,7 @@ export class ScrollView extends ScrollViewBase {
 
 	private _contentMeasuredWidth = 0;
 	private _contentMeasuredHeight = 0;
+	private _layoutAdjustedInset: UIEdgeInsets;
 	private _isFirstLayout: boolean = true;
 	private _delegate: UIScrollViewDelegateImpl;
 	private _scrollEdgeContainers: ScrollEdgeContainers;
@@ -236,13 +241,19 @@ export class ScrollView extends ScrollViewBase {
 			return;
 		}
 
-		// When iOS adjusts content insets itself, don't also subtract safe-area insets here —
+		// When iOS adjusts content insets itself (the property, or a plugin like the app bar setting it on the native view), don't also subtract safe-area insets here —
 		// doing both makes contentSize track the dynamic navbar height and causes scroll drift with large titles.
-		const useIOSInsetAdjustment = SDK_VERSION > 10 && this.iosContentInsetAdjustmentBehavior !== 'never';
+		const useIOSInsetAdjustment = SDK_VERSION > 10 && view.contentInsetAdjustmentBehavior !== UIScrollViewContentInsetAdjustmentBehavior.Never;
 		const insets = useIOSInsetAdjustment ? { left: 0, top: 0, right: 0, bottom: 0 } : this.getSafeAreaInsets();
 
-		let scrollWidth = right - left - insets.right - insets.left;
-		let scrollHeight = bottom - top - insets.bottom - insets.top;
+		// The viewport minus the insets UIKit adds itself (large title, toolbar): a content that fits there must not be scrollable.
+		const adjustedInsets = useIOSInsetAdjustment ? view.adjustedContentInset : { left: 0, top: 0, right: 0, bottom: 0 };
+		const adjustedWidth = layout.toDevicePixels(adjustedInsets.left + adjustedInsets.right);
+		const adjustedHeight = layout.toDevicePixels(adjustedInsets.top + adjustedInsets.bottom);
+		this._layoutAdjustedInset = adjustedInsets;
+
+		let scrollWidth = right - left - insets.right - insets.left - adjustedWidth;
+		let scrollHeight = bottom - top - insets.bottom - insets.top - adjustedHeight;
 
 		let scrollInsetWidth = scrollWidth + insets.left + insets.right;
 		let scrollInsetHeight = scrollHeight + insets.top + insets.bottom;
@@ -272,6 +283,27 @@ export class ScrollView extends ScrollViewBase {
 		}
 
 		View.layoutChild(this, this.layoutView, insets.left, insets.top, insets.left + scrollWidth, insets.top + scrollHeight);
+	}
+
+	/** the inset UIKit adds changes (large title collapsing, toolbar): a content that fits in the viewport follows it */
+	public onAdjustedContentInsetChanged() {
+		const view = this.nativeViewProtected;
+		const inset = view?.adjustedContentInset;
+		const laidOut = this._layoutAdjustedInset;
+		if (!inset || !laidOut) {
+			return;
+		}
+		const horizontal = this.orientation === 'horizontal';
+		const laidOutSize = horizontal ? laidOut.left + laidOut.right : laidOut.top + laidOut.bottom;
+		const size = horizontal ? inset.left + inset.right : inset.top + inset.bottom;
+		if (size === laidOutSize) {
+			return;
+		}
+		const viewport = horizontal ? view.bounds.size.width : view.bounds.size.height;
+		const content = layout.toDeviceIndependentPixels(horizontal ? this._contentMeasuredWidth : this._contentMeasuredHeight);
+		if (content <= viewport - Math.min(size, laidOutSize)) {
+			this.requestLayout();
+		}
 	}
 
 	public _onOrientationChanged() {
