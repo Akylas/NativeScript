@@ -1319,10 +1319,37 @@ export class View extends ViewCommon {
 			// let s use outline provider when we can
 			if (shouldClipToOutline) {
 				ViewHelper.setOutlineProvider(nativeView, background.borderTopLeftRadius, background.borderTopRightRadius, background.borderBottomRightRadius, background.borderBottomLeftRadius);
-
+			}
+			if (nativeView._borderForeground) {
+				nativeView.setForeground(null);
+				nativeView._borderForeground = null;
 			}
 		} else {
-			ViewHelper.clearOutlineProvider(nativeView);
+			// the view clips its children to its rounded corners (outline). The border is then drawn by the foreground, over the children:
+			// the background drawable would be under them
+			const clipsChildren =
+				background.hasBorderRadius() &&
+				!background.hasBoxShadows() &&
+				!background.clipPath &&
+				SDK_VERSION >= 21 &&
+				(!background.hasBorderWidth() || SDK_VERSION >= 23) &&
+				(SDK_VERSION >= 33 || background.hasUniformBorderRadius());
+			if (clipsChildren) {
+				ViewHelper.setOutlineProvider(nativeView, background.borderTopLeftRadius, background.borderTopRightRadius, background.borderBottomRightRadius, background.borderBottomLeftRadius);
+			} else {
+				ViewHelper.clearOutlineProvider(nativeView);
+			}
+			const borderOnTop = clipsChildren && background.hasBorderWidth();
+			if (borderOnTop) {
+				if (!nativeView._borderForeground) {
+					nativeView._borderForeground = new org.nativescript.widgets.BorderDrawable(layout.getDisplayDensity(), this.toString());
+				}
+				refreshBorderDrawable(this, nativeView._borderForeground, 'border');
+				nativeView.setForeground(nativeView._borderForeground);
+			} else if (nativeView._borderForeground) {
+				nativeView.setForeground(null);
+				nativeView._borderForeground = null;
+			}
 			if (background.clearFlags & BackgroundClearFlags.CLEAR_BACKGROUND_COLOR) {
 				if (backgroundDrawable) {
 					backgroundDrawable.mutate();
@@ -1342,10 +1369,10 @@ export class View extends ViewCommon {
 			} else {
 				if (isBorderDrawable) {
 					// org.nativescript.widgets.BorderDrawable
-					refreshBorderDrawable(this, backgroundDrawable);
+					refreshBorderDrawable(this, backgroundDrawable, borderOnTop ? 'background' : 'all');
 				} else {
 					const borderDrawable = new org.nativescript.widgets.BorderDrawable(layout.getDisplayDensity(), this.toString());
-					refreshBorderDrawable(this, borderDrawable);
+					refreshBorderDrawable(this, borderDrawable, borderOnTop ? 'background' : 'all');
 					nativeView.setBackground(borderDrawable);
 				}
 			}

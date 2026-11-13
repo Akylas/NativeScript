@@ -90,4 +90,4 @@ export namespace ad {
 	export function onBackgroundOrBorderPropertyChanged(v: View);
 }
 
-export function refreshBorderDrawable(view: View, borderDrawable: any /* org.nativescript.widgets.BorderDrawable */): void;
+export function refreshBorderDrawable(view: View, borderDrawable: any /* org.nativescript.widgets.BorderDrawable */, mode?: 'all' | 'background' | 'border'): void;

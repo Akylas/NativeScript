@@ -34,7 +34,10 @@ function fromGradient(gradient: LinearGradient): org.nativescript.widgets.Linear
 }
 
 const pattern = /url\(('|")(.*?)\1\)/;
-export function refreshBorderDrawable(view: View, borderDrawable: org.nativescript.widgets.BorderDrawable) {
+/**
+ * `mode`: `background` draws no border, `border` draws only the border (used as the foreground of a view clipping its children to its rounded corners)
+ */
+export function refreshBorderDrawable(view: View, borderDrawable: org.nativescript.widgets.BorderDrawable, mode: 'all' | 'background' | 'border' = 'all') {
 	const nativeView = <android.view.View>view.nativeViewProtected;
 	const context = nativeView.getContext();
 
@@ -81,10 +84,10 @@ export function refreshBorderDrawable(view: View, borderDrawable: org.nativescri
 			background.borderBottomColor ? background.borderBottomColor.android : blackColor,
 			background.borderLeftColor ? background.borderLeftColor.android : blackColor,
 
-			background.borderTopWidth,
-			background.borderRightWidth,
-			background.borderBottomWidth,
-			background.borderLeftWidth,
+			mode === 'background' ? 0 : background.borderTopWidth,
+			mode === 'background' ? 0 : background.borderRightWidth,
+			mode === 'background' ? 0 : background.borderBottomWidth,
+			mode === 'background' ? 0 : background.borderLeftWidth,
 
 			background.borderTopLeftRadius,
 			background.borderTopRightRadius,
@@ -93,10 +96,10 @@ export function refreshBorderDrawable(view: View, borderDrawable: org.nativescri
 
 			background.clipPath instanceof ClipPathFunction ? background.clipPath.toString() : background.clipPath,
 
-			background.color ? background.color.android : 0,
-			imageUri,
-			bitmap,
-			gradient,
+			mode !== 'border' && background.color ? background.color.android : 0,
+			mode === 'border' ? null : imageUri,
+			mode === 'border' ? null : bitmap,
+			mode === 'border' ? null : gradient,
 			context,
 			background.repeat,
 			background.position,

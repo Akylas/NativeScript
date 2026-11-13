@@ -1,5 +1,6 @@
 ﻿export interface NativeScriptAndroidView extends android.view.View {
 	_cachedDrawable: android.graphics.drawable.Drawable;
+	_borderForeground?: org.nativescript.widgets.BorderDrawable;
 }
 
 export interface NativeScriptUIView extends UIView {
