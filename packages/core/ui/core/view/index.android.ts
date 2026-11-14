@@ -1321,8 +1321,8 @@ export class View extends ViewCommon {
 				ViewHelper.setOutlineProvider(nativeView, background.borderTopLeftRadius, background.borderTopRightRadius, background.borderBottomRightRadius, background.borderBottomLeftRadius);
 			}
 			if (nativeView._borderForeground) {
-				nativeView.setForeground(null);
 				nativeView._borderForeground = null;
+				this._updateForeground();
 			}
 		} else {
 			// the view clips its children to its rounded corners (outline). The border is then drawn by the foreground, over the children:
@@ -1345,10 +1345,10 @@ export class View extends ViewCommon {
 					nativeView._borderForeground = new org.nativescript.widgets.BorderDrawable(layout.getDisplayDensity(), this.toString());
 				}
 				refreshBorderDrawable(this, nativeView._borderForeground, 'border');
-				nativeView.setForeground(nativeView._borderForeground);
+				this._updateForeground();
 			} else if (nativeView._borderForeground) {
-				nativeView.setForeground(null);
 				nativeView._borderForeground = null;
+				this._updateForeground();
 			}
 			if (background.clearFlags & BackgroundClearFlags.CLEAR_BACKGROUND_COLOR) {
 				if (backgroundDrawable) {
@@ -1397,6 +1397,27 @@ export class View extends ViewCommon {
 		}
 		org.nativescript.widgets.Utils.drawBoxShadow(nativeView, nativeArray);
 	}
+	/**
+	 * The native view has a single foreground, shared by the border drawn over the children (`_borderForeground`) and a ripple
+	 * (`_rippleForeground`, set by the ui-core plugin). Both are kept: the border is drawn over the ripple.
+	 */
+	_updateForeground(): void {
+		const nativeView = this.nativeViewProtected;
+		if (!nativeView) {
+			return;
+		}
+		const ripple = nativeView._rippleForeground;
+		const border = nativeView._borderForeground;
+		if (ripple && border) {
+			const layers = Array.create(android.graphics.drawable.Drawable, 2);
+			layers[0] = ripple;
+			layers[1] = border;
+			nativeView.setForeground(new android.graphics.drawable.LayerDrawable(layers));
+		} else {
+			nativeView.setForeground(ripple || border || null);
+		}
+	}
+
 	_redrawNativeBackground(value: android.graphics.drawable.Drawable | Background): void {
 		if (value instanceof Background) {
 			this.onBackgroundOrBorderPropertyChanged();
