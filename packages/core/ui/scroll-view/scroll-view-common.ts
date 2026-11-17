@@ -19,6 +19,7 @@ export abstract class ScrollViewBase extends ContentView {
 	public isScrollEnabled: boolean;
 	public iosContentInsetAdjustmentBehavior: 'never' | 'automatic' | 'scrollableAxes' | 'always';
 	public iosScrollEdgeEffect: CoreTypes.ScrollEdgeEffectType;
+	public clipToBounds: boolean;
 
 	private _addedScrollEvent = false;
 
@@ -128,6 +129,13 @@ export const isScrollEnabledProperty = new Property<ScrollViewBase, boolean>({
 	valueConverter: booleanConverter,
 });
 isScrollEnabledProperty.register(ScrollViewBase);
+
+export const clipToBoundsProperty = new Property<ScrollViewBase, boolean>({
+	name: 'clipToBounds',
+	defaultValue: true,
+	valueConverter: booleanConverter,
+});
+clipToBoundsProperty.register(ScrollViewBase);
 
 const insetAdjustmentConverter = makeParser<'never' | 'automatic' | 'scrollableAxes' | 'always'>(makeValidator('never', 'automatic', 'scrollableAxes', 'always'));
 export const iosContentInsetAdjustmentBehaviorProperty = new Property<ScrollViewBase, 'never' | 'automatic' | 'scrollableAxes' | 'always'>({

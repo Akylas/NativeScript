@@ -1,5 +1,5 @@
 import type { ScrollEventData } from './scroll-view-common';
-import { ScrollViewBase, scrollBarIndicatorVisibleProperty, isScrollEnabledProperty, iosContentInsetAdjustmentBehaviorProperty, iosScrollEdgeEffectProperty } from './scroll-view-common';
+import { ScrollViewBase, clipToBoundsProperty, scrollBarIndicatorVisibleProperty, isScrollEnabledProperty, iosContentInsetAdjustmentBehaviorProperty, iosScrollEdgeEffectProperty } from './scroll-view-common';
 import { layout } from '../../utils';
 import { SDK_VERSION } from '../../utils/constants';
 import { View } from '../core/view';
@@ -84,8 +84,11 @@ export class ScrollView extends ScrollViewBase {
 		if (!this.nativeViewProtected) {
 			return;
 		}
-		// Always set clipsToBounds for scroll-view
-		this.nativeViewProtected.clipsToBounds = true;
+		this.nativeViewProtected.clipsToBounds = this.clipToBounds;
+	}
+
+	[clipToBoundsProperty.setNative](value: boolean) {
+		this._setNativeClipToBounds();
 	}
 
 	protected attachNative() {

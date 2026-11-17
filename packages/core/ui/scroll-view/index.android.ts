@@ -1,5 +1,5 @@
 import type { ScrollEventData } from './scroll-view-common';
-import { ScrollViewBase, scrollBarIndicatorVisibleProperty, isScrollEnabledProperty } from './scroll-view-common';
+import { ScrollViewBase, clipToBoundsProperty, scrollBarIndicatorVisibleProperty, isScrollEnabledProperty } from './scroll-view-common';
 import { layout } from '../../utils';
 import { isUserInteractionEnabledProperty } from '../core/view';
 
@@ -52,6 +52,10 @@ export class ScrollView extends ScrollViewBase {
 		this.nativeViewProtected.setClickable(value);
 		this.nativeViewProtected.setFocusable(value);
 		this.nativeViewProtected.setScrollEnabled(value);
+	}
+
+	[clipToBoundsProperty.setNative](value: boolean) {
+		this.nativeViewProtected.setClipChildren(value);
 	}
 
 	[isScrollEnabledProperty.getDefault](): boolean {
