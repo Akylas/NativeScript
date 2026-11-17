@@ -1049,8 +1049,9 @@ export abstract class ViewBase extends Observable {
 	@profile
 	public requestLayout(): void {
 		// Default implementation for non View instances (like TabViewItem).
+		// The parent can have no layout to request: the one of a Span is a FormattedString.
 		const parent = this.parent;
-		if (parent) {
+		if (typeof parent?.requestLayout === 'function') {
 			this.performLayout();
 		}
 	}
