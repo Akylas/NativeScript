@@ -1106,12 +1106,13 @@ export class iOSApplication extends ApplicationCommon implements IiOSApplication
 
 	protected getSystemAppearance(): 'light' | 'dark' {
 		// userInterfaceStyle is available on UITraitCollection since iOS 12.
-		if ((!__VISIONOS__ && SDK_VERSION <= 11) || !this.rootController) {
+		if (!__VISIONOS__ && SDK_VERSION <= 11) {
 			return null;
 		}
 
-		const userInterfaceStyle = this.rootController.traitCollection.userInterfaceStyle;
-		return this.getSystemAppearanceValue(userInterfaceStyle);
+		// the launch event fires before the window has a root view controller: the screen traits are enough then
+		const traits = this.rootController?.traitCollection ?? this.window?.traitCollection ?? UIScreen.mainScreen.traitCollection;
+		return this.getSystemAppearanceValue(traits.userInterfaceStyle);
 	}
 
 	private getSystemAppearanceValue(userInterfaceStyle: number): 'dark' | 'light' {

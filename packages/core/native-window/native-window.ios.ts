@@ -141,11 +141,9 @@ export class IOSNativeWindow extends NativeWindow {
 		if (!__VISIONOS__ && SDK_VERSION <= 11) {
 			return null;
 		}
-		const rootVC = this._window?.rootViewController;
-		if (!rootVC) {
-			return null;
-		}
-		return this._getSystemAppearanceValue(rootVC.traitCollection.userInterfaceStyle);
+		// the launch event fires before the window has a root view controller: the screen traits are enough then
+		const traits = this._window?.rootViewController?.traitCollection ?? this._window?.traitCollection ?? UIScreen.mainScreen.traitCollection;
+		return this._getSystemAppearanceValue(traits.userInterfaceStyle);
 	}
 
 	protected _getLayoutDirection(): CoreTypes.LayoutDirectionType | null {
