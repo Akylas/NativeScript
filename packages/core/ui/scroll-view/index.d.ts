@@ -84,6 +84,15 @@ export class ScrollView extends ContentView {
 	iosContentInsetAdjustmentBehavior: 'never' | 'automatic' | 'scrollableAxes' | 'always';
 
 	/**
+	 * Whether the content is clipped to the bounds of the scroll view. `false` lets a view of the
+	 * content draw over the edges of the scroll view (an inset page, a view which goes under the safe area).
+	 *
+	 * @default true
+	 * @nsProperty
+	 */
+	clipToBounds: boolean;
+
+	/**
 	 * iOS 26+ only. The scroll edge effect UIKit draws where content scrolls
 	 * under a bar, applied to every edge of the native scroll view.
 	 *
