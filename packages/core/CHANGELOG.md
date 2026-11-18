@@ -2,6 +2,151 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.4](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@9.0.24...@akylas/nativescript@9.1.4) (2026-11-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* - `NativeWindow.iosWindow` is renamed to `NativeWindow.ios`, and its `window`
+  property to `uiWindow`. Migrate to `win.ios?.uiWindow` / `win.ios?.scene`.
+- `NativeWindow.androidWindow` is renamed to `NativeWindow.android`. Migrate to
+  `win.android?.activity`.
+- `SceneEventData.window` is now the `NativeWindow`; the native `UIWindow`
+  moved to `SceneEventData.uiWindow`. A `window` payload key always means a
+  `NativeWindow`.
+- `getWindows()` is now role-filtered and defaults to `application` +
+  `embedded`. Use `getWindows('all')` to enumerate every registered surface.
+- On Android, the `exit` event fires only when the last window finishes;
+  previously it fired for any finishing activity. iOS `exit` is unchanged
+  (process termination).
+- In scene mode, Application `suspend`/`resume` reflect whole-app state. Use a
+  window's `background`/`foreground` events to track a single window.
+- Scene disconnect and activity recreation raise `detached` instead of
+  destroying the window; the window stays registered and its listeners survive.
+- A window clears its event listeners after `close`. Do not re-use a closed
+  window instance.
+- `CSSUtils.getRootViewCssClasses()` no longer includes orientation,
+  appearance, or direction classes; these are per-window — read them from the
+  window instead.
+
+Deprecated (still working): the `launch` event (use `ready` +
+`setWindowContentResolver()`), `shouldDelayLaunchEvent` (now a no-op),
+`Application.orientation()`/`systemAppearance()`/`layoutDirection()` (they
+delegate to `primaryWindow`), and the enumeration getters (`getAllWindows`,
+`getAllScenes`, `getWindowScenes`, `getPrimaryWindow`, `getPrimaryScene`).
+
+Un-deprecated: the `activity*`/`scene*` bridges on `Application` are permanent
+aggregate APIs — they fire for every window, and `args.window` identifies
+which one.
+
+### Features
+
+* **config:** add `runtimePackageName` to `IConfigPlatform` ([#11237](https://github.com/Akylas/NativeScript/issues/11237)) ([8f7d55c](https://github.com/Akylas/NativeScript/commit/8f7d55c08ce2e60dcf011af56d715cf7b317ad66))
+* **core:** add HMR hooks for XML errors, module registry, and modals ([a6b5c75](https://github.com/Akylas/NativeScript/commit/a6b5c75975fa4d7bee91cbdb56c5618cd0936711))
+* **core:** add origin to PropertyChangeData ([#11412](https://github.com/Akylas/NativeScript/issues/11412)) ([c8eea1b](https://github.com/Akylas/NativeScript/commit/c8eea1bcab4fae4ab6d52cca52f1bd45447a5451))
+* **core:** corner-shape css property for continuous corners on iOS ([#11365](https://github.com/Akylas/NativeScript/issues/11365)) ([27a738a](https://github.com/Akylas/NativeScript/commit/27a738a0acd606284fdd88ccdca0df410704dca0))
+* **core:** CSS Color 4 and 5 color functions ([#11532](https://github.com/Akylas/NativeScript/issues/11532)) ([005970f](https://github.com/Akylas/NativeScript/commit/005970f230797e05a2f459bb238cf0bc77595eb2))
+* **core:** flexbox css gutters support ([#11310](https://github.com/Akylas/NativeScript/issues/11310)) ([cee30b7](https://github.com/Akylas/NativeScript/commit/cee30b710a0e8bd5c72eaec9fc2b6ef49cfdf560))
+* **core:** iOS 26 scroll edge effect on ScrollView and ListView ([#11447](https://github.com/Akylas/NativeScript/issues/11447)) ([e1370f1](https://github.com/Akylas/NativeScript/commit/e1370f1acbc9ab9507eb8242d84babba5500df8e))
+* **core:** rem lengths ([#11533](https://github.com/Akylas/NativeScript/issues/11533)) ([4c31046](https://github.com/Akylas/NativeScript/commit/4c31046e7856b2b1b560107123817e81e8774ac7))
+* **core:** shared element transition improvements and toolbox demo ([aaf90df](https://github.com/Akylas/NativeScript/commit/aaf90df4ad99a948ff567a87eb6159eb665c9e37))
+* **core:** support max-width and max-height CSS properties ([#11300](https://github.com/Akylas/NativeScript/issues/11300)) ([6c158ca](https://github.com/Akylas/NativeScript/commit/6c158ca70ecd9797e09402233860e08b2568d992))
+* **core:** swiftui lifecycle boot apps to use standard notification observers for windows ([#11345](https://github.com/Akylas/NativeScript/issues/11345)) ([4985a92](https://github.com/Akylas/NativeScript/commit/4985a92bbc47c400de06677632f90e9701b8dfd1))
+* **core:** type uncaughtErrorPolicy and deprecate discardUncaughtJsExceptions ([#11356](https://github.com/Akylas/NativeScript/issues/11356)) ([197b3bf](https://github.com/Akylas/NativeScript/commit/197b3bf75c6c35caf28d5aa933b6fe0cf557bd18)), closes [ios#409](https://github.com/Akylas/ios/issues/409)
+* cross-platform NativeWindow (scenes, multi-windows, improved API for iOS, and now Android) ([#11181](https://github.com/Akylas/NativeScript/issues/11181)) ([e5ea71e](https://github.com/Akylas/NativeScript/commit/e5ea71e8696603f0267803a3e6f6a2e1b1a78162))
+* **gestures:** pan gesture start position support ([#11435](https://github.com/Akylas/NativeScript/issues/11435)) ([22feaa3](https://github.com/Akylas/NativeScript/commit/22feaa34b5e764e45463f8e44c89e5a62d4683e9))
+* iOS 26.5 types, Android API Level 36 + 37 ([#11369](https://github.com/Akylas/NativeScript/issues/11369)) ([ab3327c](https://github.com/Akylas/NativeScript/commit/ab3327c003bc11dc7d9a36173cc73b2908110970))
+* **ios:** iosContentInsetAdjustmentBehavior for ScrollView with safe-area aware layouts ([#11324](https://github.com/Akylas/NativeScript/issues/11324)) ([f813bcb](https://github.com/Akylas/NativeScript/commit/f813bcb18a98925939362abaedcd5c6c7989b6b9))
+* **ios:** iPhone Duo support ([#11438](https://github.com/Akylas/NativeScript/issues/11438)) ([446aa87](https://github.com/Akylas/NativeScript/commit/446aa87341ca4eabec5f6d07753a44d041807963))
+* **ios:** ListView iosSearchInsetBehavior for search content insets ([#11327](https://github.com/Akylas/NativeScript/issues/11327)) ([e6be90d](https://github.com/Akylas/NativeScript/commit/e6be90d6a7fcf0d43a9960fc2f9565d857954f87))
+* **ios:** shared transition improvements ([#11322](https://github.com/Akylas/NativeScript/issues/11322)) ([eb0f4f1](https://github.com/Akylas/NativeScript/commit/eb0f4f129d7c3fbefc0346d2fcb90d4dac1a5093))
+* **ios:** shared transition interactive morph dismiss with cornerRadius and alpha fixes ([#11321](https://github.com/Akylas/NativeScript/issues/11321)) ([acd446a](https://github.com/Akylas/NativeScript/commit/acd446a4717d7eb19c35fea2446e278c81fb86a8))
+* **scroll-view:** clipToBounds property on iOS and Android ([16d7ea0](https://github.com/Akylas/NativeScript/commit/16d7ea06a37235cf6699a87a47ff5f77665e044b))
+* **TextBase:** localized text transform ([#11302](https://github.com/Akylas/NativeScript/issues/11302)) ([da12301](https://github.com/Akylas/NativeScript/commit/da12301c30136ad8dbd8fdb7df18d7337820b332))
+* **vite:** support plain javascript ([d0f3e76](https://github.com/Akylas/NativeScript/commit/d0f3e7654922999df135be04501be3d8ae0e6b2c))
+
+
+### Bug Fixes
+
+* **android/application:** open windows after the original activity finishes ([#11552](https://github.com/Akylas/NativeScript/issues/11552)) ([3f02413](https://github.com/Akylas/NativeScript/commit/3f02413eebdc241a87a2f8a229fb100131d2aa95))
+* **android:** back press navigates nested frames with history again ([#11432](https://github.com/Akylas/NativeScript/issues/11432)) ([77fdddd](https://github.com/Akylas/NativeScript/commit/77fddddc2bacf5f07d2d07a8ffce35589cc8c5d5))
+* **android:** clip children to the rounded corners and draw the border over them ([2accc57](https://github.com/Akylas/NativeScript/commit/2accc57a47bf8a813356503203488c1f854dcb98))
+* **android:** ContentLayout measures children against unreduced parent spec ([#11439](https://github.com/Akylas/NativeScript/issues/11439)) ([bda2d8f](https://github.com/Akylas/NativeScript/commit/bda2d8f6fc6295021eafa527aab9691ffecf8661))
+* **android:** create prompt and login inputs from the dialog context ([#11582](https://github.com/Akylas/NativeScript/issues/11582)) ([f154847](https://github.com/Akylas/NativeScript/commit/f154847ccc2058af0f77862224062f3abd8b928a)), closes [#11068](https://github.com/Akylas/NativeScript/issues/11068)
+* **android:** don't crash in Fragment.onCreateView on stale-fragment race ([#11264](https://github.com/Akylas/NativeScript/issues/11264)) ([c1096ed](https://github.com/Akylas/NativeScript/commit/c1096eda8f3a3f7b8bad050b518a7ac84e6a419a))
+* **android:** isRealDevice returns false on emulators ([#11575](https://github.com/Akylas/NativeScript/issues/11575)) ([7210a46](https://github.com/Akylas/NativeScript/commit/7210a46c4931e21230745af7fb31c878b0b57b0d)), closes [#9064](https://github.com/Akylas/NativeScript/issues/9064)
+* **android:** keep a ripple foreground with the border drawn over the children ([24cd122](https://github.com/Akylas/NativeScript/commit/24cd1221e29aa4eeedd4ec75cfbae2f603e5917e))
+* **android:** null keyboardType shows the default text keyboard ([#11576](https://github.com/Akylas/NativeScript/issues/11576)) ([a674ec0](https://github.com/Akylas/NativeScript/commit/a674ec03df372d271e98a6b4a1cc9d05ab6a1c06)), closes [#9194](https://github.com/Akylas/NativeScript/issues/9194)
+* **android:** re-apply edge-to-edge system bar style on appearance change ([#11418](https://github.com/Akylas/NativeScript/issues/11418)) ([e555c9d](https://github.com/Akylas/NativeScript/commit/e555c9db44ea7e7f906e0f2bbb8615dfb7b7fd48))
+* **android:** resume Frame navigation after early Activity attachment ([#11640](https://github.com/Akylas/NativeScript/issues/11640)) ([fb68529](https://github.com/Akylas/NativeScript/commit/fb68529206dee49e147da946685fe729ad4f4694))
+* **android:** update view imageSource when image is set asynchronously ([#11215](https://github.com/Akylas/NativeScript/issues/11215)) ([6a84bdc](https://github.com/Akylas/NativeScript/commit/6a84bdc853fcdecbcee48c6547bf9a66eb366c2d))
+* **android:** whitelist more native APIs used by core ([fa52109](https://github.com/Akylas/NativeScript/commit/fa52109a7f51ec1182572bc2f6cc7eb492bea210))
+* **core:** a `not` media query negates the whole query ([#11594](https://github.com/Akylas/NativeScript/issues/11594)) ([12b6a52](https://github.com/Akylas/NativeScript/commit/12b6a520fce8089c822d411a21205fcd0a93286e))
+* **core:** added string types for LengthType properties ([#11274](https://github.com/Akylas/NativeScript/issues/11274)) ([f4a6132](https://github.com/Akylas/NativeScript/commit/f4a61320b0d16ebb92056c3e2e9a74220a030ed7))
+* **core:** android edge to edge stabilization ([#11434](https://github.com/Akylas/NativeScript/issues/11434)) ([9f2e072](https://github.com/Akylas/NativeScript/commit/9f2e07216e252da96c52e427361bf64399f89dbf))
+* **core:** appearance APIs before app start, replaceable Android handlers, explicit systemAppearanceChanged() ([#11537](https://github.com/Akylas/NativeScript/issues/11537)) ([26f5032](https://github.com/Akylas/NativeScript/commit/26f5032e0570792788872c6ac827303b9b744b6c))
+* **core:** css lost to a local value or a late attribute assignment ([#11371](https://github.com/Akylas/NativeScript/issues/11371)) ([2b2842e](https://github.com/Akylas/NativeScript/commit/2b2842eb6b66ef086891745dbb8dab58c13d0d2a))
+* **core:** css var() fallbacks, order-independent custom properties, and no crash on unresolvable ones ([#11527](https://github.com/Akylas/NativeScript/issues/11527)) ([1044838](https://github.com/Akylas/NativeScript/commit/104483872bf3114978f4b1cef4aeac92ca4ef3d1))
+* **core:** custom application delegate scene wiring and non-scene launch timing ([#11367](https://github.com/Akylas/NativeScript/issues/11367)) ([3277309](https://github.com/Akylas/NativeScript/commit/327730935a1ae8a6be38b6b4c5ebe1ff660f05d6))
+* **core:** detach SegmentedBar/TabView items from a previous parent before adopting them ([#11353](https://github.com/Akylas/NativeScript/issues/11353)) ([c99f310](https://github.com/Akylas/NativeScript/commit/c99f3100c177b5109a7ce1e42a47022478c229b5))
+* **core:** do not request a layout from a parent which has none ([0c8812c](https://github.com/Akylas/NativeScript/commit/0c8812c4c6ce8da60d870c8c6ff36451d1bb94d0))
+* **core:** expand CSS shorthands registered after the stylesheet was parsed ([#11553](https://github.com/Akylas/NativeScript/issues/11553)) ([46ff64c](https://github.com/Akylas/NativeScript/commit/46ff64c88213fd4a1031db74cc410b752b6501e4))
+* **core:** getRandomValues fills the caller's typed array on iOS ([#11405](https://github.com/Akylas/NativeScript/issues/11405)) ([9154f61](https://github.com/Akylas/NativeScript/commit/9154f617d48f75fd24798dcad97853427a1b5941))
+* **core:** guard undefined navigation queue entry in Frame ([#11326](https://github.com/Akylas/NativeScript/issues/11326)) ([d2b8ab9](https://github.com/Akylas/NativeScript/commit/d2b8ab982535768e4ffbc68ff4975789eb0ed243))
+* **core:** improve view teardown process for reusable views ([#11260](https://github.com/Akylas/NativeScript/issues/11260)) ([012c1b1](https://github.com/Akylas/NativeScript/commit/012c1b1bd2742b58467caec896cd66771d307723))
+* **core:** insert iOS child views relative to their sibling, not by raw index ([#11406](https://github.com/Akylas/NativeScript/issues/11406)) ([5fa2a5b](https://github.com/Akylas/NativeScript/commit/5fa2a5bd9f3013f3c2ff6691a3d0faf6535b7250))
+* **core:** install global polyfills only when missing, without materializing lazy runtime globals ([#11360](https://github.com/Akylas/NativeScript/issues/11360)) ([21d59d6](https://github.com/Akylas/NativeScript/commit/21d59d695b4679418b5fd48d18106e95676599e3))
+* **core:** invalidate sibling combinator selector matches on child insert/remove ([#11348](https://github.com/Akylas/NativeScript/issues/11348)) ([e0ed4bb](https://github.com/Akylas/NativeScript/commit/e0ed4bbc3ee1526047605d07cd9d6b215e9731ef))
+* **core:** iOS box-shadow alpha was applied twice ([#11407](https://github.com/Akylas/NativeScript/issues/11407)) ([d4c1469](https://github.com/Akylas/NativeScript/commit/d4c146913ff1cc61928a5033d9fe5d875a78daf2))
+* **core:** iOS child index mapping skips the glass effect subview ([#11410](https://github.com/Akylas/NativeScript/issues/11410)) ([3552172](https://github.com/Akylas/NativeScript/commit/355217286915545b43dbc6f5f2887282c8094f37))
+* **core:** iOS double free of V8-owned buffers; getRandomValues view handling ([#11370](https://github.com/Akylas/NativeScript/issues/11370)) ([f609f17](https://github.com/Akylas/NativeScript/commit/f609f1752c6ed9cd804cd22af89f85ce45f06adb))
+* **core:** ios scroll-view ignores the content inset UIKit adds ([35ed756](https://github.com/Akylas/NativeScript/commit/35ed756bd69d073a0b212dda845008276b0fe67f))
+* **core:** iOS scrollableHeight and scrollableWidth include the end content inset ([#11548](https://github.com/Akylas/NativeScript/issues/11548)) ([2646b2c](https://github.com/Akylas/NativeScript/commit/2646b2c6827b136a5c606cb86d04e2e6d28ea736))
+* **core:** iOS scrollToVerticalOffset lands past the offset when there is a content inset ([#11409](https://github.com/Akylas/NativeScript/issues/11409)) ([c9250ec](https://github.com/Akylas/NativeScript/commit/c9250ecbed501175ee493d9d6578dbf087d27349))
+* **core:** keep function values intact when splitting css shorthands ([#11364](https://github.com/Akylas/NativeScript/issues/11364)) ([ac6e49e](https://github.com/Akylas/NativeScript/commit/ac6e49efa711d1258e35675e579452df1422226b))
+* **core:** keyframes without a 0% or 100% keyframe animate from and to the view's own values ([#11528](https://github.com/Akylas/NativeScript/issues/11528)) ([0ac0489](https://github.com/Akylas/NativeScript/commit/0ac04893b2fbab46a88e10e18bfaebe876f5bdb1))
+* **core:** make background: none clear the background color ([#11536](https://github.com/Akylas/NativeScript/issues/11536)) ([67bf7ee](https://github.com/Akylas/NativeScript/commit/67bf7ee007dd6f12e8c06633fddd3c8d16ba7735))
+* **core:** nested tab frames stay loaded and never outrank the selected tab ([#11446](https://github.com/Akylas/NativeScript/issues/11446)) ([75cbfc5](https://github.com/Akylas/NativeScript/commit/75cbfc55bb7e4c3dcf678f4dca8df0cfde10e7b3))
+* **core:** prevent goBack from removing topmost frame from stack ([#11437](https://github.com/Akylas/NativeScript/issues/11437)) ([d486c3b](https://github.com/Akylas/NativeScript/commit/d486c3b3929699be288176853a048ceb4484e610))
+* **core:** register touch animations once per view ([#11641](https://github.com/Akylas/NativeScript/issues/11641)) ([ff081de](https://github.com/Akylas/NativeScript/commit/ff081de9aa8d508be54c9aeebe2fc376119ac5b6))
+* **core:** remove once listeners by identity, not stale index ([#11306](https://github.com/Akylas/NativeScript/issues/11306)) ([8534feb](https://github.com/Akylas/NativeScript/commit/8534febef927226a9a00c7c1800d50b4ce124488))
+* **core:** replay layout requests suppressed while resuming native updates ([4e03c54](https://github.com/Akylas/NativeScript/commit/4e03c545f473432ad6082bbfb75226181adbea15))
+* **core:** resolve ESM circular imports and tighten types for Vite ([c6e6442](https://github.com/Akylas/NativeScript/commit/c6e6442c742ffedc5844da3cf6746a5fe7aa6d30))
+* **core:** resolve var() in css animations and keyframes per view ([#11534](https://github.com/Akylas/NativeScript/issues/11534)) ([2c7f149](https://github.com/Akylas/NativeScript/commit/2c7f1492745a23c8eb4142929fa90980e1eefc81))
+* **core:** restore application lifecycle events and window resolution under UIScene ([#11373](https://github.com/Akylas/NativeScript/issues/11373)) ([7c5469e](https://github.com/Akylas/NativeScript/commit/7c5469e48106bc34d6ebf84eb17c5133e3c519d4))
+* **core:** restore the css value when a local style value is reset ([#11520](https://github.com/Akylas/NativeScript/issues/11520)) ([2f1ce03](https://github.com/Akylas/NativeScript/commit/2f1ce03b418b16fa877c1fbaf68269b5f39a53cf))
+* **core:** restore the per-side padding setNative protocol ([#11368](https://github.com/Akylas/NativeScript/issues/11368)) ([93a59db](https://github.com/Akylas/NativeScript/commit/93a59db63e01cf723a9e77fb045ce087ac3dd464))
+* **core:** scene session discard no longer retires a live window ([#11376](https://github.com/Akylas/NativeScript/issues/11376)) ([399263d](https://github.com/Akylas/NativeScript/commit/399263d829edca17832a3f8ac3455b0c691af1ea))
+* **core:** split className on any whitespace ([#11577](https://github.com/Akylas/NativeScript/issues/11577)) ([16d8ef1](https://github.com/Akylas/NativeScript/commit/16d8ef12b8837542364e5d4bdf3a01299149c5ed)), closes [#9402](https://github.com/Akylas/NativeScript/issues/9402)
+* **core:** TextDecoder decodes only the bytes of a typed array view ([#11578](https://github.com/Akylas/NativeScript/issues/11578)) ([24c8311](https://github.com/Akylas/NativeScript/commit/24c8311d07dc89296e97ab53efe0b2eec01d71e6)), closes [#9941](https://github.com/Akylas/NativeScript/issues/9941)
+* **core:** unresolved var() unsets the whole value and invalid color-mix() no longer renders white ([#11593](https://github.com/Akylas/NativeScript/issues/11593)) ([c7f905d](https://github.com/Akylas/NativeScript/commit/c7f905d03c054b2b43ac1419a489d5fa2282a3d6))
+* **core:** use enumeratorAtPath for iOS shallow entity enumeration ([#11182](https://github.com/Akylas/NativeScript/issues/11182)) ([717820a](https://github.com/Akylas/NativeScript/commit/717820a842eb6934e2880aee76f81acfce6ba915))
+* **debugger:** exclude internal props from devtools elements ([#11344](https://github.com/Akylas/NativeScript/issues/11344)) ([f5ce7ad](https://github.com/Akylas/NativeScript/commit/f5ce7ad96bfecdef917eae84368405b43acce529))
+* **http:** report the real method and body to the network inspector ([#11574](https://github.com/Akylas/NativeScript/issues/11574)) ([0fda70c](https://github.com/Akylas/NativeScript/commit/0fda70ce788e2abd80bae69b23a9507ce29a8113)), closes [#6897](https://github.com/Akylas/NativeScript/issues/6897)
+* **ios:** apply box shadow alpha only once ([cf9b89a](https://github.com/Akylas/NativeScript/commit/cf9b89a5bef9d7855ef91cb84bfa00da5b82b8eb)), closes [#00000033](https://github.com/Akylas/NativeScript/issues/00000033)
+* **ios:** clear non-uniform border layer when all border widths go to 0 ([f0d9356](https://github.com/Akylas/NativeScript/commit/f0d9356554950ef0d1093469a918c5f9ad47eca5))
+* **ios:** deliver launch urls, activities and quick actions to scene apps ([#11518](https://github.com/Akylas/NativeScript/issues/11518)) ([92c4f40](https://github.com/Akylas/NativeScript/commit/92c4f400e030d774e5624f7def35cf3eec1e0d50))
+* **ios:** ensure notification event is passed to app start when not delaying launch event ([#11347](https://github.com/Akylas/NativeScript/issues/11347)) ([2b880eb](https://github.com/Akylas/NativeScript/commit/2b880eb591733c7df9c879151a1089afb76c67f9))
+* **ios:** guard interactiveContentPopGestureRecognizer for apps built with pre-26 SDKs ([#11313](https://github.com/Akylas/NativeScript/issues/11313)) ([aea175f](https://github.com/Akylas/NativeScript/commit/aea175f625edadca23a5e81da4cd833e426038d3))
+* **ios:** guard safe-area helpers against detached NS subtrees ([#11325](https://github.com/Akylas/NativeScript/issues/11325)) ([c5cef16](https://github.com/Akylas/NativeScript/commit/c5cef1641de10226764f61fbaf5f6512e6585a10))
+* **ios:** handle UIColor backgroundColor in Switch ([#11267](https://github.com/Akylas/NativeScript/issues/11267)) ([899ab7c](https://github.com/Akylas/NativeScript/commit/899ab7c76e499cdec7a134475c2c50e0316d1bf4))
+* **ios:** keep a keystroke from repeating what a textChange listener wrote ([#11443](https://github.com/Akylas/NativeScript/issues/11443)) ([3039aa7](https://github.com/Akylas/NativeScript/commit/3039aa7c2b1af99beed5028359ac5253528ed412))
+* **ios:** measure padded LiquidGlass content inside its padding ([#11562](https://github.com/Akylas/NativeScript/issues/11562)) ([4e3ffd2](https://github.com/Akylas/NativeScript/commit/4e3ffd2dfb6eceabd97a2c3376b7b7ca199a3853))
+* **ios:** never re-attach torn-down ListView item views ([#11642](https://github.com/Akylas/NativeScript/issues/11642)) ([ce4102b](https://github.com/Akylas/NativeScript/commit/ce4102b02fac4c13362c4e481fc38fe5b62e0aa4))
+* **ios:** preserve lazy controller loading during layout invalidation ([#11587](https://github.com/Akylas/NativeScript/issues/11587)) ([40c1682](https://github.com/Akylas/NativeScript/commit/40c16823aadb38f60db4f53d6d9b4f2b94aaab89))
+* **ios:** preserve native content Back for default Frame navigation ([#11590](https://github.com/Akylas/NativeScript/issues/11590)) ([c154793](https://github.com/Akylas/NativeScript/commit/c1547939030f778dec534e8d7f959ba386243f90))
+* **ios:** prevent duplicate suspend/resume events when using UIScenes ([#11269](https://github.com/Akylas/NativeScript/issues/11269)) ([9be95e7](https://github.com/Akylas/NativeScript/commit/9be95e7704cb5c2bb15c1ff21f2777712094bb2e))
+* **ios:** raise orientationChanged from scene geometry updates ([#11638](https://github.com/Akylas/NativeScript/issues/11638)) ([9875c2e](https://github.com/Akylas/NativeScript/commit/9875c2ee5575eca901396aff42d0bc37ad519682))
+* **ios:** re-attach root view after in-process runtime reload ([#11261](https://github.com/Akylas/NativeScript/issues/11261)) ([b381e5f](https://github.com/Akylas/NativeScript/commit/b381e5fbe031ff99b4c4a0714f6264b1d7ca3740))
+* **ios:** request layout when a css property without native setter changes ([06777ea](https://github.com/Akylas/NativeScript/commit/06777ea5a9a111909eb9c5c1a5a6e1cf8faf1e85))
+* **ios:** skip Switch color updates without a native view ([#11579](https://github.com/Akylas/NativeScript/issues/11579)) ([4764c37](https://github.com/Akylas/NativeScript/commit/4764c37ef1c594fe1e94416e78690a70bc53e4cc)), closes [#10101](https://github.com/Akylas/NativeScript/issues/10101)
+* **ios:** TabView search tab placement on iOS 27 ([#11509](https://github.com/Akylas/NativeScript/issues/11509)) ([0955953](https://github.com/Akylas/NativeScript/commit/0955953e3fac04c7f3447baedf8af8b5ef59bc87))
+* **ios:** update swipe back gesture from Page property ([#11312](https://github.com/Akylas/NativeScript/issues/11312)) ([36be5f4](https://github.com/Akylas/NativeScript/commit/36be5f4b536f155fd96dea675574662708891aec))
+* **ios:** use parent padding in flexbox child measure specs ([#11469](https://github.com/Akylas/NativeScript/issues/11469)) ([1d61f21](https://github.com/Akylas/NativeScript/commit/1d61f211b3d27c19c2ce896dc3c3185a83d7cbb8))
+* keep escaped commas inside CSS selectors ([#11463](https://github.com/Akylas/NativeScript/issues/11463)) ([19b7071](https://github.com/Akylas/NativeScript/commit/19b70712439f62c895562a9a57144c10b9dab1c1))
+* **listview:** correct item template resolution in sectioned ListView ([#11184](https://github.com/Akylas/NativeScript/issues/11184)) ([49e37ec](https://github.com/Akylas/NativeScript/commit/49e37ecf9f75dad4abf0c24d9c48cf2aa2dbb150))
+* **transition:** prevent circular refs on TransitionListener ([#11136](https://github.com/Akylas/NativeScript/issues/11136)) ([effbdab](https://github.com/Akylas/NativeScript/commit/effbdabb7f20d06eb9c646ff4b2aa7546185b7f7))
+
 ### [9.0.24](https://github.com/Akylas/NativeScript/compare/@akylas/nativescript@9.0.22...@akylas/nativescript@9.0.24) (2026-10-09)
 
 
