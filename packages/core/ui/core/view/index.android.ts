@@ -1402,7 +1402,7 @@ export class View extends ViewCommon {
 	 * (`_rippleForeground`, set by the ui-core plugin). Both are kept: the border is drawn over the ripple.
 	 */
 	_updateForeground(): void {
-		const nativeView = this.nativeViewProtected;
+		const nativeView = <NativeScriptAndroidView>this.nativeViewProtected;
 		if (!nativeView) {
 			return;
 		}
