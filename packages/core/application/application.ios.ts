@@ -582,6 +582,17 @@ class SceneDelegate extends UIResponder implements UIWindowSceneDelegate {
 		deliverUserActivity(windowScene, Application.ios._getWindowForScene(windowScene), userActivity);
 	}
 
+	// Scene-based apps get rotation here rather than through the status bar orientation notification.
+	// iOS 26+ calls both callbacks per rotation, earlier versions only the coordinate-space one;
+	// _setOrientation drops the repeat.
+	windowSceneDidUpdateEffectiveGeometry(windowScene: UIWindowScene, previousEffectiveGeometry: UIWindowSceneGeometry): void {
+		Application.ios._getWindowForScene(windowScene)?._syncOrientation();
+	}
+
+	windowSceneDidUpdateCoordinateSpaceInterfaceOrientationTraitCollection(windowScene: UIWindowScene, previousCoordinateSpace: UICoordinateSpace, previousInterfaceOrientation: UIInterfaceOrientation, previousTraitCollection: UITraitCollection): void {
+		Application.ios._getWindowForScene(windowScene)?._syncOrientation();
+	}
+
 	windowScenePerformActionForShortcutItemCompletionHandler(windowScene: UIWindowScene, shortcutItem: UIApplicationShortcutItem, completionHandler: (p1: boolean) => void): void {
 		deliverShortcutAction(windowScene, Application.ios._getWindowForScene(windowScene), shortcutItem, completionHandler);
 	}
@@ -1421,21 +1432,7 @@ export class iOSApplication extends ApplicationCommon implements IiOSApplication
 		// The notification is app-wide, but scenes rotate independently, so every attached
 		// window is refreshed from its own scene.
 		for (const nativeWindow of this._windows) {
-			if (nativeWindow.state !== 'attached') {
-				continue;
-			}
-
-			const orientation = nativeWindow.ios?.scene?.interfaceOrientation ?? UIApplication.sharedApplication.statusBarOrientation;
-			const [newOrientation, degrees] = this.getOrientationValue(orientation);
-
-			if (nativeWindow.isPrimary) {
-				// App-level event first so that it carries the device rotation `degrees`
-				// (the window's own change event, which would otherwise be mirrored to the
-				// app without it, then finds the app already up to date).
-				this.setOrientation(newOrientation, degrees);
-			}
-
-			nativeWindow._setOrientation(newOrientation);
+			(nativeWindow as IOSNativeWindow)._syncOrientation();
 		}
 	}
 

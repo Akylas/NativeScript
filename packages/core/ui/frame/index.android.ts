@@ -136,7 +136,7 @@ export class Frame extends FrameBase {
 
 		// _onAttachedToWindow called from OS again after it was detach
 		// still happens with androidx.fragment:1.3.2
-		const activity = androidUtils.getCurrentActivity();
+		const activity = this._android.activity;
 		const lifecycleState = (activity as androidx.fragment.app.FragmentActivity)?.getLifecycle?.()?.getCurrentState() || androidx.lifecycle.Lifecycle.State.CREATED;
 		if ((this._manager && this._manager.isDestroyed()) || !lifecycleState.isAtLeast(androidx.lifecycle.Lifecycle.State.CREATED)) {
 			return;
@@ -239,6 +239,10 @@ export class Frame extends FrameBase {
 
 	onLoaded(): void {
 		super.onLoaded();
+		// Recreation can attach the native view before Activity reaches CREATED.
+		if (!this._attachedToWindow && this.nativeViewProtected?.isAttachedToWindow()) {
+			this._onAttachedToWindow();
+		}
 	}
 
 	private disposeCurrentFragment(): void {
@@ -481,7 +485,7 @@ export class Frame extends FrameBase {
 			// so that we can set the current entry
 			// it only needs to be done on the return transition
 			if (entry.returnTransitionListener) {
-				entry.returnTransitionListener.backEntry = backstackEntry;
+				entry.returnTransitionListener.backEntry = new WeakRef(backstackEntry);
 			}
 
 			// we only hide the fragment to fix some black blick issues with GLSurfaceView and GLTextureView
