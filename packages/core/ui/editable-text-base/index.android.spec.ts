@@ -12,7 +12,7 @@ vi.hoisted(() => {
 });
 
 import { EditableTextBase } from './index.android';
-import { keyboardTypeProperty } from './editable-text-base-common';
+import { editableProperty, keyboardTypeProperty, selectableProperty } from './editable-text-base-common';
 
 function inputTypeFor(value: unknown): number {
 	const target = { _setInputType: vi.fn() };
@@ -40,5 +40,56 @@ describe('EditableTextBase keyboardType (Android)', () => {
 
 	it('maps named keyboard types', () => {
 		expect(inputTypeFor('integer')).toBe(InputType.TYPE_CLASS_NUMBER);
+	});
+});
+
+describe('EditableTextBase editable and selectable (Android)', () => {
+	function applyEditable(editable: boolean, selectable: boolean) {
+		const nativeView = {
+			getKeyListener: vi.fn(),
+			setKeyListener: vi.fn(),
+			setFocusable: vi.fn(),
+			setFocusableInTouchMode: vi.fn(),
+			setLongClickable: vi.fn(),
+			setClickable: vi.fn(),
+			setShowSoftInputOnFocus: vi.fn(),
+			setTextIsSelectable: vi.fn(),
+		};
+		const target = Object.create(EditableTextBase.prototype);
+		Object.defineProperties(target, {
+			nativeTextViewProtected: { value: nativeView },
+			editable: { value: editable },
+			selectable: { value: selectable },
+		});
+		(EditableTextBase.prototype as any)[editableProperty.setNative].call(target, editable);
+		return { target, nativeView };
+	}
+
+	it('keeps read-only text selectable', () => {
+		const { nativeView } = applyEditable(false, true);
+		expect(nativeView.setKeyListener).toHaveBeenCalledWith(null);
+		expect(nativeView.setFocusable).toHaveBeenCalledWith(true);
+		expect(nativeView.setLongClickable).toHaveBeenCalledWith(true);
+		expect(nativeView.setShowSoftInputOnFocus).toHaveBeenCalledWith(false);
+	});
+
+	it('makes read-only text not selectable when asked', () => {
+		const { nativeView } = applyEditable(false, false);
+		expect(nativeView.setFocusable).toHaveBeenCalledWith(false);
+		expect(nativeView.setLongClickable).toHaveBeenCalledWith(false);
+	});
+
+	it('shows the keyboard of editable text', () => {
+		const { nativeView } = applyEditable(true, false);
+		expect(nativeView.setFocusable).toHaveBeenCalledWith(true);
+		expect(nativeView.setShowSoftInputOnFocus).toHaveBeenCalledWith(true);
+	});
+
+	it('keeps the editable and selectable state when selectable changes', () => {
+		const { target, nativeView } = applyEditable(false, true);
+		nativeView.setFocusable.mockClear();
+		(EditableTextBase.prototype as any)[selectableProperty.setNative].call(target, true);
+		expect(nativeView.setTextIsSelectable).toHaveBeenCalledWith(true);
+		expect(nativeView.setFocusable).toHaveBeenLastCalledWith(true);
 	});
 });

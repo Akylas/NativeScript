@@ -73,6 +73,14 @@ export class EditableTextBase extends TextBase {
 	editable: boolean;
 
 	/**
+	 * Gets or sets whether the text can be selected, also when it is not `editable`.
+	 *
+	 * @default true
+	 * @nsProperty
+	 */
+	selectable: boolean;
+
+	/**
 	 * Enables or disables autocorrection.
 	 *
 	 * @nsProperty

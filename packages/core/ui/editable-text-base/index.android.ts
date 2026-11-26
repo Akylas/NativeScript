@@ -373,17 +373,27 @@ export abstract class EditableTextBase extends EditableTextBaseCommon {
 			}
 			nativeView.setKeyListener(null);
 		}
-		nativeView.setFocusable(value);
-		nativeView.setFocusableInTouchMode(value);
-		nativeView.setLongClickable(value);
-		nativeView.setClickable(value);
+		nativeView.setShowSoftInputOnFocus(value);
+		this.applyInteractivity();
 	}
 
 	[selectableProperty.getDefault](): boolean {
 		return true;
 	}
 	[selectableProperty.setNative](value: boolean) {
-		this.nativeViewProtected.setTextIsSelectable(value);
+		this.nativeTextViewProtected.setTextIsSelectable(value);
+		// it resets what `editable` set
+		this.applyInteractivity();
+	}
+
+	/** Read-only text stays focusable and long clickable while it is selectable */
+	private applyInteractivity() {
+		const nativeView = this.nativeTextViewProtected;
+		const interactive = this.editable || this.selectable;
+		nativeView.setFocusable(interactive);
+		nativeView.setFocusableInTouchMode(interactive);
+		nativeView.setLongClickable(interactive);
+		nativeView.setClickable(interactive);
 	}
 
 	[autocapitalizationTypeProperty.getDefault](): 'none' | 'words' | 'sentences' | 'allcharacters' | string {
