@@ -1,5 +1,5 @@
 import { profile } from '../profiling';
-import { ContentView } from '../ui/content-view';
+import type { ContentView } from '../ui/content-view';
 import type { View } from '../ui/core/view';
 import { isEmbedded } from '../ui/embedding';
 import { IOSHelper } from '../ui/core/view/view-helper';
@@ -19,7 +19,7 @@ import type { WindowRole } from '../native-window/window-base';
 import { NativeWindowEvents } from '../native-window/native-window-interfaces';
 import type { NativeWindowEventData, WindowContentRequest, WindowOpenOptions } from '../native-window/native-window-interfaces';
 import { CoreTypes } from '../core-types';
-import { getiOSWindow, setApplicationPropertiesCallback, setAppMainEntry, setiOSWindow, setRootView, setToggleApplicationEventListenersCallback } from './helpers-common';
+import { createContentView, getiOSWindow, setApplicationPropertiesCallback, setAppMainEntry, setiOSWindow, setRootView, setToggleApplicationEventListenersCallback } from './helpers-common';
 
 @NativeClass
 class NotificationObserver extends NSObject {
@@ -1223,7 +1223,7 @@ export class iOSApplication extends ApplicationCommon implements IiOSApplication
 	 * window's actual root view (see `_contentHosts`).
 	 */
 	private setHostedWindowContent(window: NativeWindow, userView: View): void {
-		const host = new ContentView();
+		const host = createContentView() as ContentView;
 		this._contentHosts.add(host);
 
 		// Sets the host up as a root view (CSS classes, native controller) and, for the primary
@@ -1277,7 +1277,7 @@ export class iOSApplication extends ApplicationCommon implements IiOSApplication
 			this._rootView._onRootViewReset();
 		}
 
-		const rootView = new ContentView();
+		const rootView = createContentView() as ContentView;
 		this._contentHosts.add(rootView);
 		const controller = this.getViewController(rootView);
 
