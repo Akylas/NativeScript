@@ -772,6 +772,11 @@ const borderColorProperty = new ShorthandProperty<Style, string | Color>({
 		}
 	},
 	converter: function (value) {
+		// an empty string resets the colors, like unsetValue
+		if (value === '') {
+			value = unsetValue;
+		}
+
 		if (typeof value === 'string') {
 			const colors = parseBorderColorPositioning(value);
 
