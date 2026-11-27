@@ -1,5 +1,6 @@
 ﻿import { View, CustomLayoutView, AddChildFromBuilder } from '../core/view';
 import { layout } from '../../utils';
+import { setContentViewFactory } from '../../application/helpers-common';
 
 /**
  * Represents a View that has a single child - content.
@@ -104,3 +105,4 @@ export class ContentView extends CustomLayoutView implements AddChildFromBuilder
 }
 
 ContentView.prototype.recycleNativeView = 'auto';
+setContentViewFactory(() => new ContentView());

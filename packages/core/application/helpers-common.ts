@@ -175,6 +175,18 @@ export function setApplicationPropertiesCallback(callback: () => ApplicationProp
 	_applicationPropertiesCallback = callback;
 }
 
+// Lets the application create its root host without importing the UI stack, which workers must not load
+let _contentViewFactory: () => any /* ContentView */;
+export function setContentViewFactory(factory: () => any /* ContentView */) {
+	_contentViewFactory = factory;
+}
+export function createContentView(): any /* ContentView */ {
+	if (!_contentViewFactory) {
+		throw new Error('ContentView is not registered: import "@nativescript/core/ui/content-view" before creating the root view.');
+	}
+	return _contentViewFactory();
+}
+
 let _a11yUpdatePropertiesCallback: (view: any /* View */) => void;
 export function setA11yUpdatePropertiesCallback(callback: (view: any /* View */) => void) {
 	_a11yUpdatePropertiesCallback = callback;
